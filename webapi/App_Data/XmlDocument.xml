@@ -1,0 +1,2259 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>webapi</name>
+    </assembly>
+    <members>
+        <member name="T:webapi.LoginController">
+            <summary>
+            login controller class for authenticate users
+            </summary>
+        </member>
+        <member name="M:webapi.LoginController.ChangePassword(Models.LoginRequest)">
+            <summary>
+            Cambiar password
+            </summary>
+            <param name="loginChange"></param>
+            <returns></returns>
+        </member>
+        <member name="M:webapi.LoginController.Authenticate(Models.LoginRequest)">
+            <summary>
+            Identificar usuario
+            </summary>
+            <param name="login"></param>
+            <returns></returns>
+        </member>
+        <member name="T:webapi.TokenGenerator">
+            <summary>
+            JWT Token generator class using "secret-key"
+            more info: https://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
+            </summary>
+        </member>
+        <member name="M:webapi.TokenGenerator.CalculaRetardo(System.String)">
+            <summary>
+            Añadir tiempos de retardo a las peticiones 
+            </summary>
+            <param name="nifRegante"></param>
+            <returns></returns>
+        </member>
+        <member name="T:webapi.TokenValidationHandler">
+            <summary>
+            Token validator for Authorization Request using a DelegatingHandler
+            </summary>
+        </member>
+        <member name="T:webapi.Utiles.Extensiones">
+            <summary>
+            Utiles de cadenas
+            </summary>
+        </member>
+        <member name="M:webapi.Utiles.Extensiones.Quoted(System.String)">
+            <summary>
+            Añadir ' al comienzo y al final de del string (sino los tuviera ya)
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="T:webapi.Encriptacion">
+            <summary>
+            This class uses a symmetric key algorithm (Rijndael/AES) to encrypt and 
+            decrypt data. As long as encryption and decryption routines use the same
+            parameters to generate the keys, the keys are guaranteed to be the same.
+            class uses static functions with duplicate code to make it easier to
+            demonstrate encryption and decryption logic. In a real-life application, 
+            this may not be the most efficient way of handling encryption, so - as
+            soon as you feel comfortable with it - you may want to redesign this class.
+            </summary>
+        </member>
+        <member name="M:webapi.Encriptacion.Encrypt(System.String,System.String,System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            Encrypts specified plaintext using Rijndael symmetric key algorithm
+            and returns a base64-encoded result.
+            </summary>
+            <param name="plainText">
+            Plaintext value to be encrypted.
+            </param>
+            <param name="passPhrase">
+            Passphrase from which a pseudo-random password will be derived. The
+            derived password will be used to generate the encryption key.
+            Passphrase can be any string. In this example we assume that this
+            passphrase is an ASCII string.
+            </param>
+            <param name="saltValue">
+            Salt value used along with passphrase to generate password. Salt can
+            be any string. In this example we assume that salt is an ASCII string.
+            </param>
+            <param name="hashAlgorithm">
+            Hash algorithm used to generate password. Allowed values are: "MD5" and
+            "SHA1". SHA1 hashes are a bit slower, but more secure than MD5 hashes.
+            </param>
+            <param name="passwordIterations">
+            Number of iterations used to generate password. One or two iterations
+            should be enough.
+            </param>
+            <param name="initVector">
+            Initialization vector (or IV). This value is required to encrypt the
+            first block of plaintext data. For RijndaelManaged class IV must be 
+            exactly 16 ASCII characters long.
+            </param>
+            <param name="keySize">
+            Size of encryption key in bits. Allowed values are: 128, 192, and 256. 
+            Longer keys are more secure than shorter keys.
+            </param>
+            <returns>
+            Encrypted value formatted as a base64-encoded string.
+            </returns>
+        </member>
+        <member name="M:webapi.Encriptacion.Decrypt(System.String,System.String,System.String,System.String,System.Int32,System.String,System.Int32)">
+            <summary>
+            Decrypts specified ciphertext using Rijndael symmetric key algorithm.
+            </summary>
+            <param name="cipherText">
+            Base64-formatted ciphertext value.
+            </param>
+            <param name="passPhrase">
+            Passphrase from which a pseudo-random password will be derived. The
+            derived password will be used to generate the encryption key.
+            Passphrase can be any string. In this example we assume that this
+            passphrase is an ASCII string.
+            </param>
+            <param name="saltValue">
+            Salt value used along with passphrase to generate password. Salt can
+            be any string. In this example we assume that salt is an ASCII string.
+            </param>
+            <param name="hashAlgorithm">
+            Hash algorithm used to generate password. Allowed values are: "MD5" and
+            "SHA1". SHA1 hashes are a bit slower, but more secure than MD5 hashes.
+            </param>
+            <param name="passwordIterations">
+            Number of iterations used to generate password. One or two iterations
+            should be enough.
+            </param>
+            <param name="initVector">
+            Initialization vector (or IV). This value is required to encrypt the
+            first block of plaintext data. For RijndaelManaged class IV must be
+            exactly 16 ASCII characters long.
+            </param>
+            <param name="keySize">
+            Size of encryption key in bits. Allowed values are: 128, 192, and 256.
+            Longer keys are more secure than shorter keys.
+            </param>
+            <returns>
+            Decrypted string value.
+            </returns>
+            <remarks>
+            Most of the logic in this function is similar to the Encrypt
+            logic. In order for decryption to work, all parameters of this function
+            - except cipherText value - must match the corresponding parameters of
+            Encrypt function which was called to generate the
+            ciphertext.
+            </remarks>
+        </member>
+        <member name="T:WebApi.ReganteController">
+            <summary>
+            Proporciona los datos de las parcelas y las propiedades de su suelo.
+            </summary>
+        </member>
+        <member name="M:WebApi.ReganteController.Get(System.Int32)">
+            <summary>
+            Datos del regante indicado
+            </summary>
+            <param name="idRegante"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ReganteController.Get">
+            <summary>
+            Lista los regantes
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ReganteController.GetReganteList(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Lista datos ampliados de regantes con filtros
+            </summary>
+            <param name="IdTemporada"></param>
+            <param name="IdRegante"></param>
+            <param name="IdUnidadCultivo"></param>
+            <param name="IdParcela"></param>
+            <param name="Search"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ReganteController.ReganteUpdate(Models.RegantePost)">
+            <summary>
+            Actualización de los datos del Regante
+            </summary>
+            <param name="regante"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.AvisosController">
+            <summary>
+            Sistema de avisos.
+            </summary>
+        </member>
+        <member name="M:WebApi.AvisosController.Get(System.String,System.Nullable{System.Int32},System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Lista de Avisos
+            </summary>
+            <param name="idAviso"></param>
+            <param name="idAvisoTipo"></param>
+            <param name="fInicio"></param>
+            <param name="fFin"></param>
+            <param name="de"></param>
+            <param name="para"></param>
+            <param name="search"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.TablasMaestrasController">
+            <summary>
+            Proporciona información sobre las temporadas
+            </summary>
+        </member>
+        <member name="M:WebApi.TablasMaestrasController.Parajes">
+            <summary>
+             Parajes
+            </summary>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.TablasMaestrasController.Municipios">
+            <summary>
+             Municipios
+            </summary>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.TablasMaestrasController.Provincias">
+            <summary>
+             Provincias
+            </summary>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.TablasMaestrasController.Cultivos">
+            <summary>
+             Cultivos
+            </summary>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="T:WebApi.UnidadCultivoController">
+            <summary>
+            Proporciona los datos de las unidades de cultivo y las propiedades de su suelo.
+            </summary>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.Get(System.String)">
+            <summary>
+            Datos de la unidad de cultivo
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.GetUnidadesDeCultivo(System.String)">
+            <summary>
+            Lista de las unidades de Cultivo para una temporada
+            </summary>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.GetHorizontes(System.String,System.String,System.String)">
+            <summary>
+            Datos de los horizontes de una unidad de cultivo. Si idHorizonte="ALL" retorna todos los horizontes.
+            </summary>
+            <param name="idTemporada"></param>
+            <param name="idUnidadCultivo"></param>
+            <param name="idHorizonte"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.UnidadCultivoController.ParamPostHorizonte">
+            <summary>
+            Defines the <see cref="T:WebApi.UnidadCultivoController.ParamPostHorizonte" />
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.IdUnidadCultivo">
+            <summary>
+            Gets or sets the IdUnidadCultivo
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.IdTemporada">
+            <summary>
+            Gets or sets the IdTemporada
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.IdHorizonte">
+            <summary>
+            Gets or sets the IdHorizonte
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.Limo">
+            <summary>
+            Gets or sets the Limo
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.Arcilla">
+            <summary>
+            Gets or sets the Arcilla
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.Arena">
+            <summary>
+            Gets or sets the Arena
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.MatOrg">
+            <summary>
+            Gets or sets the MatOrg
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.EleGru">
+            <summary>
+            Gets or sets the EleGru
+            </summary>
+        </member>
+        <member name="P:WebApi.UnidadCultivoController.ParamPostHorizonte.Prof">
+            <summary>
+            Gets or sets the Prof
+            </summary>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.PostHorizonte(WebApi.UnidadCultivoController.ParamPostHorizonte)">
+            <summary>
+            Actulizar datos horizonte
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.UnidadCultivoCultivo(Models.ParamPostUnidadCultivoCultivo)">
+            <summary>
+            Da de alta o actualizar un cultivo para la unidad de cultivo indicada y la temporada indicada.
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.UnidadCultivoSuelo(Models.ParamPostUnidadCultivoSuelo)">
+            <summary>
+            Asignar los valores de un suelo tipo (con sus horizontes) a una unidad de cultivo.
+            Si ya existiera una definición para el suelo se reemplaza
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.GetUnidadCultivoList(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Lista datos ampliados de unidades de cultivos con filtros
+            </summary>
+            <param name="IdTemporada"></param>
+            <param name="IdUnidadCultivo"></param>
+            <param name="IdRegante"></param>
+            <param name="IdCultivo"></param>
+            <param name="IdMunicipio"></param>
+            <param name="IdTipoRiego"></param>
+            <param name="IdEstacion"></param>
+            <param name="Search"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.PostPluviometria(Models.ParamPostPluviometria)">
+            <summary>
+             PostPluviometria
+            </summary>
+            <param name="param">The param<see cref="T:Models.ParamPostPluviometria"/></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.GetUnidadCultivoDatosAmpliados(System.String,System.String)">
+            <summary>
+            Retornar datos ampliados de la unidad de cultivo.
+            IdTemporada puede ser '' para presentar todos
+            IdUnidadCultivo puede ser '' para presentar todos
+            </summary>
+            <param name="IdTemporada"></param>
+            <param name="IdUnidadCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.UnidadCultivoTemporadaCosteM3Agua(System.String,System.String)">
+            <summary>
+             UnidadCultivoTemporadaCosteM3Agua
+            </summary>
+            <param name="IdTemporada">The IdTemporada<see cref="T:System.String"/></param>
+            <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoController.PostUnidadCultivoTemporadaCosteM3Agua(Models.ParamPostCosteM3Agua)">
+            <summary>
+             PostUnidadCultivoTemporadaCosteM3Agua
+            </summary>
+            <param name="param">The param<see cref="T:Models.ParamPostCosteM3Agua"/></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="T:WebApi.UnidadCultivoReganteController">
+            <summary>
+            Proporciona las unidades de cultivo asociadas a un regante
+            </summary>
+        </member>
+        <member name="M:WebApi.UnidadCultivoReganteController.Get(System.Int32,System.String)">
+            <summary>
+            Unidades de cultivo asociadas a un regante en una temporada
+            </summary>
+            <param name="idRegante"></param>
+            <param name="idTemporada"></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="M:WebApi.UnidadCultivoReganteController.Get(System.Int32)">
+            <summary>
+            Unidades de cultivo asociadas a un regante
+            </summary>
+            <param name="idRegante"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.MateriaOrganicaTipoController">
+            <summary>
+            Permite guardar y obtener la información relativa a la "materia orgánica tipo"
+            </summary>
+        </member>
+        <member name="M:WebApi.MateriaOrganicaTipoController.Get(System.String)">
+            <summary>
+            Proporcina de los valores de la tabla "materia orgánica tipo" para el resgistro referenciado por idMateriaOrganicatipo
+            </summary>
+            <param name="idMateriaOrganicatipo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.MateriaOrganicaTipoController.GetListSuelos">
+            <summary>
+            Proporcina la lista de las materias orgánicas tipo.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.ElementosGruesosTipoController">
+            <summary>
+            Permite guardar y obtener la información relativa a los "Elementos gruesos tipo"
+            </summary>
+        </member>
+        <member name="M:WebApi.ElementosGruesosTipoController.Get(System.String)">
+            <summary>
+            Retorna los datos de la tabla "elementos gruesos tipo" para el elemento referenciado por IdElementosGruesosTipo
+            </summary>
+            <param name="IdElementosGruesosTipo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ElementosGruesosTipoController.GetList">
+            <summary>
+            Proporcina la lista de los "elemento gruesos tipo"
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.SuelosTipoController">
+            <summary>
+            Permite guardar y obtener la información relativa a los "suelos tipo"
+            </summary>
+        </member>
+        <member name="M:WebApi.SuelosTipoController.Get(System.String)">
+            <summary>
+            Proporcina los datos de un suelo tipo
+            </summary>
+            <param name="idSueloTipo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.SuelosTipoController.GetList">
+            <summary>
+            Proporcina la lista de los suelos tipo
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.DatosExtraController">
+            <summary>
+            Acceso a los datos extra de las parcelas
+            </summary>
+        </member>
+        <member name="M:WebApi.DatosExtraController.Get(System.String)">
+            <summary>
+            Devuelve los datos extra de una unidad de cultivo
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.DatosExtraController.Get(System.String,System.String)">
+            <summary>
+            Devuelve los datos extra de una unidad de cultivo a una fecha
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.DatosExtraController.PostDatosExtraParam">
+            <summary>
+            Defines the <see cref="T:WebApi.DatosExtraController.PostDatosExtraParam" />
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.IdUnidadCultivo">
+            <summary>
+            Gets or sets the IdUnidadCultivo
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.Fecha">
+            <summary>
+            Gets or sets the Fecha
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.Cobertura">
+            <summary>
+            Gets or sets the Cobertura
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.Altura">
+            <summary>
+            Gets or sets the Altura
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.Lluvia">
+            <summary>
+            Gets or sets the Lluvia
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.DriEnd">
+            <summary>
+            Gets or sets the DriEnd
+            </summary>
+        </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.Riego">
+            <summary>
+            Gets or sets the Riego
+            </summary>
+        </member>
+        <member name="M:WebApi.DatosExtraController.Post(WebApi.DatosExtraController.PostDatosExtraParam)">
+            <summary>
+            Añadir/Actualizar un registro en la tabla datos extra.
+            Si el valor de los campos cobertura, lluvia,driEnd o riego =-1 no se tiene en cuenta el valor
+            Ejemplo DatosExtra/2/02-05-2015/-1/-1/-1/0.5  Actualiza únicamente el valor del riego (0.5)
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.ParcelaController">
+            <summary>
+            Proporciona los datos de las parcelas y las propiedades de su suelo.
+            </summary>
+        </member>
+        <member name="M:WebApi.ParcelaController.Get(System.Int32)">
+            <summary>
+            Datos de la parcela indicada
+            </summary>
+            <param name="idParcela"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ParcelaController.GetParcelasDeUnidadDeCultivo(System.String,System.String)">
+            <summary>
+            Lista de parcelas de una unidad de cultivo en una temporada
+            </summary>
+            <param name="idTemporada"></param>
+            <param name="IdUnidadCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ParcelaController.GetParcelas">
+            <summary>
+            Listado de todas las parcelas
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.ParcelaController.GetParcelaList(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Lista con datos ampliados de las parcelas con filtros.
+            </summary>
+            <param name="IdTemporada"></param>
+            <param name="IdParcela"></param>
+            <param name="IdRegante"></param>
+            <param name="IdMunicipio"></param>
+            <param name="Search"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.BalanceHidricoController">
+            <summary>
+            Proporciona información del balance hídrico
+            </summary>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.GetBalanceHidrico(System.String,System.String,System.Boolean)">
+            <summary>
+            Balance hídrico de una unidad de cultivo en una temporada.
+            </summary>
+            <param name="idUnidadCultivo">Identificador de la unidad de cultivo</param>
+            <param name="idTemporada">Identificador de la temporada</param>
+            <param name="actualizaFechasFases">Activar si se desea recalcular las fechas de las fases para la parcela indicada</param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.GetDatosHidricos(System.String,System.String)">
+            <summary>
+            Retorna resumen de los datos hídricos a una fecha.
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.GetDatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.String)">
+            <summary>
+            Listado de los balances hídricos
+            </summary>
+            <param name="idRegante"></param>
+            <param name="idUnidadCultivo"></param>
+            <param name="idMunicipio"></param>
+            <param name="idCultivo"></param>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.GetRiegos(System.String,System.String)">
+            <summary>
+            Retornar los Riegos de una unidad de cultivo en una temporada
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.GetLluvias(System.String,System.String)">
+            <summary>
+            Retornar las lluvias registradas para una unidad de cultivo en una temporada
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.BalanceHidricoController.ResumenDiario(System.String,System.String)">
+            <summary>
+             ResumenDiario
+            </summary>
+            <param name="idUnidadCultivo">The idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="T:WebApi.FasesController">
+            <summary>
+            Proporciona información de las fases del cultivo para una unidad de cultivo
+            </summary>
+        </member>
+        <member name="M:WebApi.FasesController.Get(System.String,System.String)">
+            <summary>
+            Fases de una unidad de cultivo en una temporada.
+            </summary>
+            <param name="IdUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.FasesController.FasesPost">
+            <summary>
+            Defines the <see cref="T:WebApi.FasesController.FasesPost" />
+            </summary>
+        </member>
+        <member name="P:WebApi.FasesController.FasesPost.IdUnidadCultivo">
+            <summary>
+            Gets or sets the IdUnidadCultivo
+            </summary>
+        </member>
+        <member name="P:WebApi.FasesController.FasesPost.IdTtemporada">
+            <summary>
+            Gets or sets the IdTtemporada
+            </summary>
+        </member>
+        <member name="P:WebApi.FasesController.FasesPost.NFase">
+            <summary>
+            Gets or sets the NFase
+            </summary>
+        </member>
+        <member name="P:WebApi.FasesController.FasesPost.FechaConfirmada">
+            <summary>
+            Gets or sets the FechaConfirmada
+            </summary>
+        </member>
+        <member name="P:WebApi.FasesController.FasesPost.IdTipoEstres">
+            <summary>
+            Gets or sets the IdTipoEstres
+            </summary>
+        </member>
+        <member name="M:WebApi.FasesController.Post(WebApi.FasesController.FasesPost)">
+            <summary>
+            Actualizar la fecha de cambio de fase.
+            </summary>
+            <param name="param"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WebApi.TemporadasController">
+            <summary>
+            Proporciona información sobre las temporadas
+            </summary>
+        </member>
+        <member name="M:WebApi.TemporadasController.Get">
+            <summary>
+            Todas las temporadas definidas.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.TemporadasController.GetTemporada(System.String)">
+            <summary>
+            Retorna los datos de una temporada
+            </summary>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.TemporadasController.Get(System.String)">
+            <summary>
+            Todas las temporadas de la unidad de cultivo indicada.
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WebApi.TemporadasController.PostUnidadCultivoTemporadaCosteM3Agua(Models.Temporada)">
+            <summary>
+             PostUnidadCultivoTemporadaCosteM3Agua
+            </summary>
+            <param name="temporada">The temporada<see cref="T:Models.Temporada"/></param>
+            <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
+        </member>
+        <member name="T:WebApi.HomeController">
+            <summary>
+            Página de inicio
+            </summary>
+        </member>
+        <member name="M:WebApi.HomeController.Index">
+            <summary>
+             Index - Página inicial del controlador
+            </summary>
+            <returns>The <see cref="T:System.Web.Mvc.ActionResult"/></returns>
+        </member>
+        <member name="T:DatosOptiaqua.CalculosHidricos">
+            <summary>
+            Clase estática en la que se implementan las funciones hídricas
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CapacidadCampo(Models.UnidadCultivoSuelo)">
+            <summary>
+            CapacidadCampo. Función definida como extensi´no de UnidadCultivoSuelo
+            </summary>
+            <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.PuntoDeMarchitez(Models.UnidadCultivoSuelo)">
+            <summary>
+            PuntoDeMarchitez. Función definida como extensi´no de UnidadCultivoSuelo
+            </summary>
+            <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaTcCob(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+            <summary>
+            Calculo de la Cobertura por el método de la Tasa de Crecimiento
+            </summary>
+            <param name="it"></param>
+            <param name="nFase"></param>
+            <param name="itEmergencia"></param>
+            <param name="ModCobCoefA"></param>
+            <param name="ModCobCoefB"></param>
+            <param name="ModCobCoefC"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaTcAlt(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+            <summary>
+            Calculo de la altura por el método de la Tasa de crecimiento
+            </summary>
+            <param name="it"></param>
+            <param name="nFase"></param>
+            <param name="itEmergencia"></param>
+            <param name="ModAltCoefA"></param>
+            <param name="ModAltCoefB"></param>
+            <param name="ModAltCoefC"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaNFaseDesarrollo(System.DateTime,System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases},System.Collections.Generic.List{Models.CultivoFases})">
+            <summary>
+            Retorna en Nº de fase en la que nos encontramos en base 1 (1,2,3,4....)
+            Párametro nFase está en base 1 y la tabla de fases en base 0
+            </summary>
+            <param name="fecha"></param>
+            <param name="cobertura"></param>
+            <param name="currentNFase"></param>
+            <param name="pUnidadCultivoCultivosFases"></param>
+            <param name="pCultivoFases"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalulaKc(System.Int32,System.DateTime,System.Double,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+            <summary>
+            Calculo del Coeficiento de cultivo
+            </summary>
+            <param name="nFase"></param>
+            <param name="fecha"></param>
+            <param name="cob"></param>
+            <param name="pUnidadCultivoCultivosFases"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaKcAdjClima(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Calcula KcAdj
+            </summary>
+            <param name="kc">kc<see cref="T:System.Double"/></param>
+            <param name="tcAlt">tcAlt<see cref="T:System.Double"/></param>
+            <param name="velocidadViento">velocidadViento<see cref="T:System.Double"/></param>
+            <param name="humedadMedia">humedadMedia<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRoot(Models.LineaBalance,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Calculo de la longitud de la raiz.
+            </summary>
+            <param name="lbAnt">lbAnt<see cref="T:Models.LineaBalance"/></param>
+            <param name="it">it<see cref="T:System.Double"/></param>
+            <param name="profRaizInicial">profRaizInicial<see cref="T:System.Double"/></param>
+            <param name="modRaizCoefB">modRaizCoefB<see cref="T:System.Double"/></param>
+            <param name="profRaizMax">profRaizMax<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaCC(System.Double,System.Collections.Generic.List{Models.UnidadCultivoSuelo})">
+            <summary>
+            Calcula Capacidad de campo
+            </summary>
+            <param name="root">root<see cref="T:System.Double"/></param>
+            <param name="pUnidadCultivoSuelo">pUnidadCultivoSuelo<see cref="T:System.Collections.Generic.List`1"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaP(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+            <summary>
+            Calculo de Depletion Factor
+            </summary>
+            <param name="etc"></param>
+            <param name="nFase"></param>
+            <param name="pUnidadCultivoCultivosFases"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRAW2(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+            <summary>
+            Caculo de taw
+            </summary>
+            <param name="taw"></param>
+            <param name="nFase"></param>
+            <param name="pUnidadCultivoCultivosFases"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.ClaseEstres(System.String,System.Double)">
+            <summary>
+            Retorna a la tabla de umbrales la clase de estres.
+            Ordena la tabla por el valor umbral.
+            Retonar la descripción del maxímo umbral que puede superar el indiceEstes
+            </summary>
+            <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/></param>
+            <param name="indiceEstes">ie<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaPM(System.Double,System.Collections.Generic.List{Models.UnidadCultivoSuelo})">
+            <summary>
+            Calcula punto de marchitez
+            </summary>
+            <param name="root"></param>
+            <param name="pUnidadCultivoSuelo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaPrecipitacionEfectiva(System.Double,System.Double)">
+            <summary>
+            Calculo de la precipitación efectiva
+            </summary>
+            <param name="precipitacion"></param>
+            <param name="eto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaKs(System.Double,System.Double,System.Double)">
+            <summary>
+            Calculo de Ks
+            </summary>
+            <param name="taw"></param>
+            <param name="raw"></param>
+            <param name="dr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaKcAdj(System.Double,System.Double)">
+            <summary>
+            Calcula el Coeficiente de Cultivo ajustado
+            </summary>
+            <param name="KcAdjClima"></param>
+            <param name="ks"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaEtcAdj(System.Double,System.Double)">
+            <summary>
+            Calcula la evotranspiración ajustada
+            </summary>
+            <param name="kcAdj"></param>
+            <param name="eto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRiegoEfectivo(System.Double,System.Double)">
+            <summary>
+            Cálculo del riego efectivo
+            </summary>
+            <param name="riego"></param>
+            <param name="eto"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaDP(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Drenaje de profundidad
+            </summary>
+            <param name="ETcAdj"></param>
+            <param name="rieEfec"></param>
+            <param name="pef"></param>
+            <param name="driStart"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaCobertura(System.Double,System.Double,System.Double,Models.UnidadCultivoDatosExtra)">
+            <summary>
+            Calcula la Cobertura a una fecha dada. Tiene en cuenta si se han indicado datos extra.
+            </summary>
+            <param name="antCob"></param>
+            <param name="tcCob"></param>
+            <param name="incT"></param>
+            <param name="datoExtra"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaAltura(System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Nullable{System.Double},Models.UnidadCultivoDatosExtra)">
+            <summary>
+            Calcula la Altura para una fecha dada. NO Tiene en cuenta si se han indicado datos extra.
+            </summary>
+            <param name="antAlt"></param>
+            <param name="tcAlt"></param>
+            <param name="incT"></param>
+            <param name="modAltCoefC"></param>
+            <param name="alturaFinal"></param>
+            <param name="datoExtra"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaAguaAportadaCrecRaiz(System.Double,System.Double,System.Double)">
+            <summary>
+            CalculaAguaAportadaCrecRaiz
+            </summary>
+            <param name="pSaturacion">pSaturacion<see cref="T:System.Double"/></param>
+            <param name="tawHoy">tawHoy<see cref="T:System.Double"/></param>
+            <param name="tawAyer">tawAyer<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaDriEnd(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,Models.LineaBalance,Models.UnidadCultivoDatosExtra)">
+            <summary>
+            CalculaDriEnd
+            </summary>
+            <param name="taw">taw<see cref="T:System.Double"/></param>
+            <param name="EtcAdj">EtcAdj<see cref="T:System.Double"/></param>
+            <param name="rieEfec">rieEfec<see cref="T:System.Double"/></param>
+            <param name="pef">pef<see cref="T:System.Double"/></param>
+            <param name="driStart">driStart<see cref="T:System.Double"/></param>
+            <param name="dp">dp<see cref="T:System.Double"/></param>
+            <param name="escorrentia">escorrentia<see cref="T:System.Double"/></param>
+            <param name="pSaturacion">pSaturacion<see cref="T:System.Double"/></param>
+            <param name="lbAnt">lbAnt<see cref="T:Models.LineaBalance"/></param>
+            <param name="datoExtra">datoExtra<see cref="T:Models.UnidadCultivoDatosExtra"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaDP(System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Drenaje en profundidad
+            </summary>
+            <param name="ETcAdj"></param>
+            <param name="rieEfec"></param>
+            <param name="pef"></param>
+            <param name="aguaAportadaCrecRaiz"></param>
+            <param name="driStart"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaTcCob(System.Double,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+            <summary>
+            calculo de la Cobertura por el método de la Tasa de Crecimiento
+            </summary>
+            <param name="it"></param>
+            <param name="itEmergencia"></param>
+            <param name="ModCobCoefA"></param>
+            <param name="ModCobCoefB"></param>
+            <param name="ModCobCoefC"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaTcAlt(System.Double,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+            <summary>
+            Calculo de la altura por el método de la Tasa de crecimiento
+            </summary>
+            <param name="it"></param>
+            <param name="itEmergencia"></param>
+            <param name="ModAltCoefA"></param>
+            <param name="ModAltCoefB"></param>
+            <param name="ModAltCoefC"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRecomendacionRiegoMm(System.Double,System.Int32,System.Double,System.Int32,System.Double)">
+            <summary>
+            CalculaRecomendacionRiegoMm
+            </summary>
+            <param name="raw">raw<see cref="T:System.Double"/></param>
+            <param name="nFase">nFase<see cref="T:System.Int32"/></param>
+            <param name="driEnd">driEnd<see cref="T:System.Double"/></param>
+            <param name="faseInicioRiego">faseInicioRiego<see cref="T:System.Int32"/></param>
+            <param name="pAguaMinima">pAguaMinima<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRecomendacionRiegoTpo(System.Double,System.Int32,System.Double,System.Int32,System.Double,System.Int32)">
+            <summary>
+            Calcula la recomención del Riego en tiempo (Horas)
+            </summary>
+            <param name="raw"></param>
+            <param name="nFase"></param>
+            <param name="driEnd"></param>
+            <param name="v1"></param>
+            <param name="v2"></param>
+            <param name="v3"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.IndiceEstres(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Cálculo del indice de estrés.
+            </summary>
+            <param name="os"></param>
+            <param name="lo"></param>
+            <param name="ks"></param>
+            <param name="cc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.AvisoDrenaje(System.Double)">
+            <summary>
+            AvisoDrenaje
+            </summary>
+            <param name="dp">dp<see cref="T:System.Double"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaLineaBalance(DatosOptiaqua.UnidadCultivoDatosHidricos,Models.LineaBalance,System.DateTime)">
+            <summary>
+            CalculaLineaBalance
+            </summary>
+            <param name="dh">dh<see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/></param>
+            <param name="lbAnt">lbAnt<see cref="T:Models.LineaBalance"/></param>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:Models.LineaBalance"/></returns>
+        </member>
+        <member name="T:DatosOptiaqua.BalanceHidrico">
+            <summary>
+            Defines the <see cref="T:DatosOptiaqua.BalanceHidrico" />
+            Crear el balance hídrico y proporciona varias funciones resumen del balance
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.BalanceHidrico.unidadCultivoDatosHidricos">
+            <summary>
+            unidadCultivoDatosHidricos referencia al objeto que proporciona todos los datos necesarios para crear el balance hídrico
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.#ctor(DatosOptiaqua.UnidadCultivoDatosHidricos,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:DatosOptiaqua.BalanceHidrico"/> class.
+            </summary>
+            <param name="unidadCultivoDatosHidricos">The unidadCultivoDatosHidricos<see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/></param>
+            <param name="actualizaFases">The actualizaFases<see cref="T:System.Boolean"/></param>
+        </member>
+        <member name="P:DatosOptiaqua.BalanceHidrico.LineasBalance">
+            <summary>
+            Gets the LineasBalance
+            LineasBalance. Almacena todas las líneas del balance.
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaUtil(System.DateTime)">
+            <summary>
+            AguaUtil
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaPerdida(System.DateTime)">
+            <summary>
+            AguaPerdida
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaRiegosM3(System.DateTime)">
+            <summary>
+            SumaRiegosM3
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaDrenajeM3(System.DateTime)">
+            <summary>
+            SumaDrenajeM3
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaLluvias(System.DateTime)">
+            <summary>
+            SumaLluvias
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaLluviasEfectivas(System.DateTime)">
+            <summary>
+            SumaLluviasEfectivas
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaUtilOptima(System.DateTime)">
+            <summary>
+            AguaUtilOptima
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.NDIasEstres(System.DateTime)">
+            <summary>
+            NDIasEstres
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Int32"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.ETcMedia3Dias(System.DateTime)">
+            <summary>
+            ETcMedia3Dias
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaUtilTotal(System.DateTime)">
+            <summary>
+            AguaUtilTotal
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.RegarEnNDias(System.DateTime)">
+            <summary>
+            RegarEnNDias
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Int32"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.IndiceEstadoHidrico(System.DateTime)">
+            <summary>
+            Devuelve un valor entre -1 y 1 indicando es estado hidrico a una fecha.
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaRiegoEfectivo(System.DateTime)">
+            <summary>
+            SumaRiegoEfectivo
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.CalculaBalance(System.Boolean)">
+            <summary>
+            CalculaBalance. Función de uso interno en la clase para calcular el balance. Se ejecuta una única vez para añadir las líneas de balance.
+            </summary>
+            <param name="actualizaFases">The actualizaFases<see cref="T:System.Boolean"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.CosteAgua(System.DateTime)">
+            <summary>
+            CosteAgua
+            </summary>
+            <param name="fechaCalculo">The fechaCalculo<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.CosteDrenaje(System.DateTime)">
+            <summary>
+            CosteDrenaje
+            </summary>
+            <param name="fechaCalculo">The fechaCalculo<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.LineaBalance(System.DateTime)">
+            <summary>
+            LineaBalance
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.LineaBalance(System.DateTime)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaConsumoAguaCultivo(System.DateTime)">
+            <summary>
+            SumaConsumoAguaCultivo
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.DatosEstadoHidrico(System.DateTime)">
+            <summary>
+            DatosEstadoHidrico
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.DatosEstadoHidrico(System.DateTime)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.ResumenDiario">
+            <summary>
+            ResumenDiario
+            </summary>
+            <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.ResumenDiario"/></returns>
+        </member>
+        <member name="T:DatosOptiaqua.DB">
+            <summary>
+            Capa de acceso a las base de datos OptiAqua y Nebula en SQl Server
+            Para simplificar el acceso se hace uso de la librería NPoco - https://github.com/schotime/NPoco
+            La cadena de conexión CadenaConexionOptiAqua se define como parámetro de la aplicación.
+            La cadena de conexión Nebula se define como parámetro de la aplicación.
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.DB.IsCorrectPassword(Models.LoginRequest,Models.Regante@)">
+            <summary>
+            Devuelve true/false si una contraseña correcta.
+            El parámetro de salida rengate retorna los datos completos del regante indicado en login.
+            </summary>
+            <param name="login"></param>
+            <param name="regante"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.AvisosList(System.String,System.Nullable{System.Int32},System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.String)">
+            <summary>
+            Retorna lista de avisos con los filtros indicados según los parámetros. 
+            Pasar parámetro con valor '' si no se desea filtrar por campo
+            </summary>
+            <param name="idAviso">idAviso<see cref="T:System.String"/></param>
+            <param name="idAvisoTipo">idAvisoTipo<see cref="!:int?"/></param>
+            <param name="fInicio">fInicio<see cref="!:DateTime?"/></param>
+            <param name="fFin">fFin<see cref="!:DateTime?"/></param>
+            <param name="de">de<see cref="T:System.String"/></param>
+            <param name="para">para<see cref="T:System.String"/></param>
+            <param name="search">search<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.CrearPassw">
+            <summary>
+            Crea y almacena contraseña por defecto para regante.
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.DB.BuildPassword(System.String,System.String)">
+            <summary>
+            Crear contraseña encriptada a partir del nif del regante
+            </summary>
+            <param name="nifRegante">nifRegante<see cref="T:System.String"/></param>
+            <param name="password">password<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadaSave(Models.Temporada)">
+            <summary>
+            Crear o actualizar datos de temporada
+            </summary>
+            <param name="temporada">param<see cref="M:DatosOptiaqua.DB.Temporada(System.String)"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.DateTime,System.Boolean)">
+            <summary>
+            Retorna listado de datos hídricos filtrados por los parámetros indicados.
+            Pasar '' como parametro en blanco si no se desea filtrar
+            </summary>
+            <param name="idCliente">idCliente<see cref="!:int?"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idMunicipio">idMunicipio<see cref="!:int?"/></param>
+            <param name="idCultivo">idCultivo<see cref="T:System.String"/></param>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <param name="isAdmin">isAdmin<see cref="T:System.Boolean"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.GeoLocParcelasList(System.String,System.String)">
+            <summary>
+            GeoLocParcelasList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelasList">
+            <summary>
+            ParcelasList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadesDeCultivoList(System.String)">
+            <summary>
+            UnidadesDeCultivoList
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoTemporadaCosteM3Agua(System.String,System.String)">
+            <summary>
+            UnidadCultivoTemporadaCosteM3Agua
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="!:double?"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoTemporadaCosteM3AguaSave(Models.ParamPostCosteM3Agua)">
+            <summary>
+            UnidadCultivoTemporadaCosteM3AguaSave
+            </summary>
+            <param name="param">param<see cref="T:Models.ParamPostCosteM3Agua"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelasList(System.String,System.String)">
+            <summary>
+            ParcelasList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.CultivoSueloSave(System.String,System.String,System.String)">
+            <summary>
+            CultivoSueloSave
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idSueloTipo">idSueloTipo<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosRiegosList(System.String,System.String)">
+            <summary>
+            DatosRiegosList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TipoEstresUmbralOrderList(System.String)">
+            <summary>
+            TipoEstresUmbralList
+            </summary>
+            <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.RiegosNebulaList(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            RiegosNebulaList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="desdeFecha">desdeFecha<see cref="T:System.DateTime"/></param>
+            <param name="hastaFecha">hastaFecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosLluviaList(System.String,System.String)">
+            <summary>
+            DatosLluviaList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelaList(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            ParcelaList
+            </summary>
+            <param name="IdTemporada">IdTemporada<see cref="T:System.String"/></param>
+            <param name="IdParcela">IdParcela<see cref="T:System.String"/></param>
+            <param name="IdRegante">IdRegante<see cref="T:System.String"/></param>
+            <param name="IdMunicipio">IdMunicipio<see cref="T:System.String"/></param>
+            <param name="Search">Search<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ReganteList(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            ReganteList
+            </summary>
+            <param name="IdTemporada">IdTemporada<see cref="T:System.String"/></param>
+            <param name="IdRegante">IdRegante<see cref="T:System.String"/></param>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="IdParcela">IdParcela<see cref="T:System.String"/></param>
+            <param name="Search">Search<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.PluviometriaSave(System.String,System.String,System.Double)">
+            <summary>
+            PluviometriaSave
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="pluviometria">pluviometria<see cref="T:System.Double"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.Temporada(System.String)">
+            <summary>
+            Temporada
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.Temporada(System.String)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoList(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            UnidadCultivoList
+            </summary>
+            <param name="IdTemporada">IdTemporada<see cref="T:System.String"/></param>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="IdRegante">IdRegante<see cref="T:System.String"/></param>
+            <param name="IdCultivo">IdCultivo<see cref="T:System.String"/></param>
+            <param name="idMunicipio">idMunicipio<see cref="T:System.String"/></param>
+            <param name="IdTipoRiego">IdTipoRiego<see cref="T:System.String"/></param>
+            <param name="IdEstacion">IdEstacion<see cref="T:System.String"/></param>
+            <param name="Search">Search<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadaActiva">
+            <summary>
+            TemporadaActiva
+            </summary>
+            <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoDatosAmpliados(System.String,System.String)">
+            <summary>
+            UnidadCultivoDatosAmpliados
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.Estacion(System.Nullable{System.Int32})">
+            <summary>
+            Estacion
+            </summary>
+            <param name="idEstacion">idEstacion<see cref="!:int?"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.Estacion(System.Nullable{System.Int32})"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.Regante(System.Nullable{System.Int32})">
+            <summary>
+            Regante
+            </summary>
+            <param name="idRegante">idRegante<see cref="!:int?"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ReganteUpdate(Models.RegantePost)">
+            <summary>
+            ReganteUpdate
+            </summary>
+            <param name="rp">rp<see cref="T:Models.RegantePost"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.RiegoTipo(System.Nullable{System.Int32})">
+            <summary>
+            RiegoTipo
+            </summary>
+            <param name="idTipoRiego">idTipoRiego<see cref="!:int?"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.RiegoTipo(System.Nullable{System.Int32})"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.LaUnidadDeCultivoPerteneceAlRegante(System.String,System.Int32,System.String)">
+            <summary>
+            LaUnidadDeCultivoPerteneceAlRegante
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <param name="IdTemporada">IdTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.RegantesList">
+            <summary>
+            RegantesList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.LaUnidadDeCultivoPerteneceAlRegante(System.String,System.Int32)">
+            <summary>
+            LaUnidadDeCultivoPerteneceAlRegante
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.PasswordSave(Models.LoginRequest)">
+            <summary>
+            PasswordSave
+            </summary>
+            <param name="login">login<see cref="T:Models.LoginRequest"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(System.String,System.Int32,System.String)">
+            <summary>
+            LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.LaUnidadDeCultivoPerteneceAlReganteEnLaFecha(System.String,System.Int32,System.DateTime)">
+            <summary>
+            LaUnidadDeCultivoPerteneceAlReganteEnLaFecha
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadasList">
+            <summary>
+            TemporadasList
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParajesList">
+            <summary>
+            ParajesList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ProvinciaList">
+            <summary>
+            ProvinciaList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.CultivosList">
+            <summary>
+            CultivosList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.MunicipiosList">
+            <summary>
+            MunicipiosList
+            </summary>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosExtraList(System.String)">
+            <summary>
+            DatosExtraList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosExtraList(System.String,System.DateTime)">
+            <summary>
+            DatosExtraList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.FechaConfirmadaSave(System.String,System.String,System.Int32,System.DateTime)">
+            <summary>
+            FechaConfirmadaSave
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="temporada">temporada<see cref="T:System.String"/></param>
+            <param name="nFase">nFase<see cref="T:System.Int32"/></param>
+            <param name="fechaConfirmada">fechaConfirmada<see cref="T:System.DateTime"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.CultivoFasesList(System.Nullable{System.Int32})">
+            <summary>
+            CultivoFasesList
+            </summary>
+            <param name="idCultivo">idCultivo<see cref="!:int?"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.SueloTipo(System.String)">
+            <summary>
+            SueloTipo
+            </summary>
+            <param name="idSueloTipo">idSueloTipo<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.SuelosTipoList">
+            <summary>
+            SuelosTipoList
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.MateriaOrganicaTipo(System.String)">
+            <summary>
+            MateriaOrganicaTipo
+            </summary>
+            <param name="idMateriaOrganicaTipo">idMateriaOrganicaTipo<see cref="T:System.String"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.MateriaOrganicaTipo(System.String)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.MateriaOrganicaTipo">
+            <summary>
+            MateriaOrganicaTipo
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosExtraSave(System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">
+            <summary>
+            DatosExtraSave
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="fecha">fecha<see cref="T:System.String"/></param>
+            <param name="cobertura">cobertura<see cref="!:double?"/></param>
+            <param name="altura">altura<see cref="!:double?"/></param>
+            <param name="lluvia">lluvia<see cref="!:double?"/></param>
+            <param name="driEnd">driEnd<see cref="!:double?"/></param>
+            <param name="riego">riego<see cref="!:double?"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ElementosGruesosTipo(System.String)">
+            <summary>
+            ElementosGruesosTipo
+            </summary>
+            <param name="IdElementosGruesos">IdElementosGruesos<see cref="T:System.String"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.ElementosGruesosTipo(System.String)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ElementosGruesosTipo">
+            <summary>
+            ElementosGruesosTipo
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadasUnidadCultivoList(System.String)">
+            <summary>
+            TemporadasUnidadCultivoList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="!:List&lt;string&gt;"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoHorizonte(System.String,System.String,System.String)">
+            <summary>
+            Retorna los datos del suelo para el horizonte indicado.
+            Si horizonte=="ALL" retorna todos.
+            </summary>
+            <param name="idTemporada"></param>
+            <param name="IdUnidadCultivo"></param>
+            <param name="idHorizonte"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelasDatosExtrasList(System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            ParcelasDatosExtrasList
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="desdeFecha">desdeFecha<see cref="!:DateTime?"/></param>
+            <param name="hastaFecha">hastaFecha<see cref="!:DateTime?"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.RiegosList(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            Retorno lista de riegos
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="fechaSiembra"></param>
+            <param name="fechaFinal"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.RiegosHistoricosList(System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Carga los Riegos de una Parcela en un intervalo de fechas
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="desdeFecha"></param>
+            <param name="hastaFecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoCultivo(System.String,System.String)">
+            <summary>
+            Retorna los datos de la tabla ParcelasCultivo.
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivo(System.String)">
+            <summary>
+            UnidadCultivo
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.UnidadCultivo(System.String)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoList">
+            <summary>
+            UnidadCultivoList
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.Parcela(System.Int32)">
+            <summary>
+            Retorna una clase con todos los valores de la parcela IdParcela desde BD.
+            </summary>
+            <param name="idParcela"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.Cultivo(System.Nullable{System.Int32})">
+            <summary>
+            Carga los datos del cultivo referenciado
+            </summary>
+            <param name="IdCultivo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoCultivoFasesList(System.String,System.String)">
+            <summary>
+            UnidadCultivoCultivoFasesList
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelasCultivo(System.Int32,System.String)">
+            <summary>
+            ParcelasCultivo
+            </summary>
+            <param name="IdParcela">IdParcela<see cref="T:System.Int32"/></param>
+            <param name="temporada">temporada<see cref="T:System.String"/></param>
+            <returns><see cref="M:DatosOptiaqua.DB.UnidadCultivoCultivo(System.String,System.String)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoSueloList(System.String,System.String)">
+            <summary>
+            UnidadCultivoSueloList
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="F:DatosOptiaqua.DB.fechaYHoraUltimaActualacion">
+            <summary>
+            Defines the fechaYHoraUltimaActualacion
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosClimaticosRefresh">
+            <summary>
+            Actualiza los datos climáticos almacenados.
+            Se conecta a el api del SIAR si hace al menos una hora que no lo ha hecho y actualiza los datos desde última acualización.
+            Si se actualizó hace menos de 4 días actuliza los últimos 4 días.
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosClimaticosSave(System.Collections.Generic.List{Models.DatoClimatico})">
+            <summary>
+            DatosClimaticosSave
+            </summary>
+            <param name="lDatClima">lDatClima<see cref="T:System.Collections.Generic.List`1"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UltimaFechaDeEstacion">
+            <summary>
+            UltimaFechaDeEstacion
+            </summary>
+            <returns><see cref="!:DateTime?"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.EstacionesList">
+            <summary>
+            EstacionesList
+            </summary>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosClimaticosList(System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.Nullable{System.Int32})">
+            <summary>
+            DatosClimaticosList
+            </summary>
+            <param name="desdeFecha">desdeFecha<see cref="!:DateTime?"/></param>
+            <param name="hastaFecha">hastaFecha<see cref="!:DateTime?"/></param>
+            <param name="idEstacion">idEstacion<see cref="!:int?"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosClimaticosList(System.DateTime,System.DateTime)">
+            <summary>
+            DatosClimaticosList
+            </summary>
+            <param name="desdeFecha">desdeFecha<see cref="T:System.DateTime"/></param>
+            <param name="hastaFecha">hastaFecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.DatosClimaticosSiarList(System.DateTime,System.DateTime,System.Int32)">
+            <summary>
+            DatosClimaticosSiarList
+            </summary>
+            <param name="desdeFecha">desdeFecha<see cref="T:System.DateTime"/></param>
+            <param name="hastaFecha">hastaFecha<see cref="T:System.DateTime"/></param>
+            <param name="idEstacion">idEstacion<see cref="T:System.Int32"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoSueloSave(System.String,System.String,System.Int32,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Crea nuevo o actualiza el registro UnidadCultivoSuelo
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idHorizonte">idHorizonte<see cref="T:System.Int32"/></param>
+            <param name="limo">limo<see cref="T:System.Double"/></param>
+            <param name="arcilla">arcilla<see cref="T:System.Double"/></param>
+            <param name="arena">arena<see cref="T:System.Double"/></param>
+            <param name="matOrg">matOrg<see cref="T:System.Double"/></param>
+            <param name="eleGru">eleGru<see cref="T:System.Double"/></param>
+            <param name="prof">prof<see cref="T:System.Double"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoCultivoTemporadaSave(System.String,System.String,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            UnidadCultivoCultivoTemporadaSave
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idCultivo">idCultivo<see cref="T:System.Int32"/></param>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <param name="idTipoRiego">idTipoRiego<see cref="T:System.Int32"/></param>
+            <param name="fechaSiembra">fechaSiembra<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.NParcelas(System.String,System.String)">
+            <summary>
+            NParcelas
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="!:int?"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ObtenerMunicicioParaje(System.String,System.String,System.String@,System.String@)">
+            <summary>
+            ObtenerMunicicioParaje
+            </summary>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="municipios">municipios<see cref="T:System.String"/></param>
+            <param name="parajes">parajes<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadesCultivoList(System.Int32,System.String)">
+            <summary>
+            UnidadesCultivoList
+            </summary>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="!:List&lt;string&gt;"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoList(System.Int32)">
+            <summary>
+            UnidadCultivoList
+            </summary>
+            <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
+            <returns><see cref="!:List&lt;string&gt;"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.FasesList(System.String,System.String)">
+            <summary>
+            FasesList
+            </summary>
+            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.FechasFasesSave(System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+            <summary>
+            FechasFasesSave
+            </summary>
+            <param name="lFases">lFases<see cref="T:System.Collections.Generic.List`1"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.IdReganteDeUnidadCultivoTemporada(System.String,System.String)">
+            <summary>
+            IdReganteDeUnidadCultivoTemporada
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="!:int?"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.IdReganteDeUnidadCultivo(System.String)">
+            <summary>
+            IdReganteDeUnidadCultivo
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <returns><see cref="!:int?"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ParcelasDeUnidadCultivo(System.String,System.String)">
+            <summary>
+            Retorna la lista de códigos de parcelas de una unidad de cultivo para la temporada indicada
+            </summary>
+            <param name="IdUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoExtensionM2(System.String,System.String)">
+            <summary>
+            UnidadCultivoExtensionM2
+            </summary>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.Single"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadaDeFecha(System.DateTime)">
+            <summary>
+            TemporadaDeFecha
+            </summary>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.PluviometriaTipica(System.Int32)">
+            <summary>
+            PluviometriaTipica
+            </summary>
+            <param name="idCultivo">idCultivo<see cref="T:System.Int32"/></param>
+            <returns><see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ConfigLoad(System.String)">
+            <summary>
+            ConfigLoad
+            </summary>
+            <param name="parametro">parametro<see cref="T:System.String"/></param>
+            <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.DB.ConfigSave(System.String,System.String)">
+            <summary>
+            ConfigSave
+            </summary>
+            <param name="parametro">parametro<see cref="T:System.String"/></param>
+            <param name="valor">valor<see cref="T:System.String"/></param>
+        </member>
+        <member name="T:DatosOptiaqua.UnidadCultivoDatosHidricos">
+            <summary>
+            Define <see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos" />
+            UnidadCultivoDatosHidricos es una clase que almacena y proporciona la mayoria de los datos necesarios para el calculo del balance hídrico de una unidad de cultivo en una temporada.
+            Encapsula los datos necesarios para los cálculos del balance hídrico.
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.lDatosClimaticos">
+            <summary>
+            Defines the lDatosClimaticos
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.unidadCultivo">
+            <summary>
+            Defines the unidadCultivo
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.pUnidadCultivoExtensionM2">
+            <summary>
+            Defines the pUnidadCultivoExtensionM2
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.cultivo">
+            <summary>
+            Defines the cultivo
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.estacion">
+            <summary>
+            Defines the estacion
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.temporada">
+            <summary>
+            Defines the temporada
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.riegoTipo">
+            <summary>
+            Defines the riegoTipo
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.regante">
+            <summary>
+            Defines the regante
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.unidadCultivoCultivo">
+            <summary>
+            Define pUnidadCultivoCultivo
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.lUnidadCultivoDatosExtas">
+            <summary>
+            Define pUnidadCultivoDatosExtas
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.UnidadCultivoDatosHidricos.lDatosRiego">
+            <summary>
+            Define pDatosRiego
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.Eficiencia">
+            <summary>
+            Gets the Eficiencia
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.Alias">
+            <summary>
+            Gets the Alias
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdCultivo">
+            <summary>
+            Gets the IdCultivo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.UnidadCultivoExtensionM2">
+            <summary>
+            Gets the UnidadCultivoExtensionM2
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdTemporada">
+            <summary>
+            Gets the IdTemporada
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdTipoRiego">
+            <summary>
+            Gets the IdTipoRiego
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.NParcelas">
+            <summary>
+            Gets the NParcelas
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.ReganteNombre">
+            <summary>
+            Gets the ReganteNombre
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.ReganteNif">
+            <summary>
+            Gets the ReganteNif
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.ReganteTelefono">
+            <summary>
+            Gets the ReganteTelefono
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.ReganteTelefonoSMS">
+            <summary>
+            Gets the ReganteTelefonoSMS
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.Pluviometria">
+            <summary>
+            Gets the Pluviometria
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.TipoRiego">
+            <summary>
+            Gets the TipoRiego
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.UnidadCultivoCultivoFasesList">
+            <summary>
+            Gets the UnidadCultivoCultivoFasesList
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoFasesList">
+            <summary>
+            Gets the CultivoFasesList
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.FechaSiembra">
+            <summary>
+            Retorna primera fecha de las fases como fecha de siembra.
+            En caso de que no existandatos retorna fecha actual.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoNombre">
+            <summary>
+            Gets the CultivoNombre
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdUnidadCultivo">
+            <summary>
+            Gets the IdUnidadCultivo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.EstacionNombre">
+            <summary>
+            Gets the EstacionNombre
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdRegante">
+            <summary>
+            Gets the IdRegante
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.IdEstacion">
+            <summary>
+            Gets the IdEstacion
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.TipoSueloDescripcion">
+            <summary>
+            Gets the TipoSueloDescripcion
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.NFases">
+            <summary>
+            Gets the NFases
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoTBase">
+            <summary>
+            Gets the CultivoTBase
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoIntegralEmergencia">
+            <summary>
+            Gets the CultivoIntegralEmergencia
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModCobCoefA">
+            <summary>
+            Gets the CultivoModCobCoefA
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModCobCoefB">
+            <summary>
+            Gets the CultivoModCobCoefB
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModCobCoefC">
+            <summary>
+            Gets the CultivoModCobCoefC
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoAlturaFinal">
+            <summary>
+            Gets the CultivoAlturaFinal
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModAltCoefA">
+            <summary>
+            Gets the CultivoModAltCoefA
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModAltCoefB">
+            <summary>
+            Gets the CultivoModAltCoefB
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModAltCoefC">
+            <summary>
+            Gets the CultivoModAltCoefC
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoProfRaizInicial">
+            <summary>
+            Gets the CultivoProfRaizInicial
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoProfRaizMax">
+            <summary>
+            Gets the CultivoProfRaizMax
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModRaizCoefA">
+            <summary>
+            Gets the CultivoModRaizCoefA
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModRaizCoefB">
+            <summary>
+            Gets the CultivoModRaizCoefB
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoModRaizCoefC">
+            <summary>
+            Gets the CultivoModRaizCoefC
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.ListaUcSuelo">
+            <summary>
+            Gets the ListaUcSuelo
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/> class.
+            </summary>
+            <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/> class.
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.DatosCalculoGet(System.String,System.String)">
+            <summary>
+            DatosCalculoGet
+            </summary>
+            <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.DatoExtra(System.DateTime)">
+            <summary>
+            Retorna los datos extra a una fecha.  0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.ObtenerMunicicioParaje(System.String@,System.String@)">
+            <summary>
+            ObtenerMunicicioParaje
+            </summary>
+            <param name="municipios">The municipios<see cref="T:System.String"/></param>
+            <param name="parajes">The parajes<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.FechaFinalDeEstudio">
+            <summary>
+            Retonar el cálculo de la fecha de fin de estudio.
+            Si se excede de fecha del día retornar la fecha del día.
+            Si no hay datos suficientes para el cálculo retorna fecha del día.
+            </summary>
+            <returns>Fecha din del estudio</returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.RiegoM3(System.DateTime)">
+            <summary>
+            Retorna los datos de riego a una fecha. 0 Si no se dispone de datos en esa fecha.
+            Primero consulta en la tabla datos extra.
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.RiegoMm(System.DateTime)">
+            <summary>
+            RiegoMm
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.VelocidadViento(System.DateTime)">
+            <summary>
+            Retorna velocidad del viento a una Fecha.  0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.HumedadMedia(System.DateTime)">
+            <summary>
+            Retorna Humedad media a una fecha. 0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.Temperatura(System.DateTime)">
+            <summary>
+            Retorna la temperatura a una fecha.  0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.LluviaMm(System.DateTime)">
+            <summary>
+            Retorna los mm de lluvía a una fecha.  0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.Eto(System.DateTime)">
+            <summary>
+            Retorna el valor de Evotranspieración a una fecha.  0 Si no se dispone de datos en esa fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.ClaseEstres(System.Double,System.Int32)">
+            <summary>
+            Retorna la definición de la clase de estres.
+            </summary>
+            <param name="indiceEstres">The ie<see cref="T:System.Double"/></param>
+            <param name="nFase">The nFase<see cref="T:System.Int32"/></param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="T:DatosOptiaqua.Config">
+            <summary>
+            Clase dedicada a optener y guardar parámetros de la aplicación almacenados en la tabla configuracion
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.Config.GetString(System.String)">
+            <summary>
+            GetString - Retorna el parametro almacenado como un string
+            </summary>
+            <param name="parametro">The parametro<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.Config.GetDouble(System.String)">
+            <summary>
+            GetDouble - Retorna el parametro almacenado como un double
+            </summary>
+            <param name="parametro">The parametro<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.Config.SetString(System.String,System.String)">
+            <summary>
+            SetString - Almacenar valor para el parámetro indicado
+            </summary>
+            <param name="parametro">The parametro<see cref="T:System.String"/></param>
+            <param name="valor">The valor<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.Config.SetDouble(System.String,System.Double)">
+            <summary>
+            SetDouble Almacenar valor para el parámetro indicado
+            </summary>
+            <param name="parametro">The parametro<see cref="T:System.String"/></param>
+            <param name="valor">The valor<see cref="T:System.Double"/></param>
+        </member>
+    </members>
+</doc>

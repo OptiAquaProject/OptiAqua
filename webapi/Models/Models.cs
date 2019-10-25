@@ -1,0 +1,571 @@
+﻿using NPoco;
+using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// Modelo de datos de la aplicación
+/// </summary>
+namespace Models {
+
+    public class LoginRequest {
+        public string NifRegante { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class LoginAcceso {
+        public string nifRegante;
+        public int nIntentos;
+        public DateTime horaUltimoIntento;
+    }
+
+    [TableName("Configuracion")]
+    [PrimaryKey("Parametro", AutoIncrement = false)]
+    public class Configuracion {
+        public string Parametro { get; set; }
+        public string Valor { get; set; }
+    }
+
+    [TableName("UnidadCultivo")]
+    [PrimaryKey("IdUnidadCultivo", AutoIncrement = false)]
+    public class UnidadCultivo {
+        public string IdUnidadCultivo { get; set; }
+        public int? IdRegante { get; set; }
+        public int IdEstacion { get; set; }
+        public string Alias { get; set; }
+        public string TipoSueloDescripcion { get; set; }
+    }
+
+
+    [TableName("CultivoFases")]
+    [PrimaryKey("IdCultivo,OrdenFase", AutoIncrement = false)]
+    public class CultivoFases {
+        public int IdCultivo { get; set; }
+        public string IdTipoEstres { get; set; }
+        public int OrdenFase { get; set; }
+        public string Fase { get; set; }
+        public int DuracionDiasFase { get; set; }
+        public double KcInicial { get; set; }
+        public double KcFinal { get; set; }
+        public bool DefinicionPorDias { get; set; }
+        public double? CobInicial { get; set; }
+        public double? CobFinal { get; set; }
+        public double FactorAgotamiento { get; set; }
+    }
+
+    [TableName("Cultivo")]
+    [PrimaryKey("IdCultivo", AutoIncrement = false)]
+    public class Cultivo {
+        public int IdCultivo { get; set; }
+        public string Nombre { get; set; }
+        public double TBase { get; set; }
+        public double ProfRaizInicial { get; set; }
+        public double ProfRaizMax { get; set; }
+        public double ModCobCoefA { get; set; }
+        public double ModCobCoefB { get; set; }
+        public double? ModCobCoefC { get; set; }
+        public double ModAltCoefA { get; set; }
+        public double ModAltCoefB { get; set; }
+        public double? ModAltCoefC { get; set; }
+        public double ModRaizCoefA { get; set; }
+        public double ModRaizCoefB { get; set; }
+        public double? ModRaizCoefC { get; set; }
+        public double? AlturaInicial { get; set; }
+        public double? AlturaFinal { get; set; }
+        public double IntegralEmergencia { get; set; }
+    }
+
+    [TableName("DatoClimatico")]
+    [PrimaryKey("Fecha,IdEstacion", AutoIncrement = false)]
+    public class DatoClimatico {
+        public DateTime Fecha { get; set; }
+        public int IdEstacion { get; set; }
+        public double TempMedia { get; set; }
+        public double HumedadMedia { get; set; }
+        public double VelViento { get; set; }
+        public double Precipitacion { get; set; }
+        public double Eto { get; set; }
+    }
+
+    [TableName("Estacion")]
+    [PrimaryKey("IdEstacion", AutoIncrement = false)]
+    public class Estacion {
+        public int IdEstacion { get; set; }
+        public string Nombre { get; set; }
+        public int IdRed { get; set; }
+        public byte IdProvincia { get; set; }
+        public int IdTermino { get; set; }
+        public int? Longitud { get; set; }
+        public int? Latitud { get; set; }
+        public int? XUTM { get; set; }
+        public int? YUTM { get; set; }
+        public int? Huso { get; set; }
+        public double? Altitud { get; set; }
+    }
+
+    [TableName("UnidadCultivoSuelo")]
+    [PrimaryKey("IdTemporada,IdUnidadCultivo,IdHorizonte", AutoIncrement = false)]
+    public class UnidadCultivoSuelo {
+        public string IdTemporada { get; set; }
+        public string IdUnidadCultivo { get; set; }
+        public int IdHorizonte { get; set; }
+        public double ProfundidadHorizonte { get; set; }
+        public double ElementosGruesos { get; set; }
+        public double Limo { get; set; }
+        public double Arcilla { get; set; }
+        public double Arena { get; set; }
+        public double MateriaOrganica { get; set; }
+
+    }
+
+    [TableName("UnidadCultivoDatosExtra")]
+    [PrimaryKey("IdUnidadCultivo,Fecha", AutoIncrement = false)]
+    public class UnidadCultivoDatosExtra {
+        public string IdUnidadCultivo { get; set; }
+        public DateTime Fecha { get; set; } = DateTime.Now;
+        public double? Cobertura { get; set; } = null;
+        public double? Altura { get; set; } = null;
+        public double? LluviaMm { get; set; } = null;
+        public double? DriEnd { get; set; } = null;
+        public double? RiegoM3 { get; set; } = null;
+    }
+
+    [TableName("Parcela")]
+    [PrimaryKey("IdParcelaInt", AutoIncrement = false)]
+    public class Parcela {
+        public int IdParcelaInt { get; set; } // nvarchar(10), not null
+        public int? IdRegante { get; set; } // int, null
+        public int? IdProvincia { get; set; } // nchar(2), not null
+        public int? IdMunicipio { get; set; } // nchar(3), not null
+        public int? IdPoligono { get; set; } // nchar(3), not null        
+        public string IdParcela { get; set; } // nchar(5), not null
+        public int? IdParaje { get; set; }
+        public string Descripcion { get; set; } // nvarchar(50), not null
+        public int? Longitud { get; set; } // int, null
+        public int? Latitud { get; set; } // int, null
+        public int? XUTM { get; set; } // int, null
+        public int? YUTM { get; set; } // int, null
+        public int? Huso { get; set; } // int, null
+        public double? Altitud { get; set; } // float, null
+        public double SuperficieM2 { get; set; } // float, not null
+        public string RefCatastral { get; set; }
+        public int GId { get; set; }
+        public object GEO { set; get; }
+    }
+
+    [TableName("Paraje")]
+    [PrimaryKey("IdParaje", AutoIncrement = false)]
+    public class ParajePoco {
+        public int IdParaje { get; set; }
+        public string IdProvincia { get; set; }
+        public int? IdMunucipio { get; set; }
+        public string Paraje { get; set; }
+    }
+
+
+
+    [TableName("ParcelaValvula")]
+    [PrimaryKey("IdParcelaInt,IdValcula", AutoIncrement = false)]
+    public class ParcelaValvula {
+        public int IdParcelaInt { get; set; }
+        public int IdValvula { get; set; }
+    }
+
+    [TableName("UnidadCultivoCultivo")]
+    [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
+    public class UnidadCultivoCultivo {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public int IdCultivo { get; set; }
+        public int IdRegante { get; set; }
+        public int IdTipoRiego { get; set; }
+        public DateTime? FechaSiembra { get; set; }
+        public double Pluviometria { set; get; }
+    }
+
+    [TableName("UnidadCultivoCultivoFases")]
+    [PrimaryKey("IdParcela,IdTemporada,IdFaseCultivo", AutoIncrement = false)]
+    public class UnidadCultivoCultivoFases {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public int IdFaseCultivo { get; set; }
+        public string Fase { get; set; }
+        public DateTime FechaInicioFase { get; set; }
+        public DateTime? FechaFinFaseConfirmada { get; set; }
+        //public DateTime? FechaConfirmacionFindeFase { get; set; }
+        public bool DefinicionPorDias { get; set; }
+        public double KcInicial { get; set; }
+        public double KcFinal { get; set; }
+        public double? CobInicial { get; set; }
+        public double? CobFinal { get; set; }
+        public double FactorDeAgotamiento { get; set; }
+        public string IdTipoEstres { get; set; }
+    }
+
+    [TableName("Regante")]
+    [PrimaryKey("idRegante", AutoIncrement = false)]
+    public class Regante {
+        public int IdRegante { get; set; }
+        public int? IdGadmin { get; set; }
+        public string NIF { get; set; }
+        public string Nombre { get; set; }
+        public string Direccion { get; set; }
+        public string CodigoPostal { get; set; }
+        public string Poblacion { get; set; }
+        public string Provincia { get; set; }
+        public string Pais { get; set; }
+        public string Contraseña { get; set; }
+        public string Role { get; set; }
+        public string TelefonoSMS { get; set; }
+        public string Telefono { get; set; }
+        public string Email { get; set; }
+        public bool? WebActive { get; set; }
+    }
+
+    public class RegantePost {
+        public int IdRegante { get; set; }
+        public string NIF { get; set; }
+        public string Nombre { get; set; }
+        public string Direccion { get; set; }
+        public string CodigoPostal { get; set; }
+        public string Poblacion { get; set; }
+        public string Provincia { get; set; }
+        public string Pais { get; set; }
+        public string TelefonoSMS { get; set; }
+        public string Telefono { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class Riego {
+        public DateTime Fecha { get; set; }
+        public string IdUnidadCultivo { get; set; }
+        public double? RiegoM3 { get; set; }
+    }
+
+    [TableName("SueloTipo")]
+    [PrimaryKey("IdSueloTipo,IdHorizonte", AutoIncrement = false)]
+    public class SueloTipo {
+        public string IdSueloTipo { get; set; }
+        public int IdHorizonte { get; set; }
+        public double Profundidad { get; set; }
+        public double Limo { get; set; }
+        public double Arcilla { get; set; }
+        public double Arena { get; set; }
+        public double ElementosGruesos { get; set; }
+        public double MateriaOrganica { get; set; }
+    }
+
+    [TableName("MateriaOrganicaTipo")]
+    [PrimaryKey("IdMateriaOrganica", AutoIncrement = false)]
+    public class MateriaOrganicaTipo {
+        public string IdMateriaOrganica { get; set; }
+        public double MatOrgVal { get; set; }
+    }
+
+    [TableName("ElementosGruesosTipo")]
+    [PrimaryKey("IdElementosGruesos", AutoIncrement = false)]
+    public class ElementosGruesosTipo {
+        public string IdElementosGruesos { get; set; }
+        public double EleGruVal { get; set; }
+    }
+
+    [TableName("RiegoTipo")]
+    [PrimaryKey("IdTipoRiego", AutoIncrement = false)]
+    public class RiegoTipo {
+        public int IdTipoRiego { get; set; }
+        public string TipoRiego { get; set; }
+        public double Eficiencia { get; set; }
+        public double PluviometriaTipica { get; set; }
+    }
+
+    public class LineaBalance {
+        public DateTime? Fecha { get; set; } = null;
+        public int DDA { get; set; }
+        public double IT { get; set; }
+        public double TcCob { get; set; }
+        public double Cob { get; set; }
+        public double tcAlt { get; set; }
+        public double Alt { get; set; }
+        public double Mad { get; set; }
+        public int NFase { get; set; } = 1;
+        public string EtapaDes { get; set; }
+        public double Kc { get; set; }
+        public double KcAdjClima { get; set; }
+        public double Ks { get; set; }
+        public double EtcAdj { get; set; }
+        public double Root { get; set; }
+        public double Taw { get; set; }
+        public double P { get; set; }
+        public double Raw { get; set; }
+        public double Raw2 { get; set; }
+        public double DriStart { get; set; }
+        public double lluvia { get; set; }
+        public double Pef { get; set; }
+        public double Riego { get; set; }
+        public double RieEfec { get; set; }
+        public double Dp { get; set; }
+        public double DriEnd { get; set; }
+        public double RecRegTpo { get; set; }
+
+        public double CC { get; set; }
+        public double PM { get; set; }
+        public double OS { get; set; }
+        public double LO { get; set; } // límite óptimo, antes ccraw
+        public double LOFijo { get; set; }// limite optimo fijo, antes ccraw2
+
+        public double AguaCrecRaiz { set; get; }
+        public double RecRegMm { set; get; }
+    }
+
+    [TableName("Temporada")]
+    [PrimaryKey("IdTemporada", AutoIncrement = false)]
+    public class Temporada {
+        public string IdTemporada { get; set; }
+        public string Descripcion { get; set; }
+        public DateTime FechaInicial { get; set; }
+        public DateTime FechaFinal { get; set; }
+        public double CosteM3Agua { get; set; }
+        public bool? Activa { get; set; }
+    }
+
+    public class DatosEstadoHidrico {
+        public string IdUnidadCultivo { set; get; }
+        public int? IdRegante { set; get; }
+        public string Municipios { set; get; }
+        public string Parajes { set; get; }
+        public double? AguaUtil { set; get; }
+        public int? RegarEnNDias { set; get; }
+        public double? AguaUtilTotal { set; get; }
+        public double? Pluviometria { set; get; }
+        public double? CapacidadDeCampo { set; get; }
+        public double? PuntoDeMarchited { set; get; }
+        public double? AguaUtilOptima { set; get; }
+        public double? AguaPerdida { set; get; }
+        public double? CosteAgua { set; get; }
+        public int? NDiasEstres { set; get; }
+        public double? EstadoHidrico { set; get; }
+        public string TipoRiego { set; get; }
+        public DateTime? FechaSiembra { set; get; }
+        public int? IdEstacion { set; get; }
+        public string Estacion { set; get; }
+        public string Cultivo { set; get; }
+        public double? SumaRiego { set; get; }
+        public double? SumaLluvia { set; get; }
+        public string Status { set; get; }
+
+        public string IdTemporada { set; get; }
+        public string Regante { set; get; }
+        public string NIF { set; get; }
+        public string Telefono { set; get; }
+        public string TelefonoSMS { set; get; }
+        public int? IdCultivo { set; get; }
+        public int? IdTipoRiego { set; get; }
+        public double? Eficiencia { set; get; }
+        public string Alias { set; get; }
+        public int? NParcelas { set; get; }
+        public double? SuperficieM2 { set; get; }
+        public string Textura { set; get; }
+        public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
+    }
+
+    public class ResumenDiario {
+        public double RiegoTotal { set; get; }
+        public double RiegoEfecTotal { set; get; }
+        public double LluviaTotal { set; get; }
+        public double LluviaEfecTotal { set; get; }
+        public double AguaPerdida { set; get; }
+        public double ConsumoAguaCultivo { set; get; }
+        public int DiasEstres { set; get; }
+        public double DeficitRiego{ set; get; }       
+        public double CosteDeficitRiego { set; get; }
+        public double CosteAguaRiego { set; get; }
+        public double CosteAguaDrenaje { set; get; }
+
+        public double CC { set; get; }
+        public double LO { set; get; }
+        public double PM { set; get; }
+        public double OS { set; get; }
+
+        public double CC_porcent { set; get; }
+        public double LO_porcent { set; get; }
+        public double PM_porcent { set; get; }
+        public double OS_porcent { set; get; }
+
+        public double DP { set; get; }
+        public bool AvisoDrenaje{ set; get; }
+
+        public double AguaHastaCC { set; get; }
+        public double RecRegMm { set; get; } // Recomentación de riego en MM
+        public double RecRegTpo { set; get; } // Recomentacion de riego en tiempo (horas)
+        public double IndiceEstres { set; get; }
+        public string ClaseEstres { set; get; }
+    }
+
+    public class GeoLocParcela {
+        public int IdParcelaInt { set; get; }
+        public int IdMunicipio { set; get; }
+        public string Municipio { set; get; }
+        public int IdPoligono { set; get; }
+        public int IdParcela { set; get; }
+        public int GID { set; get; }
+        public string GEO { set; get; }
+    }
+
+
+    public class DatosLLuviaORiego {
+        public string IdTipoAportacion;//Lluvia  o Riego
+        public DateTime Fecha { set; get; }
+        public double Mm { set; get; }
+        public double M3 { set; get; }
+        public string Obtencion { set; get; } // puede se (A)portación o (S)istema metereológico.
+        public string IdUnidadCultivo { set; get; }
+        public string IdTemporada { set; get; }
+        public string UnidadCultivo { set; get; }
+        public string IdEstacion { set; get; }
+        public string Estacion { set; get; }
+    }
+
+    public class DatosLLuvia {
+        public DateTime Fecha { set; get; }
+        public double Mm { set; get; }
+        public string Obtencion { set; get; } // puede se (A)portación o (S)istema metereológico.
+        public string IdUnidadCultivo { set; get; }
+        public string IdTemporada { set; get; }
+        public string UnidadCultivo { set; get; }
+        public string IdEstacion { set; get; }
+        public string Estacion { set; get; }
+    }
+
+    public class DatosRiego {
+        public DateTime Fecha { set; get; }
+        public double M3 { set; get; }
+        public double Mm { set; get; }
+        public string Obtencion; // puede se (A)portación o (S)istema de riego de la comunidad.
+        public string IdTemporada { set; get; }
+        public string IdUnidadCultivo { set; get; }
+        public string UnidadCultivo { set; get; }
+    }
+
+    public class BalanceData {
+        public string IdUnidadCultivo { get; set; }
+        public string Alias { get; set; }
+        public string TipoSueloDescripcion { get; set; }
+        public string IdTemporada { get; set; }
+        public string Descripcion { get; set; }
+        public DateTime? FechaInicial { get; set; }
+        public DateTime? FechaFinal { get; set; }
+        public int IdRegante { get; set; }
+        public string Nombre { get; set; }
+        public DateTime? FechaSiembra { get; set; }
+        public double? Pluviometria { get; set; }
+        public string CultivoNombre { get; set; }
+        public int IdCultivo { get; set; }
+        public double TBase { get; set; }
+        public double ProfRaizInicial { get; set; }
+        public double ProfRaizMax { get; set; }
+        public double ModCobCoefA { get; set; }
+        public double ModCobCoefB { get; set; }
+        public double? ModCobCoefC { get; set; }
+        public double ModAltCoefA { get; set; }
+        public double ModAltCoefB { get; set; }
+        public double? ModAltCoefC { get; set; }
+        public double ModRaizCoefA { get; set; }
+        public double ModRaizCoefB { get; set; }
+        public double? ModRaizCoefC { get; set; }
+        public double? AlturaInicial { get; set; }
+        public double? AlturaFinal { get; set; }
+        public double? IntegralEmergencia { get; set; }
+        public int IdFaseCultivo { get; set; }
+        public string Fase { get; set; }
+        public DateTime FechaInicioFase { get; set; }
+        public DateTime? FechaFinFaseConfirmada { get; set; }
+        public bool DefinicionPorDias { get; set; }
+        public double? KcInicial { get; set; }
+        public double? KcFinal { get; set; }
+        public double? CobInicial { get; set; }
+        public double? FactorDeAgotamiento { get; set; }
+        public double? CobFinal { get; set; }
+        public int IdTipoRiego { get; set; }
+        public string TipoRiego { get; set; }
+        public double Eficiencia { get; set; }
+        public double PluviometriaTipica { get; set; }
+        public int IdHorizonte { get; set; }
+        public double ProfundidadHorizonte { get; set; }
+        public double Limo { get; set; }
+        public double Arcilla { get; set; }
+        public double Arena { get; set; }
+        public double ElementosGruesos { get; set; }
+        public double MateriaOrganica { get; set; }
+        public int OrdenFase { get; set; }
+        public string FaseNombre { get; set; }
+        public int DuracionDiasFase { get; set; }
+        public double? CultivoFasesKcInicial { get; set; }
+        public double? CultivoFasesKcFinal { get; set; }
+        public bool CultivoFasesDefinicionPorDias { get; set; }
+        public double? CultivoFasesCobInicial { get; set; }
+        public double? CultivoFasesFinal { get; set; }
+        public double? FactorAgotamiento { get; set; }
+    }
+
+    [TableName("UnidadCultivoTemporadaCosteAgua")]
+    [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
+    public class ParamPostCosteM3Agua {
+        public string IdUnidadCultivo { set; get; }
+        public string IdTemporada { set; get; }
+        public float? CosteM3Agua { set; get; }
+    }
+
+    [TableName("TipoEstres")]
+    [PrimaryKey("IdTipoEstres", AutoIncrement = false)]
+    public class TipoEstres {
+        public string IdTipoEstres { get; set; }
+        public string Estres { get; set; }
+        public bool ADemanda { get; set; }
+    }
+
+    [TableName("TipoEstresUmbral")]
+    [PrimaryKey("IdTipoEstres,IdUmbral", AutoIncrement = false)]
+    public class TipoEstresUmbral {
+        public string IdTipoEstres { get; set; }
+        public int IdUmbral { get; set; }
+        public string Descripcion { get; set; }
+        public double Umbral { get; set; }
+    }
+
+    public class ParamPostUnidadCultivoSuelo {
+        public string idTemporada { set; get; }
+        public string IdUnidadCultivo { set; get; }
+        public string IdSueloTipo { set; get; }
+    }
+
+    //Establecer la pluviometria para una unidad de cultivo.
+    public class ParamPostPluviometria {
+        public string IdTemporada { set; get; }
+        public string IdUnidadCultivo { set; get; }
+        public double Valor { set; get; }
+    }
+
+    public class ParamPostUnidadCultivoCultivo {
+        public string IdUnidadCultivo { set; get; }
+        public string IdTemporada { set; get; }
+        public int IdCultivo { set; get; }
+        public int IdRegante { set; get; }
+        public int IdTipoRiego { set; get; }
+        public string FechaSiembra { set; get; }
+    }
+
+    public class UnidadCultivoConSuperficieYGeoLoc {
+        public string IdUnidadCultivo { get; set; }
+        public int? IdRegante { get; set; }
+        public string Alias { get; set; }
+        public float? SuperficieM2 { get; set; }
+        public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
+    }
+
+    public class MunicipioParaje {
+        public string Municipio { set; get; }
+        public string Paraje { set; get; }
+    }
+
+
+}
+
