@@ -59,7 +59,7 @@
         /// <param name="ModCobCoefB"></param>
         /// <param name="ModCobCoefC"></param>
         /// <returns></returns>
-        public static double CalculaTcCob(double it, int nFase, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
+        public static double TcCob(double it, int nFase, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Fase y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -90,7 +90,7 @@
         /// <param name="ModAltCoefB"></param>
         /// <param name="ModAltCoefC"></param>
         /// <returns></returns>
-        public static double CalculaTcAlt(double it, int nFase, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
+        public static double TcAlt(double it, int nFase, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Fase y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -122,7 +122,7 @@
         /// <param name="pUnidadCultivoCultivosFases"></param>
         /// <param name="pCultivoFases"></param>
         /// <returns></returns>
-        public static int CalculaNFaseDesarrollo(DateTime fecha, double cobertura, int currentNFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases, List<CultivoFases> pCultivoFases) {
+        public static int NFaseDesarrollo(DateTime fecha, double cobertura, int currentNFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases, List<CultivoFases> pCultivoFases) {
             int nFaseBase0 = currentNFase - 1 > 0 ? currentNFase - 1 : 0; // situación anómala
             int ret = currentNFase;
             if (pUnidadCultivoCultivosFases.Count < currentNFase)
@@ -170,7 +170,7 @@
         /// <param name="cob"></param>
         /// <param name="pUnidadCultivoCultivosFases"></param>
         /// <returns></returns>
-        public static double CalulaKc(int nFase, DateTime fecha, double cob, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
+        public static double Kc(int nFase, DateTime fecha, double cob, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
             double ret = 0;
             int nFaseIndex = nFase - 1 > 0 ? nFase - 1 : 0; // la fase está en base 1
             if (pUnidadCultivoCultivosFases[nFaseIndex].KcInicial == pUnidadCultivoCultivosFases[nFaseIndex].KcFinal) {
@@ -208,7 +208,7 @@
         /// <param name="velocidadViento">velocidadViento<see cref="double"/></param>
         /// <param name="humedadMedia">humedadMedia<see cref="double"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaKcAdjClima(double kc, double tcAlt, double velocidadViento, double humedadMedia) {
+        public static double KcAdjClima(double kc, double tcAlt, double velocidadViento, double humedadMedia) {
             double ret;
             if (kc < 0.45) {
                 ret = kc;
@@ -246,7 +246,7 @@
         /// <param name="root">root<see cref="double"/></param>
         /// <param name="pUnidadCultivoSuelo">pUnidadCultivoSuelo<see cref="List{UnidadCultivoSuelo}"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaCC(double root, List<UnidadCultivoSuelo> pUnidadCultivoSuelo) {
+        public static double CapacidadCampo(double root, List<UnidadCultivoSuelo> pUnidadCultivoSuelo) {
             double ret = 0;
             double profRestante = root;
             int i = 0;
@@ -272,7 +272,7 @@
         /// <param name="nFase"></param>
         /// <param name="pUnidadCultivoCultivosFases"></param>
         /// <returns></returns>
-        public static double CalculaP(double etc, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
+        public static double DepletionFactor(double etc, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
             int nFaseBase0 = nFase > 0 ? nFase - 1 : 0;
             double ret = pUnidadCultivoCultivosFases[nFaseBase0].FactorDeAgotamiento + 0.04 * (5 - etc);
             if (ret < 0.1)
@@ -283,36 +283,15 @@
         }
 
         /// <summary>
-        /// Caculo de taw
+        /// Caculo de RAW2
         /// </summary>
         /// <param name="taw"></param>
         /// <param name="nFase"></param>
         /// <param name="pUnidadCultivoCultivosFases"></param>
         /// <returns></returns>
-        public static double CalculaRAW2(double taw, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
+        public static double RAW2(double taw, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
             int nFaseBase0 = nFase > 0 ? nFase - 1 : 0;
             double ret = taw * Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseBase0].FactorDeAgotamiento);
-            return ret;
-        }
-
-        /// <summary>
-        /// Retorna a la tabla de umbrales la clase de estres.
-        /// Ordena la tabla por el valor umbral.
-        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstes
-        /// </summary>
-        /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
-        /// <param name="indiceEstes">ie<see cref="double"/></param>
-        /// <returns><see cref="string"/></returns>
-        public static string ClaseEstres(string idTipoEstres, double indiceEstes) {
-            string ret = "";
-            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
-            if (ltu?.Count == 0)
-                return ret;
-            ret = ltu[0].Descripcion;
-            int i = 0;
-            while (indiceEstes > ltu[i].IdUmbral) {
-                ret = ret = ltu[++i].Descripcion;
-            }
             return ret;
         }
 
@@ -322,7 +301,7 @@
         /// <param name="root"></param>
         /// <param name="pUnidadCultivoSuelo"></param>
         /// <returns></returns>
-        public static double CalculaPM(double root, List<UnidadCultivoSuelo> pUnidadCultivoSuelo) {
+        public static double PuntoMarchitez(double root, List<UnidadCultivoSuelo> pUnidadCultivoSuelo) {
             double profRestante = root;
             int i = 0;
             double ret = 0;
@@ -345,7 +324,7 @@
         /// <param name="precipitacion"></param>
         /// <param name="eto"></param>
         /// <returns></returns>
-        public static double CalculaPrecipitacionEfectiva(double precipitacion, double eto) {
+        public static double PrecipitacionEfectiva(double precipitacion, double eto) {
             double ret = precipitacion > 2 ? precipitacion - 0.2 * eto : 0;
             return ret;
         }
@@ -357,10 +336,21 @@
         /// <param name="raw"></param>
         /// <param name="dr"></param>
         /// <returns></returns>
-        public static double CalculaKs(double taw, double raw, double dr) {
+        public static double Ks(double taw, double raw, double dr) {
             double ret = dr < raw ? 1 : (taw - dr) / (taw - raw);
             return ret;
         }
+
+        /// <summary>
+        /// The EtcAdj
+        /// </summary>
+        /// <param name="et0">The et0<see cref="double"/></param>
+        /// <param name="kcAdj">The kcAdj<see cref="double"/></param>
+        /// <param name="ks">The ks<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double EtcAdj(double et0, double kcAdj, double ks) =>
+            //ETc ajustada por clima y estrés
+            et0 * kcAdj * ks;
 
         /// <summary>
         /// Calcula el Coeficiente de Cultivo ajustado
@@ -368,7 +358,7 @@
         /// <param name="KcAdjClima"></param>
         /// <param name="ks"></param>
         /// <returns></returns>
-        public static double CalculaKcAdj(double KcAdjClima, double ks) {
+        public static double CoeficienteCultivoAjustado(double KcAdjClima, double ks) {
             double ret = KcAdjClima * ks;
             return ret;
         }
@@ -379,7 +369,7 @@
         /// <param name="kcAdj"></param>
         /// <param name="eto"></param>
         /// <returns></returns>
-        public static double CalculaEtcAdj(double kcAdj, double eto) {
+        public static double EvoTranspiracionAjustada(double kcAdj, double eto) {
             double ret = kcAdj * eto;
             return ret;
         }
@@ -390,22 +380,8 @@
         /// <param name="riego"></param>
         /// <param name="eto"></param>
         /// <returns></returns>
-        public static double CalculaRiegoEfectivo(double riego, double eto) {
+        public static double RiegoEfectivo(double riego, double eto) {
             double ret = riego > 2 ? riego - 0.2 * eto : 0;
-            return ret;
-        }
-
-        /// <summary>
-        /// Drenaje de profundidad
-        /// </summary>
-        /// <param name="ETcAdj"></param>
-        /// <param name="rieEfec"></param>
-        /// <param name="pef"></param>
-        /// <param name="driStart"></param>
-        /// <returns></returns>
-        public static double CalculaDP(double ETcAdj, double rieEfec, double pef, double driStart) {
-            double ret = rieEfec + pef - ETcAdj - driStart;
-            if (ret < 0) ret = 0;
             return ret;
         }
 
@@ -417,7 +393,7 @@
         /// <param name="incT"></param>
         /// <param name="datoExtra"></param>
         /// <returns></returns>
-        public static double CalculaCobertura(double antCob, double tcCob, double incT, UnidadCultivoDatosExtra datoExtra) {
+        public static double Cobertura(double antCob, double tcCob, double incT, UnidadCultivoDatosExtra datoExtra) {
             if (datoExtra?.Cobertura != null)
                 return datoExtra.Cobertura ?? 0;
             else
@@ -434,7 +410,7 @@
         /// <param name="alturaFinal"></param>
         /// <param name="datoExtra"></param>
         /// <returns></returns>
-        public static double CalculaAltura(double antAlt, double tcAlt, double incT, double? modAltCoefC, double? alturaFinal, UnidadCultivoDatosExtra datoExtra) {
+        public static double Altura(double antAlt, double tcAlt, double incT, double? modAltCoefC, double? alturaFinal, UnidadCultivoDatosExtra datoExtra) {
             double ret = 0;
             if (datoExtra?.Altura != null)
                 return datoExtra.Altura ?? 0;
@@ -455,7 +431,7 @@
         /// <param name="tawHoy">tawHoy<see cref="double"/></param>
         /// <param name="tawAyer">tawAyer<see cref="double"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaAguaAportadaCrecRaiz(double pSaturacion, double tawHoy, double tawAyer) {
+        public static double AguaAportadaCrecRaiz(double pSaturacion, double tawHoy, double tawAyer) {
             /*  se usa el parametro pSaturacion que desde la funcion principal indica el porcentaje de agua que hay en el suelo
                  que va explorando la raíz, cuando la raíz ha alcanzado su tamaño definitivo TAW es constante, es decir
                  tawyHoy = tawAyer por lo que la aportación de agua es 0.
@@ -478,7 +454,7 @@
         /// <param name="lbAnt">lbAnt<see cref="LineaBalance"/></param>
         /// <param name="datoExtra">datoExtra<see cref="UnidadCultivoDatosExtra"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaDriEnd(double taw, double EtcAdj, double rieEfec, double pef, double driStart, double dp, double escorrentia, double pSaturacion, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
+        public static double DriEnd(double taw, double EtcAdj, double rieEfec, double pef, double driStart, double dp, double escorrentia, double pSaturacion, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
             double ret = 0;
             if (datoExtra?.DriEnd != null) {// si existen datos extra prevalecen sobre los calculados.
                 return datoExtra.DriEnd ?? 0;
@@ -501,7 +477,7 @@
         /// <param name="aguaAportadaCrecRaiz"></param>
         /// <param name="driStart"></param>
         /// <returns></returns>
-        public static double CalculaDP(double ETcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart) {
+        public static double DrenajeEnProdundidad(double ETcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart) {
             double ret = rieEfec + pef + aguaAportadaCrecRaiz - ETcAdj - driStart;
             if (ret < 0) ret = 0;
             return ret;
@@ -516,7 +492,7 @@
         /// <param name="ModCobCoefB"></param>
         /// <param name="ModCobCoefC"></param>
         /// <returns></returns>
-        public static double CalculaTcCob(double it, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
+        public static double TcCob(double it, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
 
             double ret;
 
@@ -532,6 +508,8 @@
             return ret;
         }
 
+        /*
+         Anterior función
         /// <summary>
         /// Calculo de la altura por el método de la Tasa de crecimiento
         /// </summary>
@@ -541,7 +519,7 @@
         /// <param name="ModAltCoefB"></param>
         /// <param name="ModAltCoefC"></param>
         /// <returns></returns>
-        public static double CalculaTcAlt(double it, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
+        public static double TcAlt(double it, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
             double ret;
             if (it < itEmergencia) {
                 ret = 0;
@@ -555,6 +533,7 @@
             }
             return ret;
         }
+        */
 
         /// <summary>
         /// CalculaRecomendacionRiegoMm
@@ -565,7 +544,7 @@
         /// <param name="faseInicioRiego">faseInicioRiego<see cref="int"/></param>
         /// <param name="pAguaMinima">pAguaMinima<see cref="double"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaRecomendacionRiegoMm(double raw, int nFase, double driEnd, int faseInicioRiego, double pAguaMinima) {
+        public static double RecomendacionRiegoMm(double raw, int nFase, double driEnd, int faseInicioRiego, double pAguaMinima) {
             /*
                 1- Cambiar el funcionamiento de la función para hacerlo más claro
                 2- Añadir las variables faseInicioRiego y pAguaMinima.
@@ -590,7 +569,22 @@
         /// <param name="v2"></param>
         /// <param name="v3"></param>
         /// <returns></returns>
-        public static double CalculaRecomendacionRiegoTpo(double raw, int nFase, double driEnd, int v1, double v2, int v3) => double.NaN;
+        public static double RecomendacionRiegoHr(double raw, int nFase, double driEnd, int v1, double v2, int v3) => double.NaN;
+
+        /// <summary>
+        /// Incremento de temperatura efectivo
+        /// </summary>
+        /// <param name="temperatura">The temperatura<see cref="double"/></param>
+        /// <param name="CultivoTBase">The CultivoTBase<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double IncrementoTemperatura(double temperatura, double CultivoTBase) => temperatura > CultivoTBase ? temperatura - CultivoTBase : 0;
+
+        /// <summary>
+        /// AvisoDrenaje
+        /// </summary>
+        /// <param name="dp">dp<see cref="double"/></param>
+        /// <returns><see cref="bool"/></returns>
+        public static bool AvisoDrenaje(double dp) => dp > Config.GetDouble("DrenajeUmbral");
 
         /// <summary>
         /// Cálculo del indice de estrés.
@@ -608,11 +602,25 @@
         }
 
         /// <summary>
-        /// AvisoDrenaje
+        /// Retorna a la tabla de umbrales la clase de estres.
+        /// Ordena la tabla por el valor umbral.
+        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstes
         /// </summary>
-        /// <param name="dp">dp<see cref="double"/></param>
-        /// <returns><see cref="bool"/></returns>
-        public static bool AvisoDrenaje(double dp) => dp > Config.GetDouble("DrenajeUmbral");
+        /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
+        /// <param name="indiceEstes">ie<see cref="double"/></param>
+        /// <returns><see cref="string"/></returns>
+        public static string ClaseEstres(string idTipoEstres, double indiceEstes) {
+            string ret = "";
+            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
+            if (ltu?.Count == 0)
+                return ret;
+            ret = ltu[0].Descripcion;
+            int i = 0;
+            while (indiceEstes > ltu[i].IdUmbral) {
+                ret = ret = ltu[++i].Descripcion;
+            }
+            return ret;
+        }
 
         /// <summary>
         /// CalculaLineaBalance
@@ -628,54 +636,54 @@
             if (lbAnt == null)
                 lbAnt = new LineaBalance();
             double temperatura = dh.Temperatura(fecha);
-            double incT = temperatura > dh.CultivoTBase ? temperatura - dh.CultivoTBase : 0;
+            double incT = IncrementoTemperatura(temperatura, dh.CultivoTBase);
             if (lbAnt?.Fecha == null) incT = 0; // el primero es 0
 
             UnidadCultivoDatosExtra datoExtra = dh.DatoExtra(fecha);
             // Parámetros de desarrollo del cultivo
             lb.IT = (lbAnt.IT + incT);
-            lb.TcCob = CalculaTcCob(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
-            lb.tcAlt = CalculaTcAlt(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
-            lb.Cob = CalculaCobertura(lbAnt.Cob, lb.TcCob, incT, datoExtra);
-            lb.Alt = CalculaAltura(lbAnt.Alt, lb.tcAlt, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
+            lb.TcCob = TcCob(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);            
+            lb.Cob = Cobertura(lbAnt.Cob, lb.TcCob, incT, datoExtra);
+            lb.NFase = NFaseDesarrollo(fecha, lb.Cob, lbAnt.NFase, dh.UnidadCultivoCultivoFasesList, dh.CultivoFasesList);
+            lb.tcAlt = TcAlt(lb.IT, lb.NFase, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
+            lb.Alt = Altura(lbAnt.Alt, lb.tcAlt, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
             lb.Root = CalculaRoot(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
-
-            lb.NFase = CalculaNFaseDesarrollo(fecha, lb.Cob, lbAnt.NFase, dh.UnidadCultivoCultivoFasesList, dh.CultivoFasesList);
+            
             lb.Mad = lbAnt.Mad > 0 ? lb.Mad = lbAnt.Mad + 1 : lb.Cob > 0.8 ? 1 : 0;
             lb.EtapaDes = dh.UnidadCultivoCultivoFasesList[lb.NFase - 1].Fase;
 
             // Parámetros de suelo
-            lb.CC = CalculaCC(lb.Root, dh.ListaUcSuelo);
-            lb.PM = CalculaPM(lb.Root, dh.ListaUcSuelo);
+            lb.CC = CapacidadCampo(lb.Root, dh.ListaUcSuelo);
+            lb.PM = PuntoMarchitez(lb.Root, dh.ListaUcSuelo);
             lb.Taw = lb.CC - lb.PM;
 
             // Parámetros de aporte de agua
             lb.lluvia = dh.LluviaMm(fecha);
-            lb.Pef = CalculaPrecipitacionEfectiva(lb.lluvia, dh.Eto(fecha));
+            lb.Pef = PrecipitacionEfectiva(lb.lluvia, dh.Eto(fecha));
             lb.Riego = dh.RiegoMm(fecha);
-            lb.RieEfec = CalculaRiegoEfectivo(lb.Riego, dh.Eto(fecha));
-            lb.AguaCrecRaiz = CalculaAguaAportadaCrecRaiz(0.8, lb.Taw, lbAnt.Taw);
+            lb.RieEfec = RiegoEfectivo(lb.Riego, dh.Eto(fecha));
+            lb.AguaCrecRaiz = AguaAportadaCrecRaiz(0.8, lb.Taw, lbAnt.Taw);
 
             // Parámetros de cálculo del balance
             lb.DriStart = lbAnt.DriEnd;
-            lb.Kc = CalulaKc(lb.NFase, fecha, lb.Cob, dh.UnidadCultivoCultivoFasesList);
-            lb.KcAdjClima = CalculaKcAdjClima(lb.Kc, lb.Alt, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
+            lb.Kc = Kc(lb.NFase, fecha, lb.Cob, dh.UnidadCultivoCultivoFasesList);
+            lb.KcAdjClima = KcAdjClima(lb.Kc, lb.Alt, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
 
             // Parámetros de estrés en suelo
-            lb.P = CalculaP(lb.KcAdjClima * dh.Eto(fecha), lb.NFase, dh.UnidadCultivoCultivoFasesList);
+            lb.P = DepletionFactor(lb.KcAdjClima * dh.Eto(fecha), lb.NFase, dh.UnidadCultivoCultivoFasesList);
             lb.Raw = lb.P * lb.Taw; // depletion factor f(ETc)
-            lb.Raw2 = CalculaRAW2(lb.Taw, lb.NFase, dh.UnidadCultivoCultivoFasesList); // depletion factor fijo
+            lb.Raw2 = RAW2(lb.Taw, lb.NFase, dh.UnidadCultivoCultivoFasesList); // depletion factor fijo
             lb.LO = (lb.CC - lb.Raw); // depletion factor f(ETc)
             lb.LOFijo = (lb.CC - lb.Raw2); // depletion factor fijo
-            lb.Ks = CalculaKs(lb.Taw, lb.Raw, lb.DriStart); // K de estrés hídrico
+            lb.Ks = Ks(lb.Taw, lb.Raw, lb.DriStart); // K de estrés hídrico
 
-            lb.EtcAdj = (dh.Eto(fecha) * lb.KcAdjClima * lb.Ks); //ETc ajustada por clima y estrés
+            lb.EtcAdj = EtcAdj(dh.Eto(fecha), lb.KcAdjClima, lb.Ks); //ETc ajustada por clima y estrés
 
-            lb.Dp = CalculaDP(lb.EtcAdj, lb.RieEfec, lb.Pef, lb.AguaCrecRaiz, lb.DriStart);
-            lb.DriEnd = CalculaDriEnd(lb.Taw, lb.EtcAdj, lb.RieEfec, lb.Pef, lb.DriStart, lb.Dp, 0, 0.8, lbAnt, datoExtra);
+            lb.Dp = DrenajeEnProdundidad(lb.EtcAdj, lb.RieEfec, lb.Pef, lb.AguaCrecRaiz, lb.DriStart);
+            lb.DriEnd = DriEnd(lb.Taw, lb.EtcAdj, lb.RieEfec, lb.Pef, lb.DriStart, lb.Dp, 0, 0.8, lbAnt, datoExtra);
             lb.OS = lb.CC - lb.DriEnd;
-            lb.RecRegMm = CalculaRecomendacionRiegoMm(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8); //!!! Esta función es incorrecta
-            lb.RecRegTpo = CalculaRecomendacionRiegoTpo(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8, 0); //!!! POR DESARROLLAR
+            lb.RecRegMm = RecomendacionRiegoMm(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8); //!!! Esta función es incorrecta
+            lb.RecRegTpo = RecomendacionRiegoHr(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8, 0); //!!! POR DESARROLLAR
 
             return lb;
         }

@@ -30,7 +30,7 @@
         [Route("api/ElementosGruesosTipo/")]
         public IHttpActionResult GetList() {
             try {
-                return Json(DB.ElementosGruesosTipo());
+                return Json(DB.ElementosGruesosTipoList());
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

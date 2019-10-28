@@ -883,10 +883,10 @@
         }
 
         /// <summary>
-        /// MateriaOrganicaTipo
+        /// The MateriaOrganicaTipo
         /// </summary>
-        /// <param name="idMateriaOrganicaTipo">idMateriaOrganicaTipo<see cref="string"/></param>
-        /// <returns><see cref="MateriaOrganicaTipo"/></returns>
+        /// <param name="idMateriaOrganicaTipo">The idMateriaOrganicaTipo<see cref="string"/></param>
+        /// <returns>The <see cref="MateriaOrganicaTipo"/></returns>
         public static MateriaOrganicaTipo MateriaOrganicaTipo(string idMateriaOrganicaTipo) {
             Database db = new Database("CadenaConexionOptiAqua");
             MateriaOrganicaTipo ret = db.SingleById<MateriaOrganicaTipo>(idMateriaOrganicaTipo);
@@ -897,7 +897,7 @@
         /// MateriaOrganicaTipo
         /// </summary>
         /// <returns><see cref="List{MateriaOrganicaTipo}"/></returns>
-        public static List<MateriaOrganicaTipo> MateriaOrganicaTipo() {
+        public static List<MateriaOrganicaTipo> MateriaOrganicaTipoList() {
             Database db = new Database("CadenaConexionOptiAqua");
             List<MateriaOrganicaTipo> ret = db.Fetch<MateriaOrganicaTipo>("select * from MateriaOrganicaTipo");
             return ret;
@@ -944,10 +944,10 @@
         }
 
         /// <summary>
-        /// ElementosGruesosTipo
+        /// The ElementosGruesosTipo
         /// </summary>
-        /// <param name="IdElementosGruesos">IdElementosGruesos<see cref="string"/></param>
-        /// <returns><see cref="ElementosGruesosTipo"/></returns>
+        /// <param name="IdElementosGruesos">The IdElementosGruesos<see cref="string"/></param>
+        /// <returns>The <see cref="ElementosGruesosTipo"/></returns>
         public static ElementosGruesosTipo ElementosGruesosTipo(string IdElementosGruesos) {
             Database db = new Database("CadenaConexionOptiAqua");
             ElementosGruesosTipo ret = db.SingleOrDefaultById<ElementosGruesosTipo>(IdElementosGruesos);
@@ -960,7 +960,7 @@
         /// ElementosGruesosTipo
         /// </summary>
         /// <returns><see cref="List{ElementosGruesosTipo}"/></returns>
-        public static List<ElementosGruesosTipo> ElementosGruesosTipo() {
+        public static List<ElementosGruesosTipo> ElementosGruesosTipoList() {
             Database db = new Database("CadenaConexionOptiAqua");
             List<ElementosGruesosTipo> ret = db.Fetch<ElementosGruesosTipo>("select * from ElementosGruesosTipo");
             return ret;
@@ -1186,8 +1186,8 @@
                     }
                     fechaYHoraUltimaActualacion = DateTime.Now;
                 }
-            } catch (Exception ex) {
-                
+            } catch {
+                // continua sin datos del SIAR
             }
         }
 

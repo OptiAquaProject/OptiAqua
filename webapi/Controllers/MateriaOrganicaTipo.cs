@@ -30,7 +30,7 @@
         [Route("api/MateriaOrganicaTipo/")]
         public IHttpActionResult GetListSuelos() {
             try {
-                return Json(DB.MateriaOrganicaTipo());
+                return Json(DB.MateriaOrganicaTipoList());
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
