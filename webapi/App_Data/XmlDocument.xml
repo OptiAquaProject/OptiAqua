@@ -782,7 +782,7 @@
             <param name="humedadMedia">humedadMedia<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.CalculaRoot(Models.LineaBalance,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.RaizLongitud(Models.LineaBalance,System.Double,System.Double,System.Double,System.Double)">
             <summary>
             Calculo de la longitud de la raiz.
             </summary>
@@ -874,7 +874,7 @@
             Cálculo del riego efectivo
             </summary>
             <param name="riego"></param>
-            <param name="eto"></param>
+            <param name="eficienciaRiego"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.Cobertura(System.Double,System.Double,System.Double,Models.UnidadCultivoDatosExtra)">
@@ -946,16 +946,18 @@
             <param name="ModCobCoefC"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.RecomendacionRiegoMm(System.Double,System.Int32,System.Double,System.Int32,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.RecomendacionRiegoMm(System.Double,System.Double,System.Int32,System.Double,System.Int32,System.Double,System.Double)">
             <summary>
-            CalculaRecomendacionRiegoMm
+            Calculo de la recomentación de riego en mm.
             </summary>
-            <param name="raw">raw<see cref="T:System.Double"/></param>
-            <param name="nFase">nFase<see cref="T:System.Int32"/></param>
-            <param name="driEnd">driEnd<see cref="T:System.Double"/></param>
-            <param name="faseInicioRiego">faseInicioRiego<see cref="T:System.Int32"/></param>
-            <param name="pAguaMinima">pAguaMinima<see cref="T:System.Double"/></param>
-            <returns><see cref="T:System.Double"/></returns>
+            <param name="raw">The raw<see cref="T:System.Double"/></param>
+            <param name="taw">The taw<see cref="T:System.Double"/></param>
+            <param name="nFase">The nFase<see cref="T:System.Int32"/></param>
+            <param name="driEnd">The driEnd<see cref="T:System.Double"/></param>
+            <param name="faseInicioRiego">The faseInicioRiego<see cref="T:System.Int32"/></param>
+            <param name="ieUmbralRiego">The ieUmbralRiego<see cref="T:System.Double"/></param>
+            <param name="ieLimiteRiego">The ieLimiteRiego<see cref="T:System.Double"/></param>
+            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.RecomendacionRiegoHr(System.Double,System.Int32,System.Double,System.Int32,System.Double,System.Int32)">
             <summary>
@@ -1003,6 +1005,13 @@
             <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/></param>
             <param name="indiceEstes">ie<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.MaxUmbralEstres(System.String)">
+            <summary>
+            Devuelve el máximo valor de la tabla de umbrales para el tipo de estres indicado por idTipoEstres
+            </summary>
+            <param name="idTipoEstres"></param>
+            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.CalculaLineaBalance(DatosOptiaqua.UnidadCultivoDatosHidricos,Models.LineaBalance,System.DateTime)">
             <summary>
@@ -1192,6 +1201,14 @@
             <param name="regante"></param>
             <returns></returns>
         </member>
+        <member name="M:DatosOptiaqua.DB.IsCorrectPassword(System.String,System.String)">
+            <summary>
+            Retorna si el password es correcto para en nif indicado.
+            </summary>
+            <param name="nif">The nif<see cref="T:System.String"/></param>
+            <param name="password">The password<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.Boolean"/></returns>
+        </member>
         <member name="M:DatosOptiaqua.DB.AvisosList(System.String,System.Nullable{System.Int32},System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.String)">
             <summary>
             Retorna lista de avisos con los filtros indicados según los parámetros. 
@@ -1283,9 +1300,17 @@
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
             <returns><see cref="T:System.Object"/></returns>
         </member>
+        <member name="M:DatosOptiaqua.DB.DuplicarAnteriorSuelo(System.String,System.String,System.String)">
+            <summary>
+            Duplicar para la temporada indicada los datos de suelo de la temporada anterior
+            </summary>
+            <param name="idUnidadCultivo"></param>
+            <param name="idTemporada"></param>
+            <param name="idTemporadaAnterior"></param>
+        </member>
         <member name="M:DatosOptiaqua.DB.CultivoSueloSave(System.String,System.String,System.String)">
             <summary>
-            CultivoSueloSave
+            Guardar en la temporada actual los horizontes definicios en el suelo tipo.
             </summary>
             <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
@@ -1864,6 +1889,94 @@
             <param name="parametro">parametro<see cref="T:System.String"/></param>
             <param name="valor">valor<see cref="T:System.String"/></param>
         </member>
+        <member name="T:DatosOptiaqua.Importacion">
+            <summary>
+            Capa de acceso a las base de datos OptiAqua y Nebula en SQl Server
+            Para simplificar el acceso se hace uso de la librería NPoco - https://github.com/schotime/NPoco
+            La cadena de conexión CadenaConexionOptiAqua se define como parámetro de la aplicación.
+            La cadena de conexión Nebula se define como parámetro de la aplicación.
+            </summary>
+        </member>
+        <member name="T:DatosOptiaqua.Importacion.ImportItem">
+            <summary>
+            Defines the <see cref="T:DatosOptiaqua.Importacion.ImportItem" />
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdUnidadCultivo">
+            <summary>
+            Gets or sets the IdUnidadCultivo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdRegante">
+            <summary>
+            Gets or sets the IdRegante
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdEstacion">
+            <summary>
+            Gets or sets the IdEstacion
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.Alias">
+            <summary>
+            Gets or sets the Alias
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdSueloTipo">
+            <summary>
+            Gets or sets the IdSueloTipo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdParcelaIntList">
+            <summary>
+            Gets or sets the IdParcelaInt
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.IdCultivo">
+            <summary>
+            Gets or sets the IdCultivo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.FechaSiembra">
+            <summary>
+            Gets or sets the FechaSiembra
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ImportItem.SuperficieM2">
+            <summary>
+            Gets or sets the SuperficieM2
+            </summary>
+        </member>
+        <member name="T:DatosOptiaqua.Importacion.ErrorItem">
+            <summary>
+            Defines the <see cref="T:DatosOptiaqua.Importacion.ErrorItem" />
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ErrorItem.NLinea">
+            <summary>
+            Gets or sets the NLinea
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.Importacion.ErrorItem.Descripcion">
+            <summary>
+            Gets or sets the Descripcion
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.Importacion.Importar(WebApi.ImportacionController.ImportaPost)">
+            <summary>
+            The Importar
+            </summary>
+            <param name="param">The param<see cref="T:WebApi.ImportacionController.ImportaPost"/></param>
+            <returns>The <see cref="T:System.Collections.Generic.List`1"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.Importacion.Importar(DatosOptiaqua.Importacion.ImportItem,System.String,System.String)">
+            <summary>
+            The Importar
+            </summary>
+            <param name="item">The item<see cref="T:DatosOptiaqua.Importacion.ImportItem"/></param>
+            <param name="idTemporada"></param>
+            <param name="idTemporadaAnterior">The idTemporadaAnterior<see cref="T:System.String"/></param>
+        </member>
         <member name="T:DatosOptiaqua.UnidadCultivoDatosHidricos">
             <summary>
             Define <see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos" />
@@ -1926,7 +2039,7 @@
             Define pDatosRiego
             </summary>
         </member>
-        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.Eficiencia">
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.EficienciaRiego">
             <summary>
             Gets the Eficiencia
             </summary>

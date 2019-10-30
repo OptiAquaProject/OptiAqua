@@ -205,6 +205,7 @@
     <Compile Include="Controllers\Authorize\LoginController.cs" />
     <Compile Include="Controllers\Authorize\TokenGenerator.cs" />
     <Compile Include="Controllers\Authorize\TokenValidationHandler.cs" />
+    <Compile Include="Controllers\Importacion.cs" />
     <Compile Include="Controllers\Regante.cs" />
     <Compile Include="Controllers\Aviso.cs" />
     <Compile Include="Controllers\TablasGenerales.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Datos\Calculos Hídricos.cs" />
     <Compile Include="Datos\Balance Hidrico.cs" />
     <Compile Include="Datos\DB.cs" />
+    <Compile Include="Datos\Importacion.cs" />
     <Compile Include="Datos\Datos Hidricos.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Global.asax.cs">
@@ -320,6 +322,8 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\Home\Importacion.cshtml" />
+    <Content Include="Views\Home\EspecificacionesImportacion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\HelpPage\App_Start\" />

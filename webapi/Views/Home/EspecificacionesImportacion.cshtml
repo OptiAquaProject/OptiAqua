@@ -1,0 +1,46 @@
+﻿<div class="jumbotron">
+    <h1>OptiAqua</h1>
+    <p class="lead">Aplicación para la optimización del regadio</p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Consideraciones para la importación masiva datos.</h2>
+
+
+        <div class="card">
+            <h5 class="card-header">Fichero de importación</h5>
+            <div class="card-body">
+                <h5 class="card-title">Especificación csv</h5>
+                <p class="card-text">Se debe de seleccinar un fichero de texto con formato CSV, con los campos separados por ';' y con cabecera.</p>
+                <p class="card-text">Puede descargar plantilla como ejemplo.</p>
+                <a href="https://optiaqua.dyndns.org/PlantillaImportación.csv" class="btn btn-info">Plantilla ejemplo</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h5 class="card-header">Descripción de los campos</h5>
+            <div class="card-body">
+                <h5 class="card-title">IdUnidadCultivo</h5>
+                <p class="card-text">Es un campo alfanumérico. Es la referencia de la unidad de cultivo. Si no existe se crea nueva y se existe se actualizará.</p>
+                <h5 class="card-title">IdRegante</h5>
+                <p class="card-text">Identificador del regante que en esta temporada cultivará la unidad de cultivo.</p>
+                <h5 class="card-title">IdEstacion</h5>
+                <p class="card-text">Identificación de la estación metereológica que se desar utilizar para obtener los dos climáticos.</p>
+                <h5 class="card-title">Alias</h5>
+                <p class="card-text">Nombre corto que se le dá a la Unidad de cultivo.</p>
+                <h5 class="card-title">IdSueloTipo</h5>
+                <p class="card-text">Identificador del suelo tipo que se desea asignar a la unidad de cultivo para esta temporada. Se deja en blanco se tomarán los datos del suelo de la anterior temporarda. Si no existieran datos dará error.</p>
+                <h5 class="card-title">IdParcelaInt</h5>
+                <p class="card-text">Lista separada por ',' de las parcelas que forman la unidad de cultivo. Ej: 12856,19554</p>
+                <h5 class="card-title">IdCultivo</h5>
+                <p class="card-text">Identificacador del cultivo que se siembra</p>
+                <h5 class="card-title">FechaSiembra</h5>
+                <p class="card-text">Fecha de siembra del cultivo</p>
+                <h5 class="card-title">IdTipoRiego</h5>
+                <p class="card-text">Identificacador del tipo de riego</p>
+                <h5 class="card-title">Superficie</h5>
+                <p class="card-text">Superficie total de la unidad de cultivo. Si se pone 0 o se deja en blanco se calculará como la suma de la parcelas que componen la unidad de cultivo.</p>
+            </div>
+        </div>
+    </div>
+</div>

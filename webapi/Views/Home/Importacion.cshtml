@@ -1,0 +1,120 @@
+﻿<div class="jumbotron">
+    <h1>OptiAqua</h1>
+    <p class="lead">Aplicación para la optimización del regadio</p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Importación de fichero para la creación masiva de unidades de culvivo.</h2>
+        <p><a class="btn btn-info" href="https://optiaqua.dyndns.org/optiaqua/home/especificacionesimportacion/">Especificaciones Importación &raquo;</a></p>
+        <form class="md-form">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="NifRegante">Nif del regante</label>
+                    <input type="text" class="form-control" id="NifRegante" placeholder="">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="PassRegante">Contraseña</label>
+                    <input type="password" class="form-control" id="PassRegante" placeholder="">
+                </div>
+            </div>
+            <hr />
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="IdTemporada">Temporada</label>
+                    <input type="text" class="form-control" id="IdTemporada" placeholder="T20xx">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="IdTemporadaAnterior">Temporada Anterior</label>
+                    <input type="text" class="form-control" id="IdTemporadaAnterior" placeholder="T20xx">
+                </div>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="IdDemo">
+                <label class="form-check-label" for="dropdownCheck">
+                    Importar en base de datos de pruebas
+                </label>
+            </div>
+            <hr />
+            <div class="file-field">
+                <p>Seleccione fichero que desea importar</p>
+                <a class="btn-default .form-control-lg ">
+                    <input id="file-id" class="form-control col-lg-9 float-left" type="file">
+                </a>
+            </div>
+            <div class="float-left" style="padding-left:10px">
+                <button type="button" class="btn-default" onclick="OnImportar() ">Importar</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 border-top-0">
+            <div id="TablaErrores">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function OnImportar() {
+            var file = document.getElementById("file-id").files[0];
+            var NifRegante = document.getElementById("NifRegante").value;
+            var PassRegante = document.getElementById("PassRegante").value;
+            var IdTemporada= document.getElementById("IdTemporada").value;
+            var IdTemporadaAnterior = document.getElementById("IdTemporadaAnterior").value;
+            var ModoPruebas = document.getElementById("IdDemo").checked;
+            var reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function (event) {
+                enviar(IdTemporada,IdTemporadaAnterior, NifRegante, PassRegante, ModoPruebas, event.target.result);
+            };
+        };
+
+        function enviar(IdTemporada,IdTemporadaAnterior, nifRegante, passRegante, ModoPruebas, csv) {
+            //alert(csv);
+            var param = {"IdTemporada":IdTemporada, "IdTemporadaAnterior": IdTemporadaAnterior, "ModoPruebas": ModoPruebas, "NifRegante": nifRegante, "PassRegante": passRegante, "CSV": csv };
+            $.ajax({
+                type: "POST",
+                url: "/api/Importacion",
+                data: param,
+                datatype: "json",
+                async: false,
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (respuesta) {
+                    try {
+                        PresentaResultados(respuesta);
+                    } catch (err) {
+                        alert("error");
+                    }
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+
+        function PresentaResultados(respuesta) {
+            var html = "<hr/>";
+            if (respuesta.length == 0) {
+                html += "<h3>Importación finalizada sin errores.</h3>";
+                document.getElementById("TablaErrores").innerHTML = html;
+                return;
+            }
+            html += "<h3>Lista de errores de la importación</h3>";
+            html += "<table class='table table-hover'>";
+            html += "<tr>";
+            html += " <th scope='col'>#Lin</th>";
+            html += " <th scope='col'>Descripción del error</th>";
+            html += "</tr>";
+            for (i = 0; i < respuesta.length; i++) {
+                html += "<tr>";
+                html += "<td>" + respuesta[i].NLinea + "</td>";
+                html += "<td>" + respuesta[i].Descripcion + "</td>";
+                html += "</tr>";
+            }
+            var html = html + "</table>"
+            document.getElementById("TablaErrores").innerHTML = html;
+        }
+    </script>
+</div>

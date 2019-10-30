@@ -35,6 +35,13 @@ namespace Models {
         public string TipoSueloDescripcion { get; set; }
     }
 
+    [TableName("UnidadCultivoSuperficie")]
+    [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
+    public class UnidadCultivoSuperficie {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public double SuperficieM2 { get; set; }
+    }
 
     [TableName("CultivoFases")]
     [PrimaryKey("IdCultivo,OrdenFase", AutoIncrement = false)]
@@ -72,7 +79,18 @@ namespace Models {
         public double? AlturaInicial { get; set; }
         public double? AlturaFinal { get; set; }
         public double IntegralEmergencia { get; set; }
+        public int FaseInicioRiego { get; set; }
     }
+
+    [TableName("UnidadCultivoParcela")]
+    [PrimaryKey("IdUnidadCultivo,IdTemporada,IdParcelaInt", AutoIncrement = false)]
+    public class UnidadCultivoParcela {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public int IdParcelaInt { get; set; }
+        public int IdRegante { get; set; }
+    }
+
 
     [TableName("DatoClimatico")]
     [PrimaryKey("Fecha,IdEstacion", AutoIncrement = false)]
@@ -283,7 +301,7 @@ namespace Models {
         public double IT { get; set; }
         public double TcCob { get; set; }
         public double Cob { get; set; }
-        public double tcAlt { get; set; }
+        public double TcAlt { get; set; }
         public double Alt { get; set; }
         public double Mad { get; set; }
         public int NFase { get; set; } = 1;
@@ -298,13 +316,12 @@ namespace Models {
         public double Raw { get; set; }
         public double Raw2 { get; set; }
         public double DriStart { get; set; }
-        public double lluvia { get; set; }
-        public double Pef { get; set; }
+        public double Lluvia { get; set; }
+        public double PEf { get; set; }
         public double Riego { get; set; }
         public double RieEfec { get; set; }
-        public double Dp { get; set; }
+        public double DP { get; set; }
         public double DriEnd { get; set; }
-        public double RecRegTpo { get; set; }
 
         public double CC { get; set; }
         public double PM { get; set; }
@@ -313,7 +330,10 @@ namespace Models {
         public double LOFijo { get; set; }// limite optimo fijo, antes ccraw2
 
         public double AguaCrecRaiz { set; get; }
-        public double RecRegMm { set; get; }
+
+        public double RecRegHr { get; set; }
+        public double RecRegMmEfectivos { set; get; }
+        public double RecRegMmReales { set; get; }
     }
 
     [TableName("Temporada")]

@@ -57,7 +57,7 @@
                 if (lin.Fecha <= fecha) {
                     sumaRiego += lin.Riego;
                     sumaRiegoEfec += lin.RieEfec;
-                    sumaDrenaje += lin.Dp;
+                    sumaDrenaje += lin.DP;
                 }
             }
             return (sumaDrenaje + sumaRiego - sumaRiegoEfec);
@@ -81,7 +81,7 @@
         /// <returns>The <see cref="double"/></returns>
         public double SumaDrenajeM3(DateTime fecha) {
             // Los datos de riego del balance hídrico ya han tenido en cuenta los datos Extra
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.Dp);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.DP);
             return ret;
         }
 
@@ -92,7 +92,7 @@
         /// <returns>The <see cref="double"/></returns>
         public double SumaLluvias(DateTime fecha) {
             // Los datos de riego del balance hídrico ya han tenido en cuenta los datos Extra
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.lluvia);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.Lluvia);
             return ret;
         }
 
@@ -102,7 +102,7 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="double"/></returns>
         public double SumaLluviasEfectivas(DateTime fecha) {
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.Pef);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.PEf);
             return ret;
         }
 
@@ -284,7 +284,7 @@
             LineaBalance linBalAFecha = LineasBalance.Find(x => x.Fecha == fecha);
             unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string municipios, out string parajes);
             DatosEstadoHidrico ret = new DatosEstadoHidrico {
-                Eficiencia = unidadCultivoDatosHidricos.Eficiencia,
+                Eficiencia = unidadCultivoDatosHidricos.EficienciaRiego,
                 Alias = unidadCultivoDatosHidricos.Alias,
                 IdCultivo = unidadCultivoDatosHidricos.IdCultivo,
                 SuperficieM2 = unidadCultivoDatosHidricos.UnidadCultivoExtensionM2,
@@ -365,12 +365,12 @@
             }
 
 
-            ret.DP = lb.Dp;
-            ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.Dp);
+            ret.DP = lb.DP;
+            ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DP);
 
             ret.AguaHastaCC = ret.CC - ret.OS;
-            ret.RecRegMm = lb.RecRegMm;
-            ret.RecRegTpo = lb.RecRegTpo;
+            ret.RecRegMm = lb.RecRegMmEfectivos;
+            ret.RecRegTpo = lb.RecRegHr;
             ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.OS, lb.LO, lb.Ks, lb.CC);
             ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NFase);
             return ret;

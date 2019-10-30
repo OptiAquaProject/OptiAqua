@@ -2,6 +2,7 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Clase estática en la que se implementan las funciones hídricas
@@ -227,7 +228,7 @@
         /// <param name="modRaizCoefB">modRaizCoefB<see cref="double"/></param>
         /// <param name="profRaizMax">profRaizMax<see cref="double"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double CalculaRoot(LineaBalance lbAnt, double it, double profRaizInicial, double modRaizCoefB, double profRaizMax) {
+        public static double RaizLongitud(LineaBalance lbAnt, double it, double profRaizInicial, double modRaizCoefB, double profRaizMax) {
             double ret;
             if (lbAnt.Root == 0) {
                 ret = profRaizInicial;
@@ -378,11 +379,10 @@
         /// Cálculo del riego efectivo
         /// </summary>
         /// <param name="riego"></param>
-        /// <param name="eto"></param>
+        /// <param name="eficienciaRiego"></param>
         /// <returns></returns>
-        public static double RiegoEfectivo(double riego, double eto) {
-            double ret = riego > 2 ? riego - 0.2 * eto : 0;
-            return ret;
+        public static double RiegoEfectivo(double riego,double eficienciaRiego) {
+            return riego * eficienciaRiego;
         }
 
         /// <summary>
@@ -508,53 +508,34 @@
             return ret;
         }
 
-        /*
-         Anterior función
         /// <summary>
-        /// Calculo de la altura por el método de la Tasa de crecimiento
+        /// Calculo de la recomentación de riego en mm.
         /// </summary>
-        /// <param name="it"></param>
-        /// <param name="itEmergencia"></param>
-        /// <param name="ModAltCoefA"></param>
-        /// <param name="ModAltCoefB"></param>
-        /// <param name="ModAltCoefC"></param>
+        /// <param name="raw">The raw<see cref="double"/></param>
+        /// <param name="taw">The taw<see cref="double"/></param>
+        /// <param name="nFase">The nFase<see cref="int"/></param>
+        /// <param name="driEnd">The driEnd<see cref="double"/></param>
+        /// <param name="faseInicioRiego">The faseInicioRiego<see cref="int"/></param>
+        /// <param name="ieUmbralRiego">The ieUmbralRiego<see cref="double"/></param>
+        /// <param name="ieLimiteRiego">The ieLimiteRiego<see cref="double"/></param>
         /// <returns></returns>
-        public static double TcAlt(double it, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
-            double ret;
-            if (it < itEmergencia) {
-                ret = 0;
-            } else {
-                //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
-                if (ModAltCoefC != null && ModAltCoefC != 0) {
-                    ret = (ModAltCoefA * ModAltCoefB * Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))) / Math.Pow((1 + Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))), 2);
-                } else {
-                    ret = ModAltCoefB;
-                }
-            }
-            return ret;
-        }
-        */
+        public static double RecomendacionRiegoMm(double raw, double taw, int nFase, double driEnd, int faseInicioRiego, double ieUmbralRiego, double ieLimiteRiego) {
+            // Conversion de Indices de estrés a valores de agotamiento
+            double drUmbralRiego = 0;
+            if (ieUmbralRiego < 0)
+                drUmbralRiego = taw - (1 + ieUmbralRiego) * (taw - raw);
+            else
+                drUmbralRiego = raw * (1 - ieUmbralRiego);
 
-        /// <summary>
-        /// CalculaRecomendacionRiegoMm
-        /// </summary>
-        /// <param name="raw">raw<see cref="double"/></param>
-        /// <param name="nFase">nFase<see cref="int"/></param>
-        /// <param name="driEnd">driEnd<see cref="double"/></param>
-        /// <param name="faseInicioRiego">faseInicioRiego<see cref="int"/></param>
-        /// <param name="pAguaMinima">pAguaMinima<see cref="double"/></param>
-        /// <returns><see cref="double"/></returns>
-        public static double RecomendacionRiegoMm(double raw, int nFase, double driEnd, int faseInicioRiego, double pAguaMinima) {
-            /*
-                1- Cambiar el funcionamiento de la función para hacerlo más claro
-                2- Añadir las variables faseInicioRiego y pAguaMinima.
-                      faseInicioRiego, en el codigo anterior por defecto se regaba siempre que nFase > 1, pensamos que tendría
-                      más flexibilidad si se pudiera parametrizar esto, cada cultivo podría tener su propia fase de inicio
-                      pAguaMinima, porcentaje de agua a partir del cual se hace recomendable regar, valores recomendados entre 0.1 y 0.8
-          */
+            double drLimiteRiego = 0;
+            if (ieLimiteRiego < 0)
+                drLimiteRiego = taw - (1 + ieLimiteRiego) * (taw - raw);
+            else
+                drLimiteRiego = raw * (1 - ieLimiteRiego);
+
             double ret = 0;
-            if ((nFase >= faseInicioRiego) && (driEnd > raw * pAguaMinima)) { /* comprobar que este condicional es correcto */
-                ret = driEnd;
+            if (nFase >= faseInicioRiego && driEnd > drUmbralRiego) {
+                ret = driEnd - drLimiteRiego;
             }
             return ret;
         }
@@ -623,6 +604,16 @@
         }
 
         /// <summary>
+        /// Devuelve el máximo valor de la tabla de umbrales para el tipo de estres indicado por idTipoEstres
+        /// </summary>
+        /// <param name="idTipoEstres"></param>
+        /// <returns></returns>
+        public static double MaxUmbralEstres(string idTipoEstres) {
+            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
+            return ltu.Max(x => x.Umbral);
+        }
+
+        /// <summary>
         /// CalculaLineaBalance
         /// </summary>
         /// <param name="dh">dh<see cref="UnidadCultivoDatosHidricos"/></param>
@@ -642,13 +633,13 @@
             UnidadCultivoDatosExtra datoExtra = dh.DatoExtra(fecha);
             // Parámetros de desarrollo del cultivo
             lb.IT = (lbAnt.IT + incT);
-            lb.TcCob = TcCob(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);            
+            lb.TcCob = TcCob(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
             lb.Cob = Cobertura(lbAnt.Cob, lb.TcCob, incT, datoExtra);
             lb.NFase = NFaseDesarrollo(fecha, lb.Cob, lbAnt.NFase, dh.UnidadCultivoCultivoFasesList, dh.CultivoFasesList);
-            lb.tcAlt = TcAlt(lb.IT, lb.NFase, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
-            lb.Alt = Altura(lbAnt.Alt, lb.tcAlt, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
-            lb.Root = CalculaRoot(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
-            
+            lb.TcAlt = TcAlt(lb.IT, lb.NFase, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
+            lb.Alt = Altura(lbAnt.Alt, lb.TcAlt, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
+            lb.Root = RaizLongitud(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
+
             lb.Mad = lbAnt.Mad > 0 ? lb.Mad = lbAnt.Mad + 1 : lb.Cob > 0.8 ? 1 : 0;
             lb.EtapaDes = dh.UnidadCultivoCultivoFasesList[lb.NFase - 1].Fase;
 
@@ -658,10 +649,10 @@
             lb.Taw = lb.CC - lb.PM;
 
             // Parámetros de aporte de agua
-            lb.lluvia = dh.LluviaMm(fecha);
-            lb.Pef = PrecipitacionEfectiva(lb.lluvia, dh.Eto(fecha));
+            lb.Lluvia = dh.LluviaMm(fecha);
+            lb.PEf = PrecipitacionEfectiva(lb.Lluvia, dh.Eto(fecha));
             lb.Riego = dh.RiegoMm(fecha);
-            lb.RieEfec = RiegoEfectivo(lb.Riego, dh.Eto(fecha));
+            lb.RieEfec = RiegoEfectivo(lb.Riego, dh.EficienciaRiego);
             lb.AguaCrecRaiz = AguaAportadaCrecRaiz(0.8, lb.Taw, lbAnt.Taw);
 
             // Parámetros de cálculo del balance
@@ -672,18 +663,21 @@
             // Parámetros de estrés en suelo
             lb.P = DepletionFactor(lb.KcAdjClima * dh.Eto(fecha), lb.NFase, dh.UnidadCultivoCultivoFasesList);
             lb.Raw = lb.P * lb.Taw; // depletion factor f(ETc)
-            lb.Raw2 = RAW2(lb.Taw, lb.NFase, dh.UnidadCultivoCultivoFasesList); // depletion factor fijo
+            lb.Raw2 = RAW2(lb.Taw, lb.NFase, dh.UnidadCultivoCultivoFasesList); 
             lb.LO = (lb.CC - lb.Raw); // depletion factor f(ETc)
             lb.LOFijo = (lb.CC - lb.Raw2); // depletion factor fijo
             lb.Ks = Ks(lb.Taw, lb.Raw, lb.DriStart); // K de estrés hídrico
 
             lb.EtcAdj = EtcAdj(dh.Eto(fecha), lb.KcAdjClima, lb.Ks); //ETc ajustada por clima y estrés
 
-            lb.Dp = DrenajeEnProdundidad(lb.EtcAdj, lb.RieEfec, lb.Pef, lb.AguaCrecRaiz, lb.DriStart);
-            lb.DriEnd = DriEnd(lb.Taw, lb.EtcAdj, lb.RieEfec, lb.Pef, lb.DriStart, lb.Dp, 0, 0.8, lbAnt, datoExtra);
+            lb.DP = DrenajeEnProdundidad(lb.EtcAdj, lb.RieEfec, lb.PEf, lb.AguaCrecRaiz, lb.DriStart);
+            lb.DriEnd = DriEnd(lb.Taw, lb.EtcAdj, lb.RieEfec, lb.PEf, lb.DriStart, lb.DP, 0, 0.8, lbAnt, datoExtra);
             lb.OS = lb.CC - lb.DriEnd;
-            lb.RecRegMm = RecomendacionRiegoMm(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8); //!!! Esta función es incorrecta
-            lb.RecRegTpo = RecomendacionRiegoHr(lb.Raw, lb.NFase, lb.DriEnd, 2, 0.8, 0); //!!! POR DESARROLLAR
+
+            double indiceEstres = IndiceEstres(lb.OS, lb.LO, lb.Ks, lb.CC);
+            lb.RecRegMmEfectivos = RecomendacionRiegoMm(lb.Raw, lb.Taw, lb.NFase, lb.DriEnd, dh.FaseInicioRiego, dh.ClaseEstresUmbralInferior(lb.NFase, indiceEstres), dh.ClaseEstresUmbralSuperior(lb.NFase, indiceEstres));
+            lb.RecRegMmReales = lb.RecRegMmEfectivos / dh.EficienciaRiego;
+            lb.RecRegHr = lb.RecRegMmReales / dh.Pluviometria;
 
             return lb;
         }

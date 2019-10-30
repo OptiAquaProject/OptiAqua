@@ -14,5 +14,14 @@
 
             return View();
         }
+
+        public ActionResult Importacion() {
+            ViewBag.Title = "Importación para la creación masica de unidades de cultivo.";
+            return View();
+        }
+        
+        public ActionResult EspecificacionesImportacion() {            
+            return View();
+        }
     }
 }

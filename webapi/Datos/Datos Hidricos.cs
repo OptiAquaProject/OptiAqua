@@ -2,6 +2,7 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Define <see cref="UnidadCultivoDatosHidricos" />
@@ -67,7 +68,7 @@
         /// <summary>
         /// Gets the Eficiencia
         /// </summary>
-        public double? Eficiencia => riegoTipo.Eficiencia;
+        public double EficienciaRiego => riegoTipo.Eficiencia;
 
         /// <summary>
         /// Gets the Alias
@@ -122,7 +123,7 @@
         /// <summary>
         /// Gets the Pluviometria
         /// </summary>
-        public double? Pluviometria => unidadCultivoCultivo.Pluviometria;
+        public double Pluviometria => unidadCultivoCultivo.Pluviometria;
 
         /// <summary>
         /// Gets the TipoRiego
@@ -255,6 +256,37 @@
         /// Gets the ListaUcSuelo
         /// </summary>
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
+        public int FaseInicioRiego => cultivo.FaseInicioRiego;
+
+        public double ClaseEstresUmbralInferior(int fase,double indiceEstres) {
+            double ret = -1;
+            int nFaseBase0 = fase - 1 > 0 ? fase - 1 : 0;
+            string idTipoEstres = UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres;
+            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);            
+            if (ltu?.Count == 0)
+                return ret;
+            int i = 0;
+            ret = -1;
+            while (indiceEstres > ltu[i].IdUmbral && i<ltu.Count) {
+                ret = ltu[i++].Umbral;
+            }
+            return ret;
+        }
+
+        public double ClaseEstresUmbralSuperior(int fase, double indiceEstres) {
+            double ret = 1;
+            int nFaseBase0 = fase - 1 > 0 ? fase - 1 : 0;
+            string idTipoEstres = UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres;
+            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
+            if (ltu?.Count == 0)
+                return ret;
+            int i = ltu.Count-1;
+            ret = 1;
+            while (indiceEstres < ltu[i].IdUmbral && i >=0) {
+                ret = ltu[--i].Umbral;
+            }
+            return ret;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnidadCultivoDatosHidricos"/> class.
@@ -448,6 +480,6 @@
         public string ClaseEstres(double indiceEstres, int nFase) {
             int nFaseBase0 = nFase - 1;
             return CalculosHidricos.ClaseEstres(UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres, indiceEstres);
-        }
+        }        
     }
 }
