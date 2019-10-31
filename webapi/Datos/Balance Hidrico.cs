@@ -2,6 +2,7 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     /// <summary>
@@ -18,10 +19,10 @@
         /// Initializes a new instance of the <see cref="BalanceHidrico"/> class.
         /// </summary>
         /// <param name="unidadCultivoDatosHidricos">The unidadCultivoDatosHidricos<see cref="UnidadCultivoDatosHidricos"/></param>
-        /// <param name="actualizaFases">The actualizaFases<see cref="bool"/></param>
-        public BalanceHidrico(UnidadCultivoDatosHidricos unidadCultivoDatosHidricos, bool actualizaFases) {
+        /// <param name="actualizaEtapas">The actualizaEtapas<see cref="bool"/></param>
+        public BalanceHidrico(UnidadCultivoDatosHidricos unidadCultivoDatosHidricos, bool actualizaEtapas) {
             this.unidadCultivoDatosHidricos = unidadCultivoDatosHidricos;
-            CalculaBalance(actualizaFases);
+            CalculaBalance(actualizaEtapas);
         }
 
         /// <summary>
@@ -40,7 +41,7 @@
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 return 0;
-            ret = lin.OS - lin.CC;
+            ret = lin.ContenidoAguaSuelo - lin.CapacidadCampo;
             return ret;
         }
 
@@ -56,8 +57,8 @@
             foreach (LineaBalance lin in LineasBalance) {
                 if (lin.Fecha <= fecha) {
                     sumaRiego += lin.Riego;
-                    sumaRiegoEfec += lin.RieEfec;
-                    sumaDrenaje += lin.DP;
+                    sumaRiegoEfec += lin.RiegoEfectivo;
+                    sumaDrenaje += lin.DrenajeProfundidad;
                 }
             }
             return (sumaDrenaje + sumaRiego - sumaRiegoEfec);
@@ -81,7 +82,7 @@
         /// <returns>The <see cref="double"/></returns>
         public double SumaDrenajeM3(DateTime fecha) {
             // Los datos de riego del balance hídrico ya han tenido en cuenta los datos Extra
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.DP);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.DrenajeProfundidad);
             return ret;
         }
 
@@ -102,7 +103,7 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="double"/></returns>
         public double SumaLluviasEfectivas(DateTime fecha) {
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.PEf);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.LluviaEfectiva);
             return ret;
         }
 
@@ -115,7 +116,7 @@
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron datos del balance para esa fecha.");
-            return (lin.CC - lin.OS);
+            return (lin.CapacidadCampo - lin.ContenidoAguaSuelo);
         }
 
         /// <summary>
@@ -123,7 +124,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="int"/></returns>
-        public int NDIasEstres(DateTime fecha) => LineasBalance.Count(x => (x.Fecha <= fecha) && (x.Ks < 1));
+        public int NDIasEstres(DateTime fecha) => LineasBalance.Count(x => (x.Fecha <= fecha) && (x.CoeficienteEstresHidrico < 1));
 
         /// <summary>
         /// ETcMedia3Dias
@@ -136,9 +137,9 @@
             double suma = 0;
             double? etc1, etc2, etc3;
             int c = LineasBalance.Count;
-            etc1 = LineasBalance.Find(x => x.Fecha == fecha)?.EtcAdj;
-            etc2 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-1))?.EtcAdj;
-            etc3 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-2))?.EtcAdj;
+            etc1 = LineasBalance.Find(x => x.Fecha == fecha)?.EtcAjustadoClima;
+            etc2 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-1))?.EtcAjustadoClima;
+            etc3 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-2))?.EtcAjustadoClima;
             if (etc1 != null) {
                 nItem++;
                 suma += (double)etc1;
@@ -166,7 +167,7 @@
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron valores en el balance para la fecha indicada.");
-            double ret = lin.CC - lin.PM;
+            double ret = lin.CapacidadCampo - lin.PuntoMarchitez;
             return ret;
         }
 
@@ -195,10 +196,10 @@
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron datos del balance para esa fecha.");
-            if (lin.OS > lin.LO) {
-                return ((lin.OS - lin.LO) / (lin.CC - lin.LO));
+            if (lin.ContenidoAguaSuelo > lin.LimiteAgotamiento) {
+                return ((lin.ContenidoAguaSuelo - lin.LimiteAgotamiento) / (lin.CapacidadCampo - lin.LimiteAgotamiento));
             } else {
-                return (lin.Ks - 1);
+                return (lin.CoeficienteEstresHidrico - 1);
             }
         }
 
@@ -209,30 +210,33 @@
         /// <returns>The <see cref="double"/></returns>
         public double SumaRiegoEfectivo(DateTime fecha) {
             // Los datos de riego del balance hídrico ya han tenido en cuenta los datos Extra
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.RieEfec);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.RiegoEfectivo);
             return ret;
         }
 
         /// <summary>
         /// CalculaBalance. Función de uso interno en la clase para calcular el balance. Se ejecuta una única vez para añadir las líneas de balance.
         /// </summary>
-        /// <param name="actualizaFases">The actualizaFases<see cref="bool"/></param>
-        private void CalculaBalance(bool actualizaFases) {
+        /// <param name="actualizaEtapas">The actualizaEtapas<see cref="bool"/></param>
+        private void CalculaBalance(bool actualizaEtapas) {
             LineaBalance lbAnt = new LineaBalance();
             DateTime fecha = unidadCultivoDatosHidricos.FechaSiembra();
             DateTime fechaFinalEstudio = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
             int dda = 1;
-            if (unidadCultivoDatosHidricos.NFases <= 0)
-                throw new Exception("No se han definido fases para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
+            if (unidadCultivoDatosHidricos.nEtapas <= 0)
+                throw new Exception("No se han definido etapas para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
             while (fecha <= fechaFinalEstudio) {
+                if (dda == 83)
+                    dda = 83;
                 LineaBalance lineaBalance = CalculosHidricos.CalculaLineaBalance(unidadCultivoDatosHidricos, lbAnt, fecha);
                 lineaBalance.DDA = dda++;
+                Debug.Print(dda.ToString());
                 LineasBalance.Add(lineaBalance);
                 lbAnt = lineaBalance;
                 fecha = fecha.AddDays(1);
             }
-            if (actualizaFases)
-                DB.FechasFasesSave(unidadCultivoDatosHidricos.UnidadCultivoCultivoFasesList);
+            if (actualizaEtapas)
+                DB.FechasEtapasSave(unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList);
         }
 
         /// <summary>
@@ -270,7 +274,7 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="double"/></returns>
         public double SumaConsumoAguaCultivo(DateTime fecha) {
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.EtcAdj);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.EtcAjustadoClima);
             return ret;
         }
 
@@ -310,8 +314,8 @@
                 AguaUtil = AguaUtil(fecha),
                 RegarEnNDias = RegarEnNDias(fecha),
                 AguaUtilTotal = AguaUtilTotal(fecha),
-                CapacidadDeCampo = linBalAFecha.CC,
-                PuntoDeMarchited = linBalAFecha.PM,
+                CapacidadDeCampo = linBalAFecha.CapacidadCampo,
+                PuntoDeMarchited = linBalAFecha.PuntoMarchitez,
                 AguaUtilOptima = AguaUtilOptima(fecha),
                 AguaPerdida = AguaPerdida(fecha),
                 CosteAgua = CosteAgua(fecha),
@@ -333,9 +337,9 @@
             LineaBalance lb = LineaBalance(fechaDeCalculo);
 
             ret.RiegoTotal = SumaRiegosM3(fechaDeCalculo);
-            ret.RiegoEfecTotal = SumaRiegoEfectivo(fechaDeCalculo);
+            ret.RiegoEfectivoTotal = SumaRiegoEfectivo(fechaDeCalculo);
             ret.LluviaTotal = SumaLluvias(fechaDeCalculo);
-            ret.LluviaEfecTotal = SumaLluviasEfectivas(fechaDeCalculo);
+            ret.LluviaEfectivaTotal = SumaLluviasEfectivas(fechaDeCalculo);
             ret.AguaPerdida = AguaPerdida(fechaDeCalculo);
             ret.ConsumoAguaCultivo = SumaConsumoAguaCultivo(fechaDeCalculo);
             ret.DiasEstres = NDIasEstres(fechaDeCalculo);
@@ -344,35 +348,35 @@
             ret.CosteAguaRiego = CosteAgua(fechaDeCalculo);
             ret.CosteAguaDrenaje = CosteDrenaje(fechaDeCalculo);
 
-            ret.CC = lb.CC;
+            ret.CapacidadCampo = lb.CapacidadCampo;
 
-            ret.LO = lb.LO;
-            ret.PM = lb.PM;
-            ret.OS = lb.OS;
+            ret.LimiteAgotamiento = lb.LimiteAgotamiento;
+            ret.PuntoMarchitez = lb.PuntoMarchitez;
+            ret.ContenidoAguaSuelo = lb.ContenidoAguaSuelo;
 
-            ret.CC_porcent = ret.CC / 100;
+            ret.CapacidadCampoPorcentaje = ret.CapacidadCampo / 100;
             try {
-                ret.LO_porcent = (ret.LO - ret.PM) / (ret.CC - ret.PM);
+                ret.LimiteAgotamientoPorcentaje = (ret.LimiteAgotamiento - ret.PuntoMarchitez) / (ret.CapacidadCampo - ret.PuntoMarchitez);
             } catch {
-                ret.LO_porcent = double.NaN;
+                ret.LimiteAgotamientoPorcentaje = double.NaN;
             }
 
-            ret.PM_porcent = 0;
+            ret.PuntoMarchitezPorcentaje = 0;
             try {
-                ret.OS_porcent = (ret.OS - ret.PM) / (ret.CC - ret.PM);
+                ret.ContenidoAguaSueloPorcentaje = (ret.ContenidoAguaSuelo - ret.PuntoMarchitez) / (ret.CapacidadCampo - ret.PuntoMarchitez);
             } catch {
-                ret.OS_porcent = double.NaN;
+                ret.ContenidoAguaSueloPorcentaje = double.NaN;
             }
 
 
-            ret.DP = lb.DP;
-            ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DP);
+            ret.DrenajeProfuncidad = lb.DrenajeProfundidad;
+            ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DrenajeProfundidad);
 
-            ret.AguaHastaCC = ret.CC - ret.OS;
-            ret.RecRegMm = lb.RecRegMmEfectivos;
-            ret.RecRegTpo = lb.RecRegHr;
-            ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.OS, lb.LO, lb.Ks, lb.CC);
-            ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NFase);
+            ret.AguaHastaCapacidadCampo = ret.CapacidadCampo - ret.ContenidoAguaSuelo;
+            ret.RecomendacionRiegoMm = lb.RecRegMmEfectivos;
+            ret.RecomendacionRiegoHr = lb.RecRegHr;
+            ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
+            ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NumeroEtapaDesarrollo);
             return ret;
         }
     }

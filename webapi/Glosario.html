@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title>Glosario Optiaqua</title>
+</head>
+<body>
+    <h2>Glosario OptiAqua v3</h2>
+    <table>
+        <tr><th>Nombre</th><th>Descripción</th><th>Unidades<th>Abreviatura</th></tr>
+        <tr><td>IntegralTermica</td><td>Integral termica activa del cultivo</td><td>ºC<td>IT </td></tr>
+        <tr><td>DDA</td><td>Día del año (calendario juliano)</td><td>dias<td>DDA</td></tr>
+        <tr><td>TasaCrecimientoCobertura</td><td>Tasa de crecimiento diaria de la cobertura</td><td>tanto por uno/ºC<td>TcCob </td></tr>
+        <tr><td>TasaCrecimientoAltura</td><td>Tasa de crecimiento diaria de la altura del cultivo</td><td>m/ºC<td>TcAlt </td></tr>
+        <tr><td>Cobertura</td><td>Cobertura del cultivo: suelo cubierto por el cultivo</td><td>tanto por uno<td>Cob </td></tr>
+        <tr><td>AlturaCultivo</td><td>Altura del cultivo</td><td>metros<td>Alt </td></tr>
+        <tr><td>LongitudRaiz</td><td>Longitud de la raíz </td><td>metros<td>Root </td></tr>
+        <tr><td>NumeroEtapaDesarrollo</td><td>Número de la etapa de desarrollo en la que está el cultivo</td><td>NA<td>NFase </td></tr>
+        <tr><td>DiasMaduracion</td><td>Número de días desde el inicio de la fase de maduración del cultivo</td><td>dias<td>Mad </td></tr>
+        <tr><td> NombreEtapaDesarrollo</td><td>Nombre de la etapa de desarrollo en la que está el cultivo</td><td>NA<td>EtapaDes </td></tr>
+        <tr><td>CapacidadCampo</td><td>Capacidad de campo</td><td>mm<td>CC </td></tr>
+        <tr><td>PuntoMarchitez</td><td>Punto de marchitez</td><td>mm<td>PM </td></tr>
+        <tr><td>AguaDisponibleTotal</td><td>Agua total disponible en la zona radicular</td><td>mm<td>Taw </td></tr>
+        <tr><td>FraccionAgotamiento</td><td>Fracción de agotamiento del agua en el suelo para que el cultivo no sufra estrés</td><td>tanto por uno<td>P </td></tr>
+        <tr><td>AguaFacilmenteExtraible</td><td>Agua fácilmente extraíble, dependiente de factores climáticos</td><td>mm<td>Raw </td></tr>
+        <tr><td> AguaFacilmenteExtraibleFija</td><td>Agua fácilmente extraíble, independiente de factores climáticos</td><td>mm<td>Raw2 </td></tr>
+        <tr><td>LimiteAgotamiento</td><td>Límite de agotamiento óptimo para el cultivo, dependiente de factores climáticos </td><td>mm<td>LO </td></tr>
+        <tr><td>LimiteAgotamientoFijo</td><td>Límite de agotamiento óptimo fijo, independiente de factores climáticos</td><td>mm<td>LOFijo </td></tr>
+        <tr><td>Lluvia</td><td>Cantidad de agua de lluvia recogida por el pluviómetro</td><td>mm<td>Lluvia </td></tr>
+        <tr><td>LluviaEfectiva</td><td>Precipitación efectiva, cantidad de lluvia utilizable por el cultivo</td><td>mm<td>PEf </td></tr>
+        <tr><td>Riego</td><td>Cantidad de agua bruta aplicada al cultivo</td><td>mm<td>Riego </td></tr>
+        <tr><td>RiegoEfectivo</td><td>Cantidad de agua de riego utilizable por el cultivo</td><td>mm<td>RieEfec </td></tr>
+        <tr><td>AgotamientoInicioDia</td><td>Agotamiento de agua en la zona radicular al inicio del día</td><td>mm<td>DriStart </td></tr>
+        <tr><td>Kc</td><td>Coeficiente de cultivo</td><td>NA<td>Kc </td></tr>
+        <tr><td>KcAjustadoClima</td><td>Coeficiente de cultivo ajustado por condiciones climáticas</td><td>NA<td>KcAdjClima </td></tr>
+        <tr><td>CoeficienteEstresHidrico</td><td>Coeficiente de estrés hídrico</td><td>NA<td>Ks </td></tr>
+        <tr><td>ETcAjustadoClima</td><td>Evapotranspiración de cultivo con ajuste por condiciones climáticas</td><td>mm<td>EtcAdj </td></tr>
+        <tr><td>DrenajeProfundidad</td><td>Drenaje en profundidad</td><td>mm<td>DP </td></tr>
+        <tr><td>AgotamientoFinalDia</td><td>Agotamiento de agua en la zona radicular al final del día</td><td>mm<td>DriEnd </td></tr>
+        <tr><td>ContenidoAguaSuelo</td><td>Contenido de agua en el suelo</td><td>mm<td>OS </td></tr>
+        <tr><td>RecomendacionRiegoNeto</td><td>Recomendación de riego neto (sin considerar eficiencia sistema riego)</td><td>mm<td>RecRegMmEfectivos </td></tr>
+        <tr><td>RecomendacionRiegoBruto</td><td>Recomendación de riego bruto (considerando eficiencia riego)</td><td>mm<td>RecRegMmReales </td></tr>
+        <tr><td>TiempoRiegoBruto</td><td>Recomendación de riego bruto en tiempo</td><td>horas<td>RecRegHr </td></tr>
+        <tr><td>CapacidadCampoRefPM</td><td>Capacidad de campo referenciada al punto de marchitez</td><td>mm<td>cc2 </td></tr>
+        <tr><td>PuntoMarchitezRefPM</td><td>Punto de marchitez referenciada al punto de marchitez</td><td>mm<td>pm2 </td></tr>
+        <tr><td> ContenidoAguaSuelo RefPM</td><td>Contenido de agua en el suelo referenciada al punto de marchitez</td><td>mm <td>os2 </td></tr>
+        <tr><td> LimiteAgotamientoRefPM</td><td>Límite de agotamiento óptimo para el cultivo, dependiente de factores climáticos referenciado al punto de marchitez</td><td>mm<td>lo2 </td></tr>
+        <tr><td> LimiteAgotamientoFijo RefPM</td><td>Límite de agotamiento óptimo fijo, independiente de factores climáticos referenciado al punto de marchitez</td><td>mm<td>loFijo2 </td></tr>
+        <tr><td>RiegoTotal</td><td>Riego total aportado durante la campaña</td><td>mm<td>RiegoTotal</td></tr>
+        <tr><td>RiegoEfectivoTotal</td><td>Riego efectivo total aportado durante la campaña</td><td>mm<td>RiegoEfecTotal</td></tr>
+        <tr><td>LluviaTotal</td><td>Lluvia total registrada durante la campaña</td><td>mm<td>LluviaTotal</td></tr>
+        <tr><td>LluviaEfectivaTotal</td><td>Lluvia efectiva total regustrada durante la campaña</td><td>mm<td>LluviaEfecTotal</td></tr>
+        <tr><td>AguaPerdida</td><td>Agua perdida por drenaje durante la campaña</td><td>mm<td>AguaPerdida</td></tr>
+        <tr><td>ConsumoAguaCultivo</td><td>Consumo total del cultivo durante la campaña</td><td>mm<td>ConsumoAguaCultivo</td></tr>
+        <tr><td>DiasEstres</td><td>Días de estrés sucedidos durante la campaña</td><td>dias<td>DiasEstres</td></tr>
+        <tr><td>DeficitRiego</td><td>Deficit de Riego</td><td>mm<td>DeficitRiego</td></tr>
+        <tr><td>CosteDeficitRiego</td><td>Pérdida económica por déficit de riego</td><td>€<td>CosteDeficitRiego</td></tr>
+        <tr><td>CosteAguaRiego</td><td>Coste del agua de riego</td><td>€<td>CosteAguaRiego</td></tr>
+        <tr><td>CosteAguaDrenaje</td><td>Coste del agua perdida por drenaje</td><td>€<td>CosteAguaDrenaje</td></tr>
+        <tr><td>CapacidadCampo</td><td>Capacidad de campo</td><td>mm<td>CC</td></tr>
+        <tr><td>LimiteAgotamiento</td><td>Límite de agotamiento óptimo para el cultivo, dependiente de factores climáticos </td><td>mm<td>LO</td></tr>
+        <tr><td>PuntoMarchitez</td><td>Punto de marchitez</td><td>mm<td>PM</td></tr>
+        <tr><td>ContenidoAguaSuelo</td><td>Contenido de agua en el suelo</td><td>mm<td>OS</td></tr>
+        <tr><td>CapacidadCampoPorcentaje</td><td>Capacidad de campo en porcentaje</td><td>%<td>CC_porcent</td></tr>
+        <tr><td>LimiteAgotamientoPorcentaje</td><td>Límite de agotamiento óptimo para el cultivo, dependiente de factores climáticos en porcentaje</td><td>%<td>LO_porcent</td></tr>
+        <tr><td>PuntoMarchitezPorcentaje</td><td>Punto de marchitez en porcentaje</td><td>%<td>PM_porcent</td></tr>
+        <tr><td>ContenidoAguaSueloPorcentaje</td><td>Contenido de agua en el suelo en porcentaje</td><td>%<td>OS_porcent</td></tr>
+        <tr><td>DrenajeProfundidad</td><td>Drenaje en el último día del balance</td><td>mm<td>DP</td></tr>
+        <tr><td>AvisoDrenaje</td><td>Indica si ha existido un drenaje alto</td><td>NA<td>AvisoDrenaje</td></tr>
+        <tr><td>AguaHastaCapacidadCampo</td><td>Cantidad de agua necesaria para llegar a capacidad de campo</td><td>mm<td>AguaHastaCC</td></tr>
+        <tr><td>RecomendacionRiegoBruto</td><td>Recomendación de riego bruto (considerando eficiencia riego) enel último día del balance</td><td>mm<td>RecRegMm</td></tr>
+        <tr><td>TiempoRiegoBruto</td><td>Recomendación de riego bruto en tiempo el último día del balance</td><td>horas<td>RecRegTpo</td></tr>
+        <tr><td>IndiceEstres</td><td>Índice de estrés del cultivo</td><td>NA<td>IndiceEstres</td></tr>
+        <tr><td>ClaseEstres</td><td>Clasificación del estrés del cultivo</td><td>NA<td>ClaseEstres</td></tr>
+    </table>
+
+</body>
+</html>

@@ -131,17 +131,17 @@
         public string TipoRiego => riegoTipo.TipoRiego;
 
         /// <summary>
-        /// Gets the UnidadCultivoCultivoFasesList
+        /// Gets the UnidadCultivoCultivoEtapasList
         /// </summary>
-        public List<UnidadCultivoCultivoFases> UnidadCultivoCultivoFasesList { get; private set; }
+        public List<UnidadCultivoCultivoEtapas> UnidadCultivoCultivoEtapasList { get; private set; }
 
         /// <summary>
-        /// Gets the CultivoFasesList
+        /// Gets the CultivoEtapasList
         /// </summary>
-        public List<CultivoFases> CultivoFasesList { get; private set; }
+        public List<CultivoEtapas> CultivoEtapasList { get; private set; }
 
         /// <summary>
-        /// Retorna primera fecha de las fases como fecha de siembra.
+        /// Retorna primera fecha de las etapas como fecha de siembra.
         /// En caso de que no existandatos retorna fecha actual.
         /// </summary>
         /// <returns></returns>
@@ -178,9 +178,9 @@
         public string TipoSueloDescripcion => unidadCultivo.TipoSueloDescripcion;
 
         /// <summary>
-        /// Gets the NFases
+        /// Gets the nEtapas
         /// </summary>
-        public int NFases => CultivoFasesList.Count;
+        public int nEtapas => CultivoEtapasList.Count;
 
         /// <summary>
         /// Gets the CultivoTBase
@@ -256,34 +256,34 @@
         /// Gets the ListaUcSuelo
         /// </summary>
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
-        public int FaseInicioRiego => cultivo.FaseInicioRiego;
+        public int EtapaInicioRiego => cultivo.EtapaInicioRiego;
 
-        public double ClaseEstresUmbralInferior(int fase,double indiceEstres) {
+        public double ClaseEstresUmbralInferior(int nEtapa,double indiceEstres) {
             double ret = -1;
-            int nFaseBase0 = fase - 1 > 0 ? fase - 1 : 0;
-            string idTipoEstres = UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres;
+            int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
+            string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
             List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);            
             if (ltu?.Count == 0)
                 return ret;
             int i = 0;
             ret = -1;
-            while (indiceEstres > ltu[i].IdUmbral && i<ltu.Count) {
+            while (indiceEstres > ltu[i].Umbral && i<ltu.Count) {
                 ret = ltu[i++].Umbral;
             }
             return ret;
         }
 
-        public double ClaseEstresUmbralSuperior(int fase, double indiceEstres) {
+        public double ClaseEstresUmbralSuperior(int nEtapa, double indiceEstres) {
             double ret = 1;
-            int nFaseBase0 = fase - 1 > 0 ? fase - 1 : 0;
-            string idTipoEstres = UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres;
+            int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
+            string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
             List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
             if (ltu?.Count == 0)
                 return ret;
             int i = ltu.Count-1;
             ret = 1;
-            while (indiceEstres < ltu[i].IdUmbral && i >=0) {
-                ret = ltu[--i].Umbral;
+            while (i >= 0 && indiceEstres < ltu[i].Umbral ) {
+                ret = ltu[i--].Umbral;
             }
             return ret;
         }
@@ -302,8 +302,8 @@
 
             pUnidadCultivoExtensionM2 = DB.UnidadCultivoExtensionM2(IdUnidadCultivo, idTemporada);
 
-            if ((UnidadCultivoCultivoFasesList = DB.UnidadCultivoCultivoFasesList(IdUnidadCultivo, idTemporada)).Count == 0)
-                throw new Exception($"Imposible cargar las fases para la unidad de cultivo {IdUnidadCultivo}.");
+            if ((UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(IdUnidadCultivo, idTemporada)).Count == 0)
+                throw new Exception($"Imposible cargar las etapas para la unidad de cultivo {IdUnidadCultivo}.");
 
             if ((unidadCultivoCultivo = DB.UnidadCultivoCultivo(IdUnidadCultivo, idTemporada)) == null)
                 throw new Exception("Imposible datos del cultivo en la temporada indicada.");
@@ -329,8 +329,8 @@
 
             lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(IdUnidadCultivo, fechaSiembra, fechaFinal);
 
-            if ((CultivoFasesList = DB.CultivoFasesList(unidadCultivoCultivo.IdCultivo)) == null)
-                throw new Exception($"Imposible cargar datos fases para el cultivo para el cultivo: {unidadCultivoCultivo.IdCultivo}");
+            if ((CultivoEtapasList = DB.CultivoEtapasList(unidadCultivoCultivo.IdCultivo)) == null)
+                throw new Exception($"Imposible cargar datos etapas para el cultivo para el cultivo: {unidadCultivoCultivo.IdCultivo}");
         }
 
         /// <summary>
@@ -350,7 +350,7 @@
                 temporada = DB.Temporada(idTemporada),
                 unidadCultivo = DB.UnidadCultivo(IdUnidadCultivo),
                 pUnidadCultivoExtensionM2 = DB.UnidadCultivoExtensionM2(IdUnidadCultivo, idTemporada),
-                UnidadCultivoCultivoFasesList = DB.UnidadCultivoCultivoFasesList(IdUnidadCultivo, idTemporada),
+                UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(IdUnidadCultivo, idTemporada),
                 unidadCultivoCultivo = DB.UnidadCultivoCultivo(IdUnidadCultivo, idTemporada)
             };
             DB.DatosClimaticosRefresh();
@@ -364,7 +364,7 @@
             ret.riegoTipo = DB.RiegoTipo(ret.unidadCultivoCultivo?.IdTipoRiego);
             ret.lDatosRiego = DB.RiegosList(IdUnidadCultivo, (DateTime)fechaSiembra, (DateTime)fechaFinal);
             ret.lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(IdUnidadCultivo, fechaSiembra, fechaFinal);
-            ret.CultivoFasesList = DB.CultivoFasesList(ret.unidadCultivoCultivo?.IdCultivo);
+            ret.CultivoEtapasList = DB.CultivoEtapasList(ret.unidadCultivoCultivo?.IdCultivo);
 
             return ret;
         }
@@ -391,14 +391,14 @@
         /// <returns>Fecha din del estudio</returns>
         public DateTime FechaFinalDeEstudio() {
             DateTime ret = temporada.FechaFinal;
-            if (UnidadCultivoCultivoFasesList == null)
+            if (UnidadCultivoCultivoEtapasList == null)
                 return ret;
-            if (UnidadCultivoCultivoFasesList.Count == 0)
+            if (UnidadCultivoCultivoEtapasList.Count == 0)
                 return ret;
-            if (UnidadCultivoCultivoFasesList[UnidadCultivoCultivoFasesList.Count - 1].FechaFinFaseConfirmada != null)
-                ret = (DateTime)UnidadCultivoCultivoFasesList[UnidadCultivoCultivoFasesList.Count - 1].FechaFinFaseConfirmada;
+            if (UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada != null)
+                ret = (DateTime)UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada;
             else
-                ret = UnidadCultivoCultivoFasesList[UnidadCultivoCultivoFasesList.Count - 1].FechaInicioFase.AddDays(50);
+                ret = UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa.AddDays(50);
 
             if (ret >= DateTime.Today) {
                 ret = DateTime.Today;
@@ -475,11 +475,11 @@
         /// Retorna la definición de la clase de estres.
         /// </summary>
         /// <param name="indiceEstres">The ie<see cref="double"/></param>
-        /// <param name="nFase">The nFase<see cref="int"/></param>
+        /// <param name="nEtapa">The nEtapa<see cref="int"/></param>
         /// <returns>The <see cref="string"/></returns>
-        public string ClaseEstres(double indiceEstres, int nFase) {
-            int nFaseBase0 = nFase - 1;
-            return CalculosHidricos.ClaseEstres(UnidadCultivoCultivoFasesList[nFaseBase0].IdTipoEstres, indiceEstres);
+        public string ClaseEstres(double indiceEstres, int nEtapa) {
+            int nEtapaBase0 = nEtapa - 1;
+            return CalculosHidricos.ClaseEstres(UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres, indiceEstres);
         }        
     }
 }

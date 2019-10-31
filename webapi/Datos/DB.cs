@@ -16,17 +16,12 @@
     /// La cadena de conexión Nebula se define como parámetro de la aplicación.
     /// </summary>
     public static class DB {
+
         public enum TypeModo { Real, Pruebas };
         public static TypeModo Modo { set; get; } = TypeModo.Real;
 
-        public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";
-        /// <summary>
-        /// Devuelve true/false si una contraseña correcta.
-        /// El parámetro de salida rengate retorna los datos completos del regante indicado en login.
-        /// </summary>
-        /// <param name="login"></param>
-        /// <param name="regante"></param>
-        /// <returns></returns>
+        public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";       
+                                                                                                                                                 
         public static bool IsCorrectPassword(LoginRequest login, out Regante regante) {
             regante = null;
             try {
@@ -60,29 +55,8 @@
             }
         }
 
-        internal static void UnidadCultivoSuperficieSave(string idUnidadCultivo, string idTemporada, double superficieM2) {
-            Database db = new Database(DB.CadenaConexionOptiAqua);
-            UnidadCultivoSuperficie r = new UnidadCultivoSuperficie {
-                IdTemporada = idTemporada,
-                IdUnidadCultivo = idUnidadCultivo,
-                SuperficieM2 = superficieM2
-            };
-            db.Save(r);
-        }
-
-        internal static void UnidadCultivoParcelaSave(string idUnidadCultivo, string idTemporada, int idRegante, List<int> lIdParcelaInt) {
-            Database db = new Database(DB.CadenaConexionOptiAqua);
-            UnidadCultivoParcela ucp = new UnidadCultivoParcela {
-                IdUnidadCultivo = idUnidadCultivo,
-                IdTemporada = idTemporada,
-                IdParcelaInt = 0,
-                IdRegante = idRegante,
-            };
-            lIdParcelaInt.ForEach(x => {
-                ucp.IdParcelaInt = x;
-                db.Save(ucp);
-            });
-        }
+ 
+  
 
         /// <summary>
         /// Retorna lista de avisos con los filtros indicados según los parámetros. 
@@ -891,40 +865,40 @@
         /// </summary>
         /// <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="string"/></param>
         /// <param name="temporada">temporada<see cref="string"/></param>
-        /// <param name="nFase">nFase<see cref="int"/></param>
+        /// <param name="nEtapa">nEtapa<see cref="int"/></param>
         /// <param name="fechaConfirmada">fechaConfirmada<see cref="DateTime"/></param>
-        public static void FechaConfirmadaSave(string IdUnidadCultivo, string temporada, int nFase, DateTime fechaConfirmada) {
+        public static void FechaConfirmadaSave(string IdUnidadCultivo, string temporada, int nEtapa, DateTime fechaConfirmada) {
             try {
                 Database db = new Database(DB.CadenaConexionOptiAqua);
-                UnidadCultivoCultivoFases dat = new UnidadCultivoCultivoFases {
+                UnidadCultivoCultivoEtapas dat = new UnidadCultivoCultivoEtapas {
                     IdUnidadCultivo = IdUnidadCultivo,
                     IdTemporada = temporada,
-                    IdFaseCultivo = nFase
+                    IdEtapaCultivo = nEtapa
                 };
-                dat = db.SingleOrDefaultById<UnidadCultivoCultivoFases>(dat);
+                dat = db.SingleOrDefaultById<UnidadCultivoCultivoEtapas>(dat);
                 if (dat != null) {
-                    dat.FechaFinFaseConfirmada = fechaConfirmada;
+                    dat.FechaFinEtapaConfirmada = fechaConfirmada;
                     db.Save(dat);
                 } else {
-                    throw new Exception("Error accediendo a UnidadCultivoCultivoFases\n.");
+                    throw new Exception("Error accediendo a UnidadCultivoCultivoEtapas\n.");
                 }
             } catch (Exception ex) {
-                string msgErr = "Error cargando ParcelasCultivosFases.\n ";
+                string msgErr = "Error cargando ParcelasCultivosEtapas.\n ";
                 msgErr += ex.Message;
                 throw new Exception(msgErr);
             }
         }
 
         /// <summary>
-        /// CultivoFasesList
+        /// CultivoEtapasList
         /// </summary>
         /// <param name="idCultivo">idCultivo<see cref="int?"/></param>
-        /// <returns><see cref="List{CultivoFases}"/></returns>
-        public static List<CultivoFases> CultivoFasesList(int? idCultivo) {
+        /// <returns><see cref="List{CultivoEtapas}"/></returns>
+        public static List<CultivoEtapas> CultivoEtapasList(int? idCultivo) {
             if (idCultivo == null)
                 return null;
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            List<CultivoFases> listaCF = db.Fetch<CultivoFases>("Select * from CultivoFases Where IdCultivo=@0", idCultivo);
+            List<CultivoEtapas> listaCF = db.Fetch<CultivoEtapas>("Select * from CultivoEtapas Where IdCultivo=@0", idCultivo);
             return listaCF;
         }
 
@@ -1184,18 +1158,18 @@
         }
 
         /// <summary>
-        /// UnidadCultivoCultivoFasesList
+        /// UnidadCultivoCultivoEtapasList
         /// </summary>
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
         /// <param name="idTemporada">idTemporada<see cref="string"/></param>
-        /// <returns><see cref="List{UnidadCultivoCultivoFases}"/></returns>
-        public static List<UnidadCultivoCultivoFases> UnidadCultivoCultivoFasesList(string idUnidadCultivo, string idTemporada) {
+        /// <returns><see cref="List{UnidadCultivoCultivoEtapas}"/></returns>
+        public static List<UnidadCultivoCultivoEtapas> UnidadCultivoCultivoEtapasList(string idUnidadCultivo, string idTemporada) {
             if (idUnidadCultivo == null || idTemporada == null)
                 return null;
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string sql;
-            sql = "Select * from UnidadCultivoCultivoFases where IdUnidadCultivo =@0 AND IDTemporada=@1";
-            return db.Fetch<UnidadCultivoCultivoFases>(sql, idUnidadCultivo, idTemporada);
+            sql = "Select * from UnidadCultivoCultivoEtapas where IdUnidadCultivo =@0 AND IDTemporada=@1";
+            return db.Fetch<UnidadCultivoCultivoEtapas>(sql, idUnidadCultivo, idTemporada);
         }
 
         /// <summary>
@@ -1207,7 +1181,7 @@
         public static UnidadCultivoCultivo ParcelasCultivo(int IdParcela, string temporada) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string sql;
-            sql = "Select * from ParcelasCultivoFases where IdParcela =" + IdParcela + " AND IDTemporada='" + temporada + "' ";
+            sql = "Select * from ParcelasCultivoEtapas where IdParcela =" + IdParcela + " AND IDTemporada='" + temporada + "' ";
             return db.SingleOrDefault<UnidadCultivoCultivo>(sql);
         }
 
@@ -1455,24 +1429,23 @@
                 };
                 db.Insert(uniCulCul);
 
-                // Leer Cultivo Fases de IdCultivo
-                List<CultivoFases> listaCF = db.Fetch<CultivoFases>("Select * from CultivoFases Where IdCultivo=@0", idCultivo);
+                // Leer Cultivo Etapas de IdCultivo
+                List<CultivoEtapas> listaCF = db.Fetch<CultivoEtapas>("Select * from CultivoEtapas Where IdCultivo=@0", idCultivo);
                 if (listaCF.Count == 0) {
-                    throw new Exception("Error. No existe una definición de las fases para el cultivo indicado.");
+                    throw new Exception("Error. No existe una definición de las Etapas para el cultivo indicado.");
                 }
 
-                DateTime fechaFase = fs;
-                foreach (CultivoFases cf in listaCF) {
-                    UnidadCultivoCultivoFases pcf = new UnidadCultivoCultivoFases {
+                DateTime fechaEtapa = fs;
+                foreach (CultivoEtapas cf in listaCF) {
+                    UnidadCultivoCultivoEtapas pcf = new UnidadCultivoCultivoEtapas {
                         IdUnidadCultivo = uniCulCul.IdUnidadCultivo,
                         IdTemporada = uniCulCul.IdTemporada,
-                        IdFaseCultivo = cf.OrdenFase,
-                        Fase = cf.Fase,
-                        FechaInicioFase = fechaFase
+                        IdEtapaCultivo = cf.OrdenEtapa,
+                        Etapa = cf.Etapa,
+                        FechaInicioEtapa = fechaEtapa
                     };
-                    fechaFase = fechaFase.AddDays(cf.DuracionDiasFase);
-                    pcf.FechaFinFaseConfirmada = null;
-                    //pcf.FechaConfirmacionFindeFase = null;
+                    fechaEtapa = fechaEtapa.AddDays(cf.DuracionDiasEtapa);
+                    pcf.FechaFinEtapaConfirmada = null;
                     pcf.DefinicionPorDias = cf.DefinicionPorDias;
                     pcf.KcInicial = cf.KcInicial;
                     pcf.KcFinal = cf.KcFinal;
@@ -1486,7 +1459,7 @@
                 return;
             } catch (Exception ex) {
                 db.AbortTransaction();
-                throw new Exception("Error. No existe una definición de las fases para el cultivo indicado." + ex.Message);
+                throw new Exception("Error. No existe una definición de las Etapas para el cultivo indicado." + ex.Message);
             }
         }
 
@@ -1559,31 +1532,31 @@
         }
 
         /// <summary>
-        /// FasesList
+        /// EtapasList
         /// </summary>
         /// <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="string"/></param>
         /// <param name="idTemporada">idTemporada<see cref="string"/></param>
-        /// <returns><see cref="List{UnidadCultivoCultivoFases}"/></returns>
-        public static List<UnidadCultivoCultivoFases> FasesList(string IdUnidadCultivo, string idTemporada) {
+        /// <returns><see cref="List{UnidadCultivoCultivoEtapas}"/></returns>
+        public static List<UnidadCultivoCultivoEtapas> Etapas(string IdUnidadCultivo, string idTemporada) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            string sql = "Select * from UnidadCultivoCultivoFases where IdUnidadCultivo=@0  AND IdTemporada=@1";
-            List<UnidadCultivoCultivoFases> ret = db.Fetch<UnidadCultivoCultivoFases>(sql, IdUnidadCultivo, idTemporada);
+            string sql = "Select * from UnidadCultivoCultivoEtapas where IdUnidadCultivo=@0  AND IdTemporada=@1";
+            List<UnidadCultivoCultivoEtapas> ret = db.Fetch<UnidadCultivoCultivoEtapas>(sql, IdUnidadCultivo, idTemporada);
             return ret;
         }
 
         /// <summary>
-        /// FechasFasesSave
+        /// FechasEtapasSave
         /// </summary>
-        /// <param name="lFases">lFases<see cref="List{UnidadCultivoCultivoFases}"/></param>
-        public static void FechasFasesSave(List<UnidadCultivoCultivoFases> lFases) {
+        /// <param name="lEtapas">lEtapas<see cref="List{UnidadCultivoCultivoEtapas}"/></param>
+        public static void FechasEtapasSave(List<UnidadCultivoCultivoEtapas> lEtapas) {
             Database db = null;
-            if (lFases == null || lFases.Count == 0) return;
+            if (lEtapas == null || lEtapas.Count == 0) return;
             try {
                 db = new Database(DB.CadenaConexionOptiAqua);
                 db.BeginTransaction();
                 //Eliminar las actuales
-                db.Execute(" delete from UnidadCultivoCultivoFases where IdUnidadCultivo=@0 and IdTemporada=@1 ", lFases[0].IdUnidadCultivo, lFases[0].IdTemporada);
-                db.InsertBulk<UnidadCultivoCultivoFases>(lFases);
+                db.Execute(" delete from UnidadCultivoCultivoEtapas where IdUnidadCultivo=@0 and IdTemporada=@1 ", lEtapas[0].IdUnidadCultivo, lEtapas[0].IdTemporada);
+                db.InsertBulk<UnidadCultivoCultivoEtapas>(lEtapas);
                 db.CompleteTransaction();
             } catch (Exception) {
                 if (db != null)
@@ -1708,7 +1681,7 @@
         /// </summary>
         /// <param name="idCultivo">idCultivo<see cref="int"/></param>
         /// <returns><see cref="double"/></returns>
-        private static double PluviometriaTipica(int idCultivo) {
+        public static double PluviometriaTipica(int idCultivo) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string sql = "Select PluviometriaTipica from RiegoTipo where IdTipoRiego=@0";
             return db.Single<double>(sql, idCultivo);
@@ -1735,6 +1708,10 @@
             db.Save(cfg);
         }
 
-
+        internal static bool TemporadaExists(string idTemporada) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            var ret= db.Exists<Temporada>(idTemporada);
+            return ret;
+        }
     }
 }

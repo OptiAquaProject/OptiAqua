@@ -568,7 +568,7 @@
             </summary>
             <param name="idUnidadCultivo">Identificador de la unidad de cultivo</param>
             <param name="idTemporada">Identificador de la temporada</param>
-            <param name="actualizaFechasFases">Activar si se desea recalcular las fechas de las fases para la parcela indicada</param>
+            <param name="actualizaFechasEtapas">Activar si se desea recalcular las fechas de las etapas para la parcela indicada</param>
             <returns></returns>
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetDatosHidricos(System.String,System.String)">
@@ -614,52 +614,52 @@
             <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
             <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
         </member>
-        <member name="T:WebApi.FasesController">
+        <member name="T:WebApi.EtapasController">
             <summary>
-            Proporciona información de las fases del cultivo para una unidad de cultivo
+            Proporciona información de las etapas del cultivo para una unidad de cultivo
             </summary>
         </member>
-        <member name="M:WebApi.FasesController.Get(System.String,System.String)">
+        <member name="M:WebApi.EtapasController.Get(System.String,System.String)">
             <summary>
-            Fases de una unidad de cultivo en una temporada.
+            Etapas de una unidad de cultivo en una temporada.
             </summary>
             <param name="IdUnidadCultivo"></param>
             <param name="idTemporada"></param>
             <returns></returns>
         </member>
-        <member name="T:WebApi.FasesController.FasesPost">
+        <member name="T:WebApi.EtapasController.EtapasPost">
             <summary>
-            Defines the <see cref="T:WebApi.FasesController.FasesPost" />
+            Defines the <see cref="T:WebApi.EtapasController.EtapasPost" />
             </summary>
         </member>
-        <member name="P:WebApi.FasesController.FasesPost.IdUnidadCultivo">
+        <member name="P:WebApi.EtapasController.EtapasPost.IdUnidadCultivo">
             <summary>
             Gets or sets the IdUnidadCultivo
             </summary>
         </member>
-        <member name="P:WebApi.FasesController.FasesPost.IdTtemporada">
+        <member name="P:WebApi.EtapasController.EtapasPost.IdTtemporada">
             <summary>
             Gets or sets the IdTtemporada
             </summary>
         </member>
-        <member name="P:WebApi.FasesController.FasesPost.NFase">
+        <member name="P:WebApi.EtapasController.EtapasPost.nEtapa">
             <summary>
-            Gets or sets the NFase
+            Gets or sets the nEtapa
             </summary>
         </member>
-        <member name="P:WebApi.FasesController.FasesPost.FechaConfirmada">
+        <member name="P:WebApi.EtapasController.EtapasPost.FechaConfirmada">
             <summary>
             Gets or sets the FechaConfirmada
             </summary>
         </member>
-        <member name="P:WebApi.FasesController.FasesPost.IdTipoEstres">
+        <member name="P:WebApi.EtapasController.EtapasPost.IdTipoEstres">
             <summary>
             Gets or sets the IdTipoEstres
             </summary>
         </member>
-        <member name="M:WebApi.FasesController.Post(WebApi.FasesController.FasesPost)">
+        <member name="M:WebApi.EtapasController.Post(WebApi.EtapasController.EtapasPost)">
             <summary>
-            Actualizar la fecha de cambio de fase.
+            Actualizar la fecha de cambio de etapa.
             </summary>
             <param name="param"></param>
             <returns></returns>
@@ -730,8 +730,8 @@
             <summary>
             Calculo de la Cobertura por el método de la Tasa de Crecimiento
             </summary>
-            <param name="it"></param>
-            <param name="nFase"></param>
+            <param name="it">Integral térmica</param>
+            <param name="nEtapa"></param>
             <param name="itEmergencia"></param>
             <param name="ModCobCoefA"></param>
             <param name="ModCobCoefB"></param>
@@ -743,33 +743,33 @@
             Calculo de la altura por el método de la Tasa de crecimiento
             </summary>
             <param name="it"></param>
-            <param name="nFase"></param>
+            <param name="nEtapa"></param>
             <param name="itEmergencia"></param>
             <param name="ModAltCoefA"></param>
             <param name="ModAltCoefB"></param>
             <param name="ModAltCoefC"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.NFaseDesarrollo(System.DateTime,System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases},System.Collections.Generic.List{Models.CultivoFases})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.NEtapaDesarrollo(System.DateTime,System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas},System.Collections.Generic.List{Models.CultivoEtapas})">
             <summary>
-            Retorna en Nº de fase en la que nos encontramos en base 1 (1,2,3,4....)
-            Párametro nFase está en base 1 y la tabla de fases en base 0
+            Retorna en Nº de Etapa en la que nos encontramos en base 1 (1,2,3,4....)
+            Párametro nEtapa está en base 1 y la tabla de etapas en base 0
             </summary>
             <param name="fecha"></param>
             <param name="cobertura"></param>
-            <param name="currentNFase"></param>
-            <param name="pUnidadCultivoCultivosFases"></param>
-            <param name="pCultivoFases"></param>
+            <param name="currentnEtapa"></param>
+            <param name="pUnidadCultivoCultivosEtapas"></param>
+            <param name="pCultivoEtapas"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.Kc(System.Int32,System.DateTime,System.Double,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.Kc(System.Int32,System.DateTime,System.Double,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
             <summary>
             Calculo del Coeficiento de cultivo
             </summary>
-            <param name="nFase"></param>
+            <param name="nEtapa"></param>
             <param name="fecha"></param>
             <param name="cob"></param>
-            <param name="pUnidadCultivoCultivosFases"></param>
+            <param name="unidadCultivoCultivosEtapasList"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.KcAdjClima(System.Double,System.Double,System.Double,System.Double)">
@@ -801,22 +801,22 @@
             <param name="pUnidadCultivoSuelo">pUnidadCultivoSuelo<see cref="T:System.Collections.Generic.List`1"/></param>
             <returns><see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.DepletionFactor(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.DepletionFactor(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
             <summary>
             Calculo de Depletion Factor
             </summary>
             <param name="etc"></param>
-            <param name="nFase"></param>
-            <param name="pUnidadCultivoCultivosFases"></param>
+            <param name="nEtapa"></param>
+            <param name="unidadCultivoCultivosEtapasList"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.RAW2(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.RAW2(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
             <summary>
             Caculo de RAW2
             </summary>
             <param name="taw"></param>
-            <param name="nFase"></param>
-            <param name="pUnidadCultivoCultivosFases"></param>
+            <param name="nEtapa"></param>
+            <param name="unidadCultivoCultivosEtapasList"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.PuntoMarchitez(System.Double,System.Collections.Generic.List{Models.UnidadCultivoSuelo})">
@@ -952,9 +952,9 @@
             </summary>
             <param name="raw">The raw<see cref="T:System.Double"/></param>
             <param name="taw">The taw<see cref="T:System.Double"/></param>
-            <param name="nFase">The nFase<see cref="T:System.Int32"/></param>
+            <param name="nEtapa">The nEtapa<see cref="T:System.Int32"/></param>
             <param name="driEnd">The driEnd<see cref="T:System.Double"/></param>
-            <param name="faseInicioRiego">The faseInicioRiego<see cref="T:System.Int32"/></param>
+            <param name="etapaInicioRiego">The etapaInicioRiego<see cref="T:System.Int32"/></param>
             <param name="ieUmbralRiego">The ieUmbralRiego<see cref="T:System.Double"/></param>
             <param name="ieLimiteRiego">The ieLimiteRiego<see cref="T:System.Double"/></param>
             <returns></returns>
@@ -964,7 +964,7 @@
             Calcula la recomención del Riego en tiempo (Horas)
             </summary>
             <param name="raw"></param>
-            <param name="nFase"></param>
+            <param name="nEtapa"></param>
             <param name="driEnd"></param>
             <param name="v1"></param>
             <param name="v2"></param>
@@ -1038,7 +1038,7 @@
             Initializes a new instance of the <see cref="T:DatosOptiaqua.BalanceHidrico"/> class.
             </summary>
             <param name="unidadCultivoDatosHidricos">The unidadCultivoDatosHidricos<see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/></param>
-            <param name="actualizaFases">The actualizaFases<see cref="T:System.Boolean"/></param>
+            <param name="actualizaEtapas">The actualizaEtapas<see cref="T:System.Boolean"/></param>
         </member>
         <member name="P:DatosOptiaqua.BalanceHidrico.LineasBalance">
             <summary>
@@ -1141,7 +1141,7 @@
             <summary>
             CalculaBalance. Función de uso interno en la clase para calcular el balance. Se ejecuta una única vez para añadir las líneas de balance.
             </summary>
-            <param name="actualizaFases">The actualizaFases<see cref="T:System.Boolean"/></param>
+            <param name="actualizaEtapas">The actualizaEtapas<see cref="T:System.Boolean"/></param>
         </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.CosteAgua(System.DateTime)">
             <summary>
@@ -1191,15 +1191,6 @@
             La cadena de conexión CadenaConexionOptiAqua se define como parámetro de la aplicación.
             La cadena de conexión Nebula se define como parámetro de la aplicación.
             </summary>
-        </member>
-        <member name="M:DatosOptiaqua.DB.IsCorrectPassword(Models.LoginRequest,Models.Regante@)">
-            <summary>
-            Devuelve true/false si una contraseña correcta.
-            El parámetro de salida rengate retorna los datos completos del regante indicado en login.
-            </summary>
-            <param name="login"></param>
-            <param name="regante"></param>
-            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.DB.IsCorrectPassword(System.String,System.String)">
             <summary>
@@ -1539,12 +1530,12 @@
             </summary>
             <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
             <param name="temporada">temporada<see cref="T:System.String"/></param>
-            <param name="nFase">nFase<see cref="T:System.Int32"/></param>
+            <param name="nEtapa">nEtapa<see cref="T:System.Int32"/></param>
             <param name="fechaConfirmada">fechaConfirmada<see cref="T:System.DateTime"/></param>
         </member>
-        <member name="M:DatosOptiaqua.DB.CultivoFasesList(System.Nullable{System.Int32})">
+        <member name="M:DatosOptiaqua.DB.CultivoEtapasList(System.Nullable{System.Int32})">
             <summary>
-            CultivoFasesList
+            CultivoEtapasList
             </summary>
             <param name="idCultivo">idCultivo<see cref="!:int?"/></param>
             <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
@@ -1679,9 +1670,9 @@
             <param name="IdCultivo"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.UnidadCultivoCultivoFasesList(System.String,System.String)">
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoCultivoEtapasList(System.String,System.String)">
             <summary>
-            UnidadCultivoCultivoFasesList
+            UnidadCultivoCultivoEtapasList
             </summary>
             <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
@@ -1816,19 +1807,19 @@
             <param name="idRegante">idRegante<see cref="T:System.Int32"/></param>
             <returns><see cref="!:List&lt;string&gt;"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.FasesList(System.String,System.String)">
+        <member name="M:DatosOptiaqua.DB.Etapas(System.String,System.String)">
             <summary>
-            FasesList
+            EtapasList
             </summary>
             <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
             <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.FechasFasesSave(System.Collections.Generic.List{Models.UnidadCultivoCultivoFases})">
+        <member name="M:DatosOptiaqua.DB.FechasEtapasSave(System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
             <summary>
-            FechasFasesSave
+            FechasEtapasSave
             </summary>
-            <param name="lFases">lFases<see cref="T:System.Collections.Generic.List`1"/></param>
+            <param name="lEtapas">lEtapas<see cref="T:System.Collections.Generic.List`1"/></param>
         </member>
         <member name="M:DatosOptiaqua.DB.IdReganteDeUnidadCultivoTemporada(System.String,System.String)">
             <summary>
@@ -2104,19 +2095,19 @@
             Gets the TipoRiego
             </summary>
         </member>
-        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.UnidadCultivoCultivoFasesList">
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList">
             <summary>
-            Gets the UnidadCultivoCultivoFasesList
+            Gets the UnidadCultivoCultivoEtapasList
             </summary>
         </member>
-        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoFasesList">
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoEtapasList">
             <summary>
-            Gets the CultivoFasesList
+            Gets the CultivoEtapasList
             </summary>
         </member>
         <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.FechaSiembra">
             <summary>
-            Retorna primera fecha de las fases como fecha de siembra.
+            Retorna primera fecha de las etapas como fecha de siembra.
             En caso de que no existandatos retorna fecha actual.
             </summary>
             <returns></returns>
@@ -2151,9 +2142,9 @@
             Gets the TipoSueloDescripcion
             </summary>
         </member>
-        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.NFases">
+        <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.nEtapas">
             <summary>
-            Gets the NFases
+            Gets the nEtapas
             </summary>
         </member>
         <member name="P:DatosOptiaqua.UnidadCultivoDatosHidricos.CultivoTBase">
@@ -2328,7 +2319,7 @@
             Retorna la definición de la clase de estres.
             </summary>
             <param name="indiceEstres">The ie<see cref="T:System.Double"/></param>
-            <param name="nFase">The nFase<see cref="T:System.Int32"/></param>
+            <param name="nEtapa">The nEtapa<see cref="T:System.Int32"/></param>
             <returns>The <see cref="T:System.String"/></returns>
         </member>
         <member name="T:DatosOptiaqua.Config">

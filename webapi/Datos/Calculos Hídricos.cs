@@ -53,22 +53,22 @@
         /// <summary>
         /// Calculo de la Cobertura por el método de la Tasa de Crecimiento
         /// </summary>
-        /// <param name="it"></param>
-        /// <param name="nFase"></param>
+        /// <param name="it">Integral térmica</param>
+        /// <param name="nEtapa"></param>
         /// <param name="itEmergencia"></param>
         /// <param name="ModCobCoefA"></param>
         /// <param name="ModCobCoefB"></param>
         /// <param name="ModCobCoefC"></param>
         /// <returns></returns>
-        public static double TcCob(double it, int nFase, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
+        public static double TcCob(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
-            //     1.- La función necesita conocer el número de Fase y la it de emergencia de la BBDD
+            //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
             //     3.- cuando la planta brota, se calcula la cobertura
             //     4.- se cambia la variable itomprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
 
-            if (nFase == 1 && it < itEmergencia) {
+            if (nEtapa == 1 && it < itEmergencia) {
                 ret = 0;
             } else {
                 //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
@@ -85,22 +85,22 @@
         /// Calculo de la altura por el método de la Tasa de crecimiento
         /// </summary>
         /// <param name="it"></param>
-        /// <param name="nFase"></param>
+        /// <param name="nEtapa"></param>
         /// <param name="itEmergencia"></param>
         /// <param name="ModAltCoefA"></param>
         /// <param name="ModAltCoefB"></param>
         /// <param name="ModAltCoefC"></param>
         /// <returns></returns>
-        public static double TcAlt(double it, int nFase, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
+        public static double TcAlt(double it, int nEtapa, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
-            //     1.- La función necesita conocer el número de Fase y la it de emergencia de la BBDD
+            //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
             //     3.- cuando la planta brota, se calcula la cobertura
             //     4.- se cambia la variable it por it (más correcto conceptualmente)
             //     5.- se añade la rutina que comprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
 
-            if (nFase == 1 && it < itEmergencia) {
+            if (nEtapa == 1 && it < itEmergencia) {
                 ret = 0;
             } else {
                 //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
@@ -114,88 +114,88 @@
         }
 
         /// <summary>
-        /// Retorna en Nº de fase en la que nos encontramos en base 1 (1,2,3,4....)
-        /// Párametro nFase está en base 1 y la tabla de fases en base 0
+        /// Retorna en Nº de Etapa en la que nos encontramos en base 1 (1,2,3,4....)
+        /// Párametro nEtapa está en base 1 y la tabla de etapas en base 0
         /// </summary>
         /// <param name="fecha"></param>
         /// <param name="cobertura"></param>
-        /// <param name="currentNFase"></param>
-        /// <param name="pUnidadCultivoCultivosFases"></param>
-        /// <param name="pCultivoFases"></param>
+        /// <param name="currentnEtapa"></param>
+        /// <param name="pUnidadCultivoCultivosEtapas"></param>
+        /// <param name="pCultivoEtapas"></param>
         /// <returns></returns>
-        public static int NFaseDesarrollo(DateTime fecha, double cobertura, int currentNFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases, List<CultivoFases> pCultivoFases) {
-            int nFaseBase0 = currentNFase - 1 > 0 ? currentNFase - 1 : 0; // situación anómala
-            int ret = currentNFase;
-            if (pUnidadCultivoCultivosFases.Count < currentNFase)
-                return pUnidadCultivoCultivosFases.Count; // situación anómala
+        public static int NEtapaDesarrollo(DateTime fecha, double cobertura, int currentnEtapa, List<UnidadCultivoCultivoEtapas> pUnidadCultivoCultivosEtapas, List<CultivoEtapas> pCultivoEtapas) {
+            int nEtapaBase0 = currentnEtapa - 1 > 0 ? currentnEtapa - 1 : 0; // situación anómala
+            int ret = currentnEtapa;
+            if (pUnidadCultivoCultivosEtapas.Count < currentnEtapa)
+                return pUnidadCultivoCultivosEtapas.Count; // situación anómala
 
-            if (pUnidadCultivoCultivosFases[nFaseBase0].DefinicionPorDias == true) {
-                if (pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada != null) {
-                    if (nFaseBase0 + 1 < pUnidadCultivoCultivosFases.Count)
-                        //actualizar fecha inicio siguiente fase
-                        pUnidadCultivoCultivosFases[nFaseBase0 + 1].FechaInicioFase = ((DateTime)pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada).AddDays(1);
-                    if (fecha > pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada)
+            if (pUnidadCultivoCultivosEtapas[nEtapaBase0].DefinicionPorDias == true) {
+                if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada != null) {
+                    if (nEtapaBase0 + 1 < pUnidadCultivoCultivosEtapas.Count)
+                        //actualizar fecha inicio siguiente etapa
+                        pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = ((DateTime)pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada).AddDays(1);
+                    if (fecha > pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada)
                         ret++;
                 } else {
-                    if (nFaseBase0 + 1 < pUnidadCultivoCultivosFases.Count) {
-                        DateTime fechaInicioSiguientefase = pUnidadCultivoCultivosFases[nFaseBase0].FechaInicioFase.AddDays(pCultivoFases[nFaseBase0].DuracionDiasFase);
-                        if (fecha >= fechaInicioSiguientefase) {
-                            //actualizar fecha inicio siguiente fase
-                            pUnidadCultivoCultivosFases[nFaseBase0 + 1].FechaInicioFase = fechaInicioSiguientefase;
+                    if (nEtapaBase0 + 1 < pUnidadCultivoCultivosEtapas.Count) {
+                        DateTime fechaInicioSiguienteEtapa = pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapa.AddDays(pCultivoEtapas[nEtapaBase0].DuracionDiasEtapa);
+                        if (fecha >= fechaInicioSiguienteEtapa) {
+                            //actualizar fecha inicio siguiente etapa
+                            pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = fechaInicioSiguienteEtapa;
                             ret++;
                         }
                     }
                 }
             } else { // definido por integral termica
-                if (pUnidadCultivoCultivosFases[nFaseBase0].CobFinal < cobertura) {
-                    if (pUnidadCultivoCultivosFases.Count > nFaseBase0 + 1)
-                        //actulizar siguiente fecha de inicio siguiente fase
-                        pUnidadCultivoCultivosFases[nFaseBase0 + 1].FechaInicioFase = fecha;
+                if (pUnidadCultivoCultivosEtapas[nEtapaBase0].CobFinal < cobertura) {
+                    if (pUnidadCultivoCultivosEtapas.Count > nEtapaBase0 + 1)
+                        //actulizar siguiente fecha de inicio siguiente etapa
+                        pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = fecha;
                     ret++;
-                } else if (pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada != null) {
-                    if (pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada < fecha) {
-                        if (pUnidadCultivoCultivosFases.Count > nFaseBase0 + 1)
-                            pUnidadCultivoCultivosFases[nFaseBase0 + 1].FechaInicioFase = ((DateTime)pUnidadCultivoCultivosFases[nFaseBase0].FechaFinFaseConfirmada).AddDays(1);
+                } else if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada != null) {
+                    if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada < fecha) {
+                        if (pUnidadCultivoCultivosEtapas.Count > nEtapaBase0 + 1)
+                            pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = ((DateTime)pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada).AddDays(1);
                         ret++;
                     }
                 }
             }
-            return ret > pUnidadCultivoCultivosFases.Count ? pUnidadCultivoCultivosFases.Count : ret;
+            return ret > pUnidadCultivoCultivosEtapas.Count ? pUnidadCultivoCultivosEtapas.Count : ret;
         }
 
         /// <summary>
         /// Calculo del Coeficiento de cultivo
         /// </summary>
-        /// <param name="nFase"></param>
+        /// <param name="nEtapa"></param>
         /// <param name="fecha"></param>
         /// <param name="cob"></param>
-        /// <param name="pUnidadCultivoCultivosFases"></param>
+        /// <param name="unidadCultivoCultivosEtapasList"></param>
         /// <returns></returns>
-        public static double Kc(int nFase, DateTime fecha, double cob, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
+        public static double Kc(int nEtapa, DateTime fecha, double cob, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
             double ret = 0;
-            int nFaseIndex = nFase - 1 > 0 ? nFase - 1 : 0; // la fase está en base 1
-            if (pUnidadCultivoCultivosFases[nFaseIndex].KcInicial == pUnidadCultivoCultivosFases[nFaseIndex].KcFinal) {
-                ret = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].KcInicial);
+            int nEtapaIndex = nEtapa - 1 > 0 ? nEtapa - 1 : 0; // la etapa está en base 1
+            if (unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial == unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal) {
+                ret = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
             } else {
-                if (pUnidadCultivoCultivosFases[nFaseIndex].DefinicionPorDias == true) {
-                    double nDias = (fecha - pUnidadCultivoCultivosFases[nFaseIndex].FechaInicioFase).Days;
-                    DateTime fechaSigFase = fecha;
-                    if (nFaseIndex + 1 < pUnidadCultivoCultivosFases.Count)
-                        fechaSigFase = pUnidadCultivoCultivosFases[nFaseIndex + 1].FechaInicioFase;
+                if (unidadCultivoCultivosEtapasList[nEtapaIndex].DefinicionPorDias == true) {
+                    double nDias = (fecha - unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa).Days;
+                    DateTime fechaSigEtapa = fecha;
+                    if (nEtapaIndex + 1 < unidadCultivoCultivosEtapasList.Count)
+                        fechaSigEtapa = unidadCultivoCultivosEtapasList[nEtapaIndex + 1].FechaInicioEtapa;
 
-                    double nDiasFaseActual = (fechaSigFase - pUnidadCultivoCultivosFases[nFaseIndex].FechaInicioFase).Days;
-                    if (nDias > nDiasFaseActual)
-                        nDias = nDiasFaseActual;
-                    ret = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].KcInicial + (pUnidadCultivoCultivosFases[nFaseIndex].KcFinal - pUnidadCultivoCultivosFases[nFaseIndex].KcInicial) * nDias / nDiasFaseActual);
+                    double nDiasEtapaActual = (fechaSigEtapa - unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa).Days;
+                    if (nDias > nDiasEtapaActual)
+                        nDias = nDiasEtapaActual;
+                    ret = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial + (unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal - unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial) * nDias / nDiasEtapaActual);
                 } else {
-                    double kcIni = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].KcInicial);
-                    double cobIni = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].CobInicial);
-                    double kcFin = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].KcFinal);
-                    double cobFin = Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseIndex].CobFinal);
+                    double kcIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
+                    double cobIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobInicial);
+                    double kcFin = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal);
+                    double cobFin = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobFinal);
                     // calcular cobertura usando formulas tabla cultivo 
                     // usando cobertura cultivo obtener kc
                     ret = kcIni + (cob - cobIni) * (kcFin - kcIni) / (cobFin - cobIni);
-                    // si la cobertura actual > cobFin ==> cambio fase
+                    // si la cobertura actual > cobFin ==> cambio etapa
                 }
             }
             return ret;
@@ -230,10 +230,10 @@
         /// <returns><see cref="double"/></returns>
         public static double RaizLongitud(LineaBalance lbAnt, double it, double profRaizInicial, double modRaizCoefB, double profRaizMax) {
             double ret;
-            if (lbAnt.Root == 0) {
+            if (lbAnt.LongitudRaiz == 0) {
                 ret = profRaizInicial;
             } else {
-                ret = lbAnt.Root + modRaizCoefB * it;
+                ret = lbAnt.LongitudRaiz + modRaizCoefB * it;
                 if (ret > profRaizMax) {
                     ret = profRaizMax;
                 }
@@ -270,12 +270,12 @@
         /// Calculo de Depletion Factor
         /// </summary>
         /// <param name="etc"></param>
-        /// <param name="nFase"></param>
-        /// <param name="pUnidadCultivoCultivosFases"></param>
+        /// <param name="nEtapa"></param>
+        /// <param name="unidadCultivoCultivosEtapasList"></param>
         /// <returns></returns>
-        public static double DepletionFactor(double etc, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
-            int nFaseBase0 = nFase > 0 ? nFase - 1 : 0;
-            double ret = pUnidadCultivoCultivosFases[nFaseBase0].FactorDeAgotamiento + 0.04 * (5 - etc);
+        public static double DepletionFactor(double etc, int nEtapa, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
+            int nEtapaBase0 = nEtapa > 0 ? nEtapa - 1 : 0;
+            double ret = unidadCultivoCultivosEtapasList[nEtapaBase0].FactorDeAgotamiento + 0.04 * (5 - etc);
             if (ret < 0.1)
                 ret = 0.1;
             if (ret > 0.8)
@@ -287,12 +287,12 @@
         /// Caculo de RAW2
         /// </summary>
         /// <param name="taw"></param>
-        /// <param name="nFase"></param>
-        /// <param name="pUnidadCultivoCultivosFases"></param>
+        /// <param name="nEtapa"></param>
+        /// <param name="unidadCultivoCultivosEtapasList"></param>
         /// <returns></returns>
-        public static double RAW2(double taw, int nFase, List<UnidadCultivoCultivoFases> pUnidadCultivoCultivosFases) {
-            int nFaseBase0 = nFase > 0 ? nFase - 1 : 0;
-            double ret = taw * Convert.ToDouble(pUnidadCultivoCultivosFases[nFaseBase0].FactorDeAgotamiento);
+        public static double RAW2(double taw, int nEtapa, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
+            int nEtapaBase0 = nEtapa > 0 ? nEtapa - 1 : 0;
+            double ret = taw * Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaBase0].FactorDeAgotamiento);
             return ret;
         }
 
@@ -462,7 +462,7 @@
             if (lbAnt.Fecha == null) {
                 ret = (1 - pSaturacion) * taw;
             } else {
-                double aguaAportadaCrecRaiz = pSaturacion * (taw - lbAnt.Taw);
+                double aguaAportadaCrecRaiz = pSaturacion * (taw - lbAnt.AguaDisponibleTotal);
                 ret = driStart - rieEfec - pef - aguaAportadaCrecRaiz + EtcAdj + dp + escorrentia;
             }
             return ret;
@@ -513,13 +513,13 @@
         /// </summary>
         /// <param name="raw">The raw<see cref="double"/></param>
         /// <param name="taw">The taw<see cref="double"/></param>
-        /// <param name="nFase">The nFase<see cref="int"/></param>
+        /// <param name="nEtapa">The nEtapa<see cref="int"/></param>
         /// <param name="driEnd">The driEnd<see cref="double"/></param>
-        /// <param name="faseInicioRiego">The faseInicioRiego<see cref="int"/></param>
+        /// <param name="etapaInicioRiego">The etapaInicioRiego<see cref="int"/></param>
         /// <param name="ieUmbralRiego">The ieUmbralRiego<see cref="double"/></param>
         /// <param name="ieLimiteRiego">The ieLimiteRiego<see cref="double"/></param>
         /// <returns></returns>
-        public static double RecomendacionRiegoMm(double raw, double taw, int nFase, double driEnd, int faseInicioRiego, double ieUmbralRiego, double ieLimiteRiego) {
+        public static double RecomendacionRiegoMm(double raw, double taw, int nEtapa, double driEnd, int etapaInicioRiego, double ieUmbralRiego, double ieLimiteRiego) {
             // Conversion de Indices de estrés a valores de agotamiento
             double drUmbralRiego = 0;
             if (ieUmbralRiego < 0)
@@ -534,7 +534,7 @@
                 drLimiteRiego = raw * (1 - ieLimiteRiego);
 
             double ret = 0;
-            if (nFase >= faseInicioRiego && driEnd > drUmbralRiego) {
+            if (nEtapa >= etapaInicioRiego && driEnd > drUmbralRiego) {
                 ret = driEnd - drLimiteRiego;
             }
             return ret;
@@ -544,13 +544,13 @@
         /// Calcula la recomención del Riego en tiempo (Horas)
         /// </summary>
         /// <param name="raw"></param>
-        /// <param name="nFase"></param>
+        /// <param name="nEtapa"></param>
         /// <param name="driEnd"></param>
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <param name="v3"></param>
         /// <returns></returns>
-        public static double RecomendacionRiegoHr(double raw, int nFase, double driEnd, int v1, double v2, int v3) => double.NaN;
+        public static double RecomendacionRiegoHr(double raw, int nEtapa, double driEnd, int v1, double v2, int v3) => double.NaN;
 
         /// <summary>
         /// Incremento de temperatura efectivo
@@ -613,6 +613,14 @@
             return ltu.Max(x => x.Umbral);
         }
 
+
+        public static double LimiteOptimoRefClima(double lo, double pm) => lo-pm;
+        public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo-pm;
+        public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os-pm;
+        public static double PuntoMarchitezRefPuntoMarchitezMm() => 0;
+        public static double CapacidadCampoRefPuntoMarchitezMm(double cc, double pm) => cc-pm;
+
+
         /// <summary>
         /// CalculaLineaBalance
         /// </summary>
@@ -632,54 +640,60 @@
 
             UnidadCultivoDatosExtra datoExtra = dh.DatoExtra(fecha);
             // Parámetros de desarrollo del cultivo
-            lb.IT = (lbAnt.IT + incT);
-            lb.TcCob = TcCob(lb.IT, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
-            lb.Cob = Cobertura(lbAnt.Cob, lb.TcCob, incT, datoExtra);
-            lb.NFase = NFaseDesarrollo(fecha, lb.Cob, lbAnt.NFase, dh.UnidadCultivoCultivoFasesList, dh.CultivoFasesList);
-            lb.TcAlt = TcAlt(lb.IT, lb.NFase, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
-            lb.Alt = Altura(lbAnt.Alt, lb.TcAlt, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
-            lb.Root = RaizLongitud(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
+            lb.IntegralTermica = (lbAnt.IntegralTermica + incT);
+            lb.TasaCrecimientoCobertura = TcCob(lb.IntegralTermica, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
+            lb.Cobertura = Cobertura(lbAnt.Cobertura, lb.TasaCrecimientoCobertura, incT, datoExtra);
+            lb.NumeroEtapaDesarrollo = NEtapaDesarrollo(fecha, lb.Cobertura, lbAnt.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList, dh.CultivoEtapasList);
+            lb.TasaCrecimientoAltura = TcAlt(lb.IntegralTermica, lb.NumeroEtapaDesarrollo, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
+            lb.AlturaCultivo = Altura(lbAnt.AlturaCultivo, lb.TasaCrecimientoAltura, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
+            lb.LongitudRaiz = RaizLongitud(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
 
-            lb.Mad = lbAnt.Mad > 0 ? lb.Mad = lbAnt.Mad + 1 : lb.Cob > 0.8 ? 1 : 0;
-            lb.EtapaDes = dh.UnidadCultivoCultivoFasesList[lb.NFase - 1].Fase;
+            lb.DiasMaduracion = lbAnt.DiasMaduracion > 0 ? lb.DiasMaduracion = lbAnt.DiasMaduracion + 1 : lb.Cobertura > 0.8 ? 1 : 0;
+            lb.NombreEtapaDesarrollo = dh.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo - 1].Etapa;
 
             // Parámetros de suelo
-            lb.CC = CapacidadCampo(lb.Root, dh.ListaUcSuelo);
-            lb.PM = PuntoMarchitez(lb.Root, dh.ListaUcSuelo);
-            lb.Taw = lb.CC - lb.PM;
+            lb.CapacidadCampo = CapacidadCampo(lb.LongitudRaiz, dh.ListaUcSuelo);
+            lb.PuntoMarchitez = PuntoMarchitez(lb.LongitudRaiz, dh.ListaUcSuelo);
+            lb.AguaDisponibleTotal = lb.CapacidadCampo - lb.PuntoMarchitez;
 
             // Parámetros de aporte de agua
             lb.Lluvia = dh.LluviaMm(fecha);
-            lb.PEf = PrecipitacionEfectiva(lb.Lluvia, dh.Eto(fecha));
+            lb.LluviaEfectiva = PrecipitacionEfectiva(lb.Lluvia, dh.Eto(fecha));
             lb.Riego = dh.RiegoMm(fecha);
-            lb.RieEfec = RiegoEfectivo(lb.Riego, dh.EficienciaRiego);
-            lb.AguaCrecRaiz = AguaAportadaCrecRaiz(0.8, lb.Taw, lbAnt.Taw);
+            lb.RiegoEfectivo = RiegoEfectivo(lb.Riego, dh.EficienciaRiego);
+            lb.AguaCrecRaiz = AguaAportadaCrecRaiz(0.8, lb.AguaDisponibleTotal, lbAnt.AguaDisponibleTotal);
 
             // Parámetros de cálculo del balance
-            lb.DriStart = lbAnt.DriEnd;
-            lb.Kc = Kc(lb.NFase, fecha, lb.Cob, dh.UnidadCultivoCultivoFasesList);
-            lb.KcAdjClima = KcAdjClima(lb.Kc, lb.Alt, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
+            lb.AgotamientoInicioDia = lbAnt.AgotamientoFinalDia;
+            lb.Kc = Kc(lb.NumeroEtapaDesarrollo, fecha, lb.Cobertura, dh.UnidadCultivoCultivoEtapasList);
+            lb.KcAjustadoClima = KcAdjClima(lb.Kc, lb.AlturaCultivo, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
 
             // Parámetros de estrés en suelo
-            lb.P = DepletionFactor(lb.KcAdjClima * dh.Eto(fecha), lb.NFase, dh.UnidadCultivoCultivoFasesList);
-            lb.Raw = lb.P * lb.Taw; // depletion factor f(ETc)
-            lb.Raw2 = RAW2(lb.Taw, lb.NFase, dh.UnidadCultivoCultivoFasesList); 
-            lb.LO = (lb.CC - lb.Raw); // depletion factor f(ETc)
-            lb.LOFijo = (lb.CC - lb.Raw2); // depletion factor fijo
-            lb.Ks = Ks(lb.Taw, lb.Raw, lb.DriStart); // K de estrés hídrico
+            lb.FraccionAgotamiento = DepletionFactor(lb.KcAjustadoClima * dh.Eto(fecha), lb.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList);
+            lb.AguaFacilmenteExtraible = lb.FraccionAgotamiento * lb.AguaDisponibleTotal; // depletion factor f(ETc)
+            lb.AguaFacilmenteExtraibleFija = RAW2(lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList); 
+            lb.LimiteAgotamiento = (lb.CapacidadCampo - lb.AguaFacilmenteExtraible); // depletion factor f(ETc)
+            lb.LimiteAgotamientoFijo = (lb.CapacidadCampo - lb.AguaFacilmenteExtraibleFija); // depletion factor fijo
+            lb.CoeficienteEstresHidrico = Ks(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
 
-            lb.EtcAdj = EtcAdj(dh.Eto(fecha), lb.KcAdjClima, lb.Ks); //ETc ajustada por clima y estrés
+            lb.EtcAjustadoClima = EtcAdj(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
 
-            lb.DP = DrenajeEnProdundidad(lb.EtcAdj, lb.RieEfec, lb.PEf, lb.AguaCrecRaiz, lb.DriStart);
-            lb.DriEnd = DriEnd(lb.Taw, lb.EtcAdj, lb.RieEfec, lb.PEf, lb.DriStart, lb.DP, 0, 0.8, lbAnt, datoExtra);
-            lb.OS = lb.CC - lb.DriEnd;
+            lb.DrenajeProfundidad = DrenajeEnProdundidad(lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia);
+            lb.AgotamientoFinalDia = DriEnd(lb.AguaDisponibleTotal, lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, 0.8, lbAnt, datoExtra);
+            lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
 
-            double indiceEstres = IndiceEstres(lb.OS, lb.LO, lb.Ks, lb.CC);
-            lb.RecRegMmEfectivos = RecomendacionRiegoMm(lb.Raw, lb.Taw, lb.NFase, lb.DriEnd, dh.FaseInicioRiego, dh.ClaseEstresUmbralInferior(lb.NFase, indiceEstres), dh.ClaseEstresUmbralSuperior(lb.NFase, indiceEstres));
+            double indiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
+            lb.RecRegMmEfectivos = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, indiceEstres), dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, indiceEstres));
             lb.RecRegMmReales = lb.RecRegMmEfectivos / dh.EficienciaRiego;
             lb.RecRegHr = lb.RecRegMmReales / dh.Pluviometria;
 
+            lb.CapacidadCampoRefPM = CapacidadCampoRefPuntoMarchitezMm(lb.CapacidadCampo, lb.PuntoMarchitez);
+            lb.PuntoMarchitezRefPM = PuntoMarchitezRefPuntoMarchitezMm();
+            lb.ContenidoAguaSueloRefPM = ContenidoAguaSuelRefPuntoMarchitezMm(lb.ContenidoAguaSuelo , lb.PuntoMarchitez);
+            lb.LimiteAgotamientoRefPM =     LimiteOptimoRefClima(lb.LimiteAgotamiento , lb.PuntoMarchitez);
+            lb.LimiteAgotamientoFijoRefPM = LimiteOptimoFijoRefClima(lb.LimiteAgotamientoFijo , lb.PuntoMarchitez);
             return lb;
         }
+
     }
 }

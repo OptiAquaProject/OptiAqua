@@ -15,13 +15,13 @@
         /// </summary>
         /// <param name="idUnidadCultivo">Identificador de la unidad de cultivo</param>
         /// <param name="idTemporada">Identificador de la temporada</param>
-        /// <param name="actualizaFechasFases">Activar si se desea recalcular las fechas de las fases para la parcela indicada</param>
+        /// <param name="actualizaFechasEtapas">Activar si se desea recalcular las fechas de las etapas para la parcela indicada</param>
         /// <returns></returns>
-        [Route("api/balancehidrico/{idUnidadCultivo}/{idTemporada}/{actualizaFechasFases}")]
-        public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string idTemporada, bool actualizaFechasFases) {
+        [Route("api/balancehidrico/{idUnidadCultivo}/{idTemporada}/{actualizaFechasEtapas}")]
+        public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string idTemporada, bool actualizaFechasEtapas) {
             try {
                 UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUnidadCultivo, idTemporada);
-                BalanceHidrico bh = new BalanceHidrico(dh, actualizaFechasFases);
+                BalanceHidrico bh = new BalanceHidrico(dh, actualizaFechasEtapas);
                 return Json(bh.LineasBalance);
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

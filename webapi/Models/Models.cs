@@ -43,14 +43,14 @@ namespace Models {
         public double SuperficieM2 { get; set; }
     }
 
-    [TableName("CultivoFases")]
-    [PrimaryKey("IdCultivo,OrdenFase", AutoIncrement = false)]
-    public class CultivoFases {
+    [TableName("CultivoEtapas")]
+    [PrimaryKey("IdCultivo,OrdenEtapa", AutoIncrement = false)]
+    public class CultivoEtapas {
         public int IdCultivo { get; set; }
         public string IdTipoEstres { get; set; }
-        public int OrdenFase { get; set; }
-        public string Fase { get; set; }
-        public int DuracionDiasFase { get; set; }
+        public int OrdenEtapa { get; set; }
+        public string Etapa { get; set; }
+        public int DuracionDiasEtapa { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
         public bool DefinicionPorDias { get; set; }
@@ -79,7 +79,7 @@ namespace Models {
         public double? AlturaInicial { get; set; }
         public double? AlturaFinal { get; set; }
         public double IntegralEmergencia { get; set; }
-        public int FaseInicioRiego { get; set; }
+        public int EtapaInicioRiego { get; set; }
     }
 
     [TableName("UnidadCultivoParcela")]
@@ -200,16 +200,15 @@ namespace Models {
         public double Pluviometria { set; get; }
     }
 
-    [TableName("UnidadCultivoCultivoFases")]
-    [PrimaryKey("IdParcela,IdTemporada,IdFaseCultivo", AutoIncrement = false)]
-    public class UnidadCultivoCultivoFases {
+    [TableName("UnidadCultivoCultivoEtapas")]
+    [PrimaryKey("IdParcela,IdTemporada,IdEtapaCultivo", AutoIncrement = false)]
+    public class UnidadCultivoCultivoEtapas {
         public string IdUnidadCultivo { get; set; }
         public string IdTemporada { get; set; }
-        public int IdFaseCultivo { get; set; }
-        public string Fase { get; set; }
-        public DateTime FechaInicioFase { get; set; }
-        public DateTime? FechaFinFaseConfirmada { get; set; }
-        //public DateTime? FechaConfirmacionFindeFase { get; set; }
+        public int IdEtapaCultivo { get; set; }
+        public string Etapa { get; set; }
+        public DateTime FechaInicioEtapa { get; set; }
+        public DateTime? FechaFinEtapaConfirmada { get; set; }        
         public bool DefinicionPorDias { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
@@ -298,36 +297,42 @@ namespace Models {
     public class LineaBalance {
         public DateTime? Fecha { get; set; } = null;
         public int DDA { get; set; }
-        public double IT { get; set; }
-        public double TcCob { get; set; }
-        public double Cob { get; set; }
-        public double TcAlt { get; set; }
-        public double Alt { get; set; }
-        public double Mad { get; set; }
-        public int NFase { get; set; } = 1;
-        public string EtapaDes { get; set; }
+        public double IntegralTermica { get; set; }
+        public double TasaCrecimientoCobertura { get; set; }
+        public double Cobertura { get; set; }
+        public double TasaCrecimientoAltura { get; set; }
+        public double AlturaCultivo { get; set; }
+        public double DiasMaduracion { get; set; }
+        public int NumeroEtapaDesarrollo { get; set; } = 1;
+        public string NombreEtapaDesarrollo { get; set; }
         public double Kc { get; set; }
-        public double KcAdjClima { get; set; }
-        public double Ks { get; set; }
-        public double EtcAdj { get; set; }
-        public double Root { get; set; }
-        public double Taw { get; set; }
-        public double P { get; set; }
-        public double Raw { get; set; }
-        public double Raw2 { get; set; }
-        public double DriStart { get; set; }
+        public double KcAjustadoClima { get; set; }
+        public double CoeficienteEstresHidrico { get; set; }
+        public double EtcAjustadoClima { get; set; }
+        public double LongitudRaiz { get; set; }
+        public double AguaDisponibleTotal { get; set; }
+        public double FraccionAgotamiento { get; set; }
+        public double AguaFacilmenteExtraible { get; set; }
+        public double AguaFacilmenteExtraibleFija { get; set; }
+        public double AgotamientoInicioDia { get; set; }
         public double Lluvia { get; set; }
-        public double PEf { get; set; }
+        public double LluviaEfectiva { get; set; }
         public double Riego { get; set; }
-        public double RieEfec { get; set; }
-        public double DP { get; set; }
-        public double DriEnd { get; set; }
+        public double RiegoEfectivo { get; set; }
+        public double DrenajeProfundidad { get; set; }
+        public double AgotamientoFinalDia { get; set; }
 
-        public double CC { get; set; }
-        public double PM { get; set; }
-        public double OS { get; set; }
-        public double LO { get; set; } // límite óptimo, antes ccraw
-        public double LOFijo { get; set; }// limite optimo fijo, antes ccraw2
+        public double CapacidadCampo { get; set; }
+        public double PuntoMarchitez { get; set; }
+        public double ContenidoAguaSuelo { get; set; }
+        public double LimiteAgotamiento { get; set; } // límite óptimo, antes ccraw
+        public double LimiteAgotamientoFijo { get; set; }// limite optimo fijo, antes ccraw2
+
+        public double CapacidadCampoRefPM { get; set; }
+        public double PuntoMarchitezRefPM { get; set; }
+        public double ContenidoAguaSueloRefPM { get; set; }
+        public double LimiteAgotamientoRefPM { get; set; } 
+        public double LimiteAgotamientoFijoRefPM { get; set; }
 
         public double AguaCrecRaiz { set; get; }
 
@@ -389,9 +394,9 @@ namespace Models {
 
     public class ResumenDiario {
         public double RiegoTotal { set; get; }
-        public double RiegoEfecTotal { set; get; }
+        public double RiegoEfectivoTotal { set; get; }
         public double LluviaTotal { set; get; }
-        public double LluviaEfecTotal { set; get; }
+        public double LluviaEfectivaTotal { set; get; }
         public double AguaPerdida { set; get; }
         public double ConsumoAguaCultivo { set; get; }
         public int DiasEstres { set; get; }
@@ -400,22 +405,22 @@ namespace Models {
         public double CosteAguaRiego { set; get; }
         public double CosteAguaDrenaje { set; get; }
 
-        public double CC { set; get; }
-        public double LO { set; get; }
-        public double PM { set; get; }
-        public double OS { set; get; }
+        public double CapacidadCampo { set; get; }
+        public double LimiteAgotamiento { set; get; }
+        public double PuntoMarchitez { set; get; }
+        public double ContenidoAguaSuelo { set; get; }
 
-        public double CC_porcent { set; get; }
-        public double LO_porcent { set; get; }
-        public double PM_porcent { set; get; }
-        public double OS_porcent { set; get; }
+        public double CapacidadCampoPorcentaje { set; get; }
+        public double LimiteAgotamientoPorcentaje { set; get; }
+        public double PuntoMarchitezPorcentaje { set; get; }
+        public double ContenidoAguaSueloPorcentaje { set; get; }
 
-        public double DP { set; get; }
+        public double DrenajeProfuncidad { set; get; }
         public bool AvisoDrenaje{ set; get; }
 
-        public double AguaHastaCC { set; get; }
-        public double RecRegMm { set; get; } // Recomentación de riego en MM
-        public double RecRegTpo { set; get; } // Recomentacion de riego en tiempo (horas)
+        public double AguaHastaCapacidadCampo { set; get; }
+        public double RecomendacionRiegoMm { set; get; } // Recomentación de riego en MM
+        public double RecomendacionRiegoHr { set; get; } // Recomentacion de riego en tiempo (horas)
         public double IndiceEstres { set; get; }
         public string ClaseEstres { set; get; }
     }
@@ -494,10 +499,10 @@ namespace Models {
         public double? AlturaInicial { get; set; }
         public double? AlturaFinal { get; set; }
         public double? IntegralEmergencia { get; set; }
-        public int IdFaseCultivo { get; set; }
-        public string Fase { get; set; }
-        public DateTime FechaInicioFase { get; set; }
-        public DateTime? FechaFinFaseConfirmada { get; set; }
+        public int IdEtapaCultivo { get; set; }
+        public string Etapa { get; set; }
+        public DateTime FechaInicioEtapa { get; set; }
+        public DateTime? FechaFinEtapaConfirmada { get; set; }
         public bool DefinicionPorDias { get; set; }
         public double? KcInicial { get; set; }
         public double? KcFinal { get; set; }
@@ -515,14 +520,14 @@ namespace Models {
         public double Arena { get; set; }
         public double ElementosGruesos { get; set; }
         public double MateriaOrganica { get; set; }
-        public int OrdenFase { get; set; }
-        public string FaseNombre { get; set; }
-        public int DuracionDiasFase { get; set; }
-        public double? CultivoFasesKcInicial { get; set; }
-        public double? CultivoFasesKcFinal { get; set; }
-        public bool CultivoFasesDefinicionPorDias { get; set; }
-        public double? CultivoFasesCobInicial { get; set; }
-        public double? CultivoFasesFinal { get; set; }
+        public int OrdenEtapa { get; set; }
+        public string EtapaNombre { get; set; }
+        public int DuracionDiasEtapa { get; set; }
+        public double? CultivoEtapasKcInicial { get; set; }
+        public double? CultivoEtapasKcFinal { get; set; }
+        public bool CultivoEtapasDefinicionPorDias { get; set; }
+        public double? CultivoEtapasCobInicial { get; set; }
+        public double? CultivoEtapasFinal { get; set; }
         public double? FactorAgotamiento { get; set; }
     }
 

@@ -4,29 +4,29 @@
     using System.Web.Http;
 
     /// <summary>
-    /// Proporciona información de las fases del cultivo para una unidad de cultivo
+    /// Proporciona información de las etapas del cultivo para una unidad de cultivo
     /// </summary>
-    public class FasesController : ApiController {
+    public class EtapasController : ApiController {
         /// <summary>
-        /// Fases de una unidad de cultivo en una temporada.
+        /// Etapas de una unidad de cultivo en una temporada.
         /// </summary>
         /// <param name="IdUnidadCultivo"></param>
         /// <param name="idTemporada"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/fases/{IdUnidadCultivo}/{idTemporada}")]
+        [Route("api/etapas/{IdUnidadCultivo}/{idTemporada}")]
         public IHttpActionResult Get(string IdUnidadCultivo, string idTemporada) {
             try {
-                return Json(DB.FasesList(IdUnidadCultivo, idTemporada));
+                return Json(DB.Etapas(IdUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
         }
 
         /// <summary>
-        /// Defines the <see cref="FasesPost" />
+        /// Defines the <see cref="EtapasPost" />
         /// </summary>
-        public class FasesPost {
+        public class EtapasPost {
             /// <summary>
             /// Gets or sets the IdUnidadCultivo
             /// </summary>
@@ -38,9 +38,9 @@
             public string IdTtemporada { set; get; }
 
             /// <summary>
-            /// Gets or sets the NFase
+            /// Gets or sets the nEtapa
             /// </summary>
-            public int NFase { set; get; }
+            public int nEtapa { set; get; }
 
             /// <summary>
             /// Gets or sets the FechaConfirmada
@@ -54,15 +54,15 @@
         }
 
         /// <summary>
-        /// Actualizar la fecha de cambio de fase.
+        /// Actualizar la fecha de cambio de etapa.
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public IHttpActionResult Post([FromBody] FasesPost param) {
+        public IHttpActionResult Post([FromBody] EtapasPost param) {
             try {
-                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTtemporada, param.NFase, DateTime.Parse(param.FechaConfirmada));
+                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTtemporada, param.nEtapa, DateTime.Parse(param.FechaConfirmada));
                 return Ok();
             } catch {
                 return BadRequest();
