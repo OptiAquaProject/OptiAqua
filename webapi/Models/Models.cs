@@ -339,6 +339,9 @@ namespace Models {
         public double RecomendacionRiegoTiempo { get; set; }
         public double RecomendacionRiegoNeto { set; get; }
         public double RecomendacionRiegoBruto { set; get; }
+
+        public double IndiceEstres { set; get; }
+        public string ClaseEstes { set; get; }
     }
 
     [TableName("Temporada")]
@@ -393,6 +396,7 @@ namespace Models {
     }
 
     public class ResumenDiario {
+        public DateTime FechaDeCalculo { set; get; }
         public double RiegoTotal { set; get; }
         public double RiegoEfectivoTotal { set; get; }
         public double LluviaTotal { set; get; }
@@ -423,6 +427,13 @@ namespace Models {
         public double RecomendacionRiegoTiempo { set; get; } 
         public double IndiceEstres { set; get; }
         public string ClaseEstres { set; get; }
+
+        public double CapacidadCampoRefPM { get; set; }
+        public double PuntoMarchitezRefPM { get; set; }
+        public double ContenidoAguaSueloRefPM { get; set; }
+        public double LimiteAgotamientoRefPM { get; set; }
+        public double LimiteAgotamientoFijoRefPM { get; set; }
+
     }
 
     public class GeoLocParcela {

@@ -330,12 +330,19 @@
         /// <summary>
         /// ResumenDiario
         /// </summary>
+        /// <param name="fechaDeCalculo">Fecha en la que se desean presentar los datos<see cref="DateTime"/></param>
         /// <returns>The <see cref="ResumenDiario"/></returns>
-        public ResumenDiario ResumenDiario() {
-            DateTime fechaDeCalculo = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
+        public ResumenDiario ResumenDiario(DateTime fechaDeCalculo) {
+            if (fechaDeCalculo > unidadCultivoDatosHidricos.FechaFinalDeEstudio())
+                fechaDeCalculo = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
+            if (fechaDeCalculo > DateTime.Today)
+                fechaDeCalculo = DateTime.Today;
+            if (fechaDeCalculo < unidadCultivoDatosHidricos.FechaSiembra())
+                fechaDeCalculo = unidadCultivoDatosHidricos.FechaSiembra();
             ResumenDiario ret = new ResumenDiario();
-            LineaBalance lb = LineaBalance(fechaDeCalculo);
+            LineaBalance lb = LineaBalance(fechaDeCalculo);            
 
+            ret.FechaDeCalculo = fechaDeCalculo;
             ret.RiegoTotal = SumaRiegosM3(fechaDeCalculo);
             ret.RiegoEfectivoTotal = SumaRiegoEfectivo(fechaDeCalculo);
             ret.LluviaTotal = SumaLluvias(fechaDeCalculo);
@@ -354,7 +361,7 @@
             ret.PuntoMarchitez = lb.PuntoMarchitez;
             ret.ContenidoAguaSuelo = lb.ContenidoAguaSuelo;
 
-            ret.CapacidadCampoPorcentaje =1;
+            ret.CapacidadCampoPorcentaje = 1;
             try {
                 ret.LimiteAgotamientoPorcentaje = (ret.LimiteAgotamiento - ret.PuntoMarchitez) / (ret.CapacidadCampo - ret.PuntoMarchitez);
             } catch {
@@ -377,6 +384,13 @@
             ret.RecomendacionRiegoTiempo = lb.RecomendacionRiegoTiempo;
             ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
             ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NumeroEtapaDesarrollo);
+
+            ret.CapacidadCampoRefPM = lb.CapacidadCampoRefPM;
+            ret.PuntoMarchitezRefPM = lb.PuntoMarchitezRefPM;
+            ret.ContenidoAguaSueloRefPM = lb.ContenidoAguaSueloRefPM;
+            ret.LimiteAgotamientoRefPM = lb.LimiteAgotamientoRefPM;
+            ret.LimiteAgotamientoFijoRefPM = lb.LimiteAgotamientoFijoRefPM;
+
             return ret;
         }
     }

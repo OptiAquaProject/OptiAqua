@@ -576,7 +576,7 @@
             Retorna resumen de los datos hídricos a una fecha.
             </summary>
             <param name="idUnidadCultivo"></param>
-            <param name="fecha"></param>
+            <param name="fechaStr"></param>
             <returns></returns>
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetDatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.String)">
@@ -587,7 +587,7 @@
             <param name="idUnidadCultivo"></param>
             <param name="idMunicipio"></param>
             <param name="idCultivo"></param>
-            <param name="fecha"></param>
+            <param name="fechaStr"></param>
             <returns></returns>
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetRiegos(System.String,System.String)">
@@ -611,7 +611,7 @@
              ResumenDiario
             </summary>
             <param name="idUnidadCultivo">The idUnidadCultivo<see cref="T:System.String"/></param>
-            <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
+            <param name="fechaStr"></param>                
             <returns>The <see cref="T:System.Web.Http.IHttpActionResult"/></returns>
         </member>
         <member name="T:WebApi.EtapasController">
@@ -1178,11 +1178,12 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.DatosEstadoHidrico(System.DateTime)"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.BalanceHidrico.ResumenDiario">
+        <member name="M:DatosOptiaqua.BalanceHidrico.ResumenDiario(System.DateTime)">
             <summary>
             ResumenDiario
             </summary>
-            <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.ResumenDiario"/></returns>
+            <param name="fechaDeCalculo">Fecha en la que se desean presentar los datos<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.ResumenDiario(System.DateTime)"/></returns>
         </member>
         <member name="T:DatosOptiaqua.DB">
             <summary>
