@@ -325,8 +325,8 @@ namespace Models {
         public double CapacidadCampo { get; set; }
         public double PuntoMarchitez { get; set; }
         public double ContenidoAguaSuelo { get; set; }
-        public double LimiteAgotamiento { get; set; } // límite óptimo, antes ccraw
-        public double LimiteAgotamientoFijo { get; set; }// limite optimo fijo, antes ccraw2
+        public double LimiteAgotamiento { get; set; } 
+        public double LimiteAgotamientoFijo { get; set; }
 
         public double CapacidadCampoRefPM { get; set; }
         public double PuntoMarchitezRefPM { get; set; }
@@ -336,9 +336,9 @@ namespace Models {
 
         public double AguaCrecRaiz { set; get; }
 
-        public double RecRegHr { get; set; }
-        public double RecRegMmEfectivos { set; get; }
-        public double RecRegMmReales { set; get; }
+        public double RecomendacionRiegoTiempo { get; set; }
+        public double RecomendacionRiegoNeto { set; get; }
+        public double RecomendacionRiegoBruto { set; get; }
     }
 
     [TableName("Temporada")]
@@ -415,12 +415,12 @@ namespace Models {
         public double PuntoMarchitezPorcentaje { set; get; }
         public double ContenidoAguaSueloPorcentaje { set; get; }
 
-        public double DrenajeProfuncidad { set; get; }
+        public double DrenajeProfundidad { set; get; }
         public bool AvisoDrenaje{ set; get; }
 
         public double AguaHastaCapacidadCampo { set; get; }
-        public double RecomendacionRiegoMm { set; get; } // Recomentación de riego en MM
-        public double RecomendacionRiegoHr { set; get; } // Recomentacion de riego en tiempo (horas)
+        public double RecomendacionRiegoNeto { set; get; }
+        public double RecomendacionRiegoTiempo { set; get; } 
         public double IndiceEstres { set; get; }
         public string ClaseEstres { set; get; }
     }

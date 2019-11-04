@@ -354,7 +354,7 @@
             ret.PuntoMarchitez = lb.PuntoMarchitez;
             ret.ContenidoAguaSuelo = lb.ContenidoAguaSuelo;
 
-            ret.CapacidadCampoPorcentaje = ret.CapacidadCampo / 100;
+            ret.CapacidadCampoPorcentaje =1;
             try {
                 ret.LimiteAgotamientoPorcentaje = (ret.LimiteAgotamiento - ret.PuntoMarchitez) / (ret.CapacidadCampo - ret.PuntoMarchitez);
             } catch {
@@ -369,12 +369,12 @@
             }
 
 
-            ret.DrenajeProfuncidad = lb.DrenajeProfundidad;
+            ret.DrenajeProfundidad = lb.DrenajeProfundidad;
             ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DrenajeProfundidad);
 
             ret.AguaHastaCapacidadCampo = ret.CapacidadCampo - ret.ContenidoAguaSuelo;
-            ret.RecomendacionRiegoMm = lb.RecRegMmEfectivos;
-            ret.RecomendacionRiegoHr = lb.RecRegHr;
+            ret.RecomendacionRiegoNeto = lb.RecomendacionRiegoNeto;
+            ret.RecomendacionRiegoTiempo = lb.RecomendacionRiegoTiempo;
             ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
             ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NumeroEtapaDesarrollo);
             return ret;

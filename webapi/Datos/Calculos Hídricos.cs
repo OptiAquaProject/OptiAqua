@@ -683,9 +683,9 @@
             lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
 
             double indiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
-            lb.RecRegMmEfectivos = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, indiceEstres), dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, indiceEstres));
-            lb.RecRegMmReales = lb.RecRegMmEfectivos / dh.EficienciaRiego;
-            lb.RecRegHr = lb.RecRegMmReales / dh.Pluviometria;
+            lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, indiceEstres), dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, indiceEstres));
+            lb.RecomendacionRiegoNeto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
+            lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;
 
             lb.CapacidadCampoRefPM = CapacidadCampoRefPuntoMarchitezMm(lb.CapacidadCampo, lb.PuntoMarchitez);
             lb.PuntoMarchitezRefPM = PuntoMarchitezRefPuntoMarchitezMm();
