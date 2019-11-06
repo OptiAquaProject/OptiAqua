@@ -1,8 +1,10 @@
 ﻿namespace DatosOptiaqua {
     using Models;
+    using NPoco;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using webapi.Utiles;
 
     /// <summary>
     /// Clase estática en la que se implementan las funciones hídricas
@@ -597,20 +599,10 @@
                 return ret;
             ret = ltu[0].Descripcion;
             int i = 0;
-            while (indiceEstes > ltu[i].IdUmbral) {
-                ret = ret = ltu[++i].Descripcion;
+            while (indiceEstes > ltu[i].Umbral) {
+                ret = ltu[++i].Descripcion;
             }
             return ret;
-        }
-
-        /// <summary>
-        /// Devuelve el máximo valor de la tabla de umbrales para el tipo de estres indicado por idTipoEstres
-        /// </summary>
-        /// <param name="idTipoEstres"></param>
-        /// <returns></returns>
-        public static double MaxUmbralEstres(string idTipoEstres) {
-            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
-            return ltu.Max(x => x.Umbral);
         }
 
 
@@ -694,6 +686,94 @@
             lb.LimiteAgotamientoRefPM =     LimiteOptimoRefClima(lb.LimiteAgotamiento , lb.PuntoMarchitez);
             lb.LimiteAgotamientoFijoRefPM = LimiteOptimoFijoRefClima(lb.LimiteAgotamientoFijo , lb.PuntoMarchitez);
             return lb;
+        }
+
+
+        /// <summary>
+        /// Retorna listado de datos hídricos filtrados por los parámetros indicados.
+        /// Pasar '' como parametro en blanco si no se desea filtrar
+        /// </summary>
+        /// <param name="idCliente">idCliente<see cref="int?"/></param>
+        /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
+        /// <param name="idMunicipio">idMunicipio<see cref="int?"/></param>
+        /// <param name="idCultivo">idCultivo<see cref="string"/></param>
+        /// <param name="fecha">fecha<see cref="DateTime"/></param>
+        /// <param name="isAdmin">isAdmin<see cref="bool"/></param>
+        /// <returns><see cref="object"/></returns>
+        public static object DatosHidricosList(int? idCliente, string idUnidadCultivo, int? idMunicipio, string idCultivo, DateTime fecha, bool isAdmin) {
+            List<DatosEstadoHidrico> ret = new List<DatosEstadoHidrico>();
+            List<string> lIdUnidadCultivo = null;
+            string idTemporada = DB.TemporadaDeFecha(fecha);
+            idUnidadCultivo = idUnidadCultivo.Unquoted();
+            if (idUnidadCultivo != "") {
+                lIdUnidadCultivo = new List<string> {
+                    idUnidadCultivo
+                };
+            } else {
+                Database db = new Database(DB.CadenaConexionOptiAqua);
+                string sql = "SELECT Distinct IdUnidadCultivo from FiltroParcelasDatosHidricos ";
+                string join = " Where ";
+                if (idMunicipio != null) {
+                    sql += join + "idMunicipio=" + idMunicipio.ToString();
+                    join = " and ";
+                }
+
+                if (idCultivo.Unquoted() != "") {
+                    sql += join + " IdCultivo=" + idCultivo;
+                    join = " and ";
+                }
+
+                if (idCliente != null)
+                    sql += join + "IdRegante=" + idCliente.ToString();
+
+                lIdUnidadCultivo = db.Fetch<string>(sql);
+            }
+
+            DatosEstadoHidrico datosEstadoHidrico = null;
+            UnidadCultivoDatosHidricos dh = null;
+            List<GeoLocParcela> lGeoLocParcelas = null;
+            foreach (string idUc in lIdUnidadCultivo) {
+                try {
+                    lGeoLocParcelas = null;
+                    lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);
+                    dh = new UnidadCultivoDatosHidricos(idUc, idTemporada);
+                    BalanceHidrico bh = new BalanceHidrico(dh, true);
+                    datosEstadoHidrico = bh.DatosEstadoHidrico(fecha);
+                    datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
+                    ret.Add(datosEstadoHidrico);
+                } catch (Exception ex) {
+                    dh.ObtenerMunicicioParaje(out string municipios, out string parajes);
+                    datosEstadoHidrico = new DatosEstadoHidrico {
+                        Fecha = fecha,
+                        Pluviometria = dh.Pluviometria,
+                        TipoRiego = dh.TipoRiego,
+                        FechaSiembra = dh.FechaSiembra(),
+                        Cultivo = dh.CultivoNombre,
+                        Estacion = dh.EstacionNombre,
+                        IdEstacion = dh.IdEstacion,
+                        IdRegante = dh.IdRegante,
+                        IdUnidadCultivo = idUc,
+                        Municipios = municipios,
+                        Parajes = parajes,
+                        Regante = dh.ReganteNombre,
+                        Alias = dh.Alias,
+                        Eficiencia = dh.EficienciaRiego,
+                        IdCultivo = dh.IdCultivo,
+                        IdTemporada = dh.IdTemporada,
+                        IdTipoRiego = dh.IdTipoRiego,
+                        NIF = dh.ReganteNif,
+                        Telefono = dh.ReganteTelefono,
+                        TelefonoSMS = dh.ReganteTelefonoSMS,
+                        SuperficieM2 = dh.UnidadCultivoExtensionM2,
+                        NParcelas = dh.NParcelas,
+                        Textura = "",
+                        GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas),
+                        Status = "ERROR:" + ex.Message,
+                    };
+                    ret.Add(datosEstadoHidrico);
+                }
+            }
+            return ret;
         }
 
     }

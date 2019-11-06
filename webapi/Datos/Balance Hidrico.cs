@@ -284,10 +284,14 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="DatosEstadoHidrico"/></returns>
         public DatosEstadoHidrico DatosEstadoHidrico(DateTime fecha) {
-            //CalculaBalance(true);
+            if (fecha > DateTime.Today)
+                fecha = DateTime.Today;
+            if (fecha > unidadCultivoDatosHidricos.FechaFinalDeEstudio())
+                fecha = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
             LineaBalance linBalAFecha = LineasBalance.Find(x => x.Fecha == fecha);
             unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string municipios, out string parajes);
             DatosEstadoHidrico ret = new DatosEstadoHidrico {
+                Fecha = fecha,
                 Eficiencia = unidadCultivoDatosHidricos.EficienciaRiego,
                 Alias = unidadCultivoDatosHidricos.Alias,
                 IdCultivo = unidadCultivoDatosHidricos.IdCultivo,

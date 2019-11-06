@@ -356,6 +356,7 @@ namespace Models {
     }
 
     public class DatosEstadoHidrico {
+        public DateTime Fecha { set; get; }
         public string IdUnidadCultivo { set; get; }
         public int? IdRegante { set; get; }
         public string Municipios { set; get; }

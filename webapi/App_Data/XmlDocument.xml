@@ -576,7 +576,7 @@
             Retorna resumen de los datos hídricos a una fecha.
             </summary>
             <param name="idUnidadCultivo"></param>
-            <param name="fechaStr"></param>
+            <param name="fecha"></param>
             <returns></returns>
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetDatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.String)">
@@ -587,7 +587,7 @@
             <param name="idUnidadCultivo"></param>
             <param name="idMunicipio"></param>
             <param name="idCultivo"></param>
-            <param name="fechaStr"></param>
+            <param name="fecha"></param>
             <returns></returns>
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetRiegos(System.String,System.String)">
@@ -1022,6 +1022,19 @@
             <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
             <returns><see cref="T:Models.LineaBalance"/></returns>
         </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.DatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.DateTime,System.Boolean)">
+            <summary>
+            Retorna listado de datos hídricos filtrados por los parámetros indicados.
+            Pasar '' como parametro en blanco si no se desea filtrar
+            </summary>
+            <param name="idCliente">idCliente<see cref="!:int?"/></param>
+            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
+            <param name="idMunicipio">idMunicipio<see cref="!:int?"/></param>
+            <param name="idCultivo">idCultivo<see cref="T:System.String"/></param>
+            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
+            <param name="isAdmin">isAdmin<see cref="T:System.Boolean"/></param>
+            <returns><see cref="T:System.Object"/></returns>
+        </member>
         <member name="T:DatosOptiaqua.BalanceHidrico">
             <summary>
             Defines the <see cref="T:DatosOptiaqua.BalanceHidrico" />
@@ -1233,19 +1246,6 @@
             Crear o actualizar datos de temporada
             </summary>
             <param name="temporada">param<see cref="M:DatosOptiaqua.DB.Temporada(System.String)"/></param>
-            <returns><see cref="T:System.Object"/></returns>
-        </member>
-        <member name="M:DatosOptiaqua.DB.DatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.DateTime,System.Boolean)">
-            <summary>
-            Retorna listado de datos hídricos filtrados por los parámetros indicados.
-            Pasar '' como parametro en blanco si no se desea filtrar
-            </summary>
-            <param name="idCliente">idCliente<see cref="!:int?"/></param>
-            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/></param>
-            <param name="idMunicipio">idMunicipio<see cref="!:int?"/></param>
-            <param name="idCultivo">idCultivo<see cref="T:System.String"/></param>
-            <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
-            <param name="isAdmin">isAdmin<see cref="T:System.Boolean"/></param>
             <returns><see cref="T:System.Object"/></returns>
         </member>
         <member name="M:DatosOptiaqua.DB.GeoLocParcelasList(System.String,System.String)">
