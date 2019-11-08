@@ -258,34 +258,18 @@
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
         public int EtapaInicioRiego => cultivo.EtapaInicioRiego;
 
-        public double ClaseEstresUmbralInferior(int nEtapa,double indiceEstres) {
-            double ret = -1;
+        public double ClaseEstresUmbralInferior(int nEtapa,double indiceEstres) {            
             int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
             string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
-            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);            
-            if (ltu?.Count == 0)
-                return ret;
-            int i = 0;
-            ret = -1;
-            while (indiceEstres > ltu[i].Umbral && i<ltu.Count) {
-                ret = ltu[i++].Umbral;
-            }
-            return ret;
+            var estres = DB.TipoEstres(idTipoEstres);
+            return estres.RiegoLimiteInferior;
         }
 
         public double ClaseEstresUmbralSuperior(int nEtapa, double indiceEstres) {
-            double ret = 1;
             int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
             string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
-            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
-            if (ltu?.Count == 0)
-                return ret;
-            int i = ltu.Count-1;
-            ret = 1;
-            while (i >= 0 && indiceEstres < ltu[i].Umbral ) {
-                ret = ltu[i--].Umbral;
-            }
-            return ret;
+            var estres = DB.TipoEstres(idTipoEstres);
+            return estres.RiegoLimiteSuperior;
         }
 
         /// <summary>

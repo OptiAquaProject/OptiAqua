@@ -557,6 +557,8 @@ namespace Models {
         public string IdTipoEstres { get; set; }
         public string Estres { get; set; }
         public bool ADemanda { get; set; }
+        public double RiegoLimiteInferior { get; set; }
+        public double RiegoLimiteSuperior { get; set; }
     }
 
     [TableName("TipoEstresUmbral")]

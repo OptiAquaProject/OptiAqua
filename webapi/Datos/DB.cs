@@ -16,12 +16,35 @@
     /// La cadena de conexión Nebula se define como parámetro de la aplicación.
     /// </summary>
     public static class DB {
+        /// <summary>
+        /// Defines the TypeModo
+        /// </summary>
+        public enum TypeModo { /// <summary>
+                               /// Defines the Real
+                               /// </summary>
+            Real,
+            /// <summary>
+            /// Defines the Pruebas
+            /// </summary>
+            Pruebas
+        };
 
-        public enum TypeModo { Real, Pruebas };
+        /// <summary>
+        /// Gets or sets the Modo
+        /// </summary>
         public static TypeModo Modo { set; get; } = TypeModo.Real;
 
-        public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";       
-                                                                                                                                                 
+        /// <summary>
+        /// Gets the CadenaConexionOptiAqua
+        /// </summary>
+        public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";
+
+        /// <summary>
+        /// The IsCorrectPassword
+        /// </summary>
+        /// <param name="login">The login<see cref="LoginRequest"/></param>
+        /// <param name="regante">The regante<see cref="Regante"/></param>
+        /// <returns>The <see cref="bool"/></returns>
         public static bool IsCorrectPassword(LoginRequest login, out Regante regante) {
             regante = null;
             try {
@@ -54,9 +77,6 @@
                 return false;
             }
         }
-
- 
-  
 
         /// <summary>
         /// Retorna lista de avisos con los filtros indicados según los parámetros. 
@@ -173,6 +193,17 @@
         }
 
         /// <summary>
+        /// Devuele el registro TipoEstres inficado por su identificador.
+        /// </summary>
+        /// <param name="idTipoEstres">The idTipoEstres<see cref="string"/></param>
+        /// <returns>The <see cref="TipoEstres"/></returns>
+        internal static TipoEstres TipoEstres(string idTipoEstres) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            TipoEstres ret = db.SingleById<TipoEstres>(idTipoEstres);
+            return ret;
+        }
+
+        /// <summary>
         /// UnidadCultivoTemporadaCosteM3Agua
         /// </summary>
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
@@ -220,13 +251,13 @@
             return db.Fetch<object>(sql, idUnidadCultivo, idTemporada);
         }
 
-
         /// <summary>
         /// Duplicar para la temporada indicada los datos de suelo de la temporada anterior
         /// </summary>
         /// <param name="idUnidadCultivo"></param>
         /// <param name="idTemporada"></param>
         /// <param name="idTemporadaAnterior"></param>
+        /// <returns>The <see cref="bool"/></returns>
         public static bool DuplicarAnteriorSuelo(string idUnidadCultivo, string idTemporada, string idTemporadaAnterior) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             List<UnidadCultivoSuelo> lSt = db.Fetch<UnidadCultivoSuelo>("Select * from UnidadCultivoSuelo where idUnidadCultivo=@0 and idTemporada=@1 ", idUnidadCultivo, idTemporadaAnterior);
@@ -1622,9 +1653,14 @@
             db.Save(cfg);
         }
 
+        /// <summary>
+        /// The TemporadaExists
+        /// </summary>
+        /// <param name="idTemporada">The idTemporada<see cref="string"/></param>
+        /// <returns>The <see cref="bool"/></returns>
         internal static bool TemporadaExists(string idTemporada) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            var ret= db.Exists<Temporada>(idTemporada);
+            bool ret = db.Exists<Temporada>(idTemporada);
             return ret;
         }
     }

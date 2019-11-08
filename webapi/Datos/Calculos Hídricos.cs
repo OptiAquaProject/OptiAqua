@@ -581,7 +581,6 @@
             return ret;
         }
 
-
         public static double LimiteOptimoRefClima(double lo, double pm) => lo - pm;
         public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo - pm;
         public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os - pm;
@@ -655,7 +654,9 @@
             lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
 
             lb.ClaseEstres = dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
-            lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres), dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres));
+            var limiteInferior = dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres);
+            var limiteSuperior = dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres);
+            lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, limiteInferior, limiteSuperior);
             lb.RecomendacionRiegoNeto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
             lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;
 
