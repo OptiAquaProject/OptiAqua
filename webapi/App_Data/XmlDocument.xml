@@ -726,7 +726,7 @@
             <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/></param>
             <returns>The <see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.TcCob(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoCobertura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
             <summary>
             Calculo de la Cobertura por el método de la Tasa de Crecimiento
             </summary>
@@ -738,7 +738,7 @@
             <param name="ModCobCoefC"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.TcAlt(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoAltura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
             <summary>
             Calculo de la altura por el método de la Tasa de crecimiento
             </summary>
@@ -750,7 +750,7 @@
             <param name="ModAltCoefC"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.NEtapaDesarrollo(System.DateTime,System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas},System.Collections.Generic.List{Models.CultivoEtapas})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.NumeroEtapaDesarrollo(System.DateTime,System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas},System.Collections.Generic.List{Models.CultivoEtapas})">
             <summary>
             Retorna en Nº de Etapa en la que nos encontramos en base 1 (1,2,3,4....)
             Párametro nEtapa está en base 1 y la tabla de etapas en base 0
@@ -762,7 +762,7 @@
             <param name="pCultivoEtapas"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.Kc(System.Int32,System.DateTime,System.Double,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.Kc(System.Int32,System.DateTime,System.Double,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas},System.Collections.Generic.List{Models.CultivoEtapas})">
             <summary>
             Calculo del Coeficiento de cultivo
             </summary>
@@ -770,6 +770,7 @@
             <param name="fecha"></param>
             <param name="cob"></param>
             <param name="unidadCultivoCultivosEtapasList"></param>
+            <param name="cultivoEtapasList"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.KcAdjClima(System.Double,System.Double,System.Double,System.Double)">
@@ -810,9 +811,9 @@
             <param name="unidadCultivoCultivosEtapasList"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.RAW2(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
+        <member name="M:DatosOptiaqua.CalculosHidricos.AguaFacilmenteExtraibleFija(System.Double,System.Int32,System.Collections.Generic.List{Models.UnidadCultivoCultivoEtapas})">
             <summary>
-            Caculo de RAW2
+            Caculo de AguaFacilmenteExtraibleFija - RAW2
             </summary>
             <param name="taw"></param>
             <param name="nEtapa"></param>
@@ -835,9 +836,9 @@
             <param name="eto"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.Ks(System.Double,System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.CoeficienteEstresHidrico(System.Double,System.Double,System.Double)">
             <summary>
-            Calculo de Ks
+            Calculo de Coeficiente de estrés hídrico Ks
             </summary>
             <param name="taw"></param>
             <param name="raw"></param>
@@ -887,14 +888,13 @@
             <param name="datoExtra"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.Altura(System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Nullable{System.Double},Models.UnidadCultivoDatosExtra)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.Altura(System.Double,System.Double,System.Double,System.Nullable{System.Double},Models.UnidadCultivoDatosExtra)">
             <summary>
             Calcula la Altura para una fecha dada. NO Tiene en cuenta si se han indicado datos extra.
             </summary>
             <param name="antAlt"></param>
             <param name="tcAlt"></param>
-            <param name="incT"></param>
-            <param name="modAltCoefC"></param>
+            <param name="incT"></param>        
             <param name="alturaFinal"></param>
             <param name="datoExtra"></param>
             <returns></returns>
@@ -908,9 +908,9 @@
             <param name="tawAyer">tawAyer<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.DriEnd(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,Models.LineaBalance,Models.UnidadCultivoDatosExtra)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.AgotamientoFinalDia(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,Models.LineaBalance,Models.UnidadCultivoDatosExtra)">
             <summary>
-            CalculaDriEnd
+            Agotamiento al final del día CalculaDriEnd
             </summary>
             <param name="taw">taw<see cref="T:System.Double"/></param>
             <param name="EtcAdj">EtcAdj<see cref="T:System.Double"/></param>
@@ -933,17 +933,6 @@
             <param name="pef"></param>
             <param name="aguaAportadaCrecRaiz"></param>
             <param name="driStart"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.TcCob(System.Double,System.Double,System.Double,System.Double,System.Nullable{System.Double})">
-            <summary>
-            calculo de la Cobertura por el método de la Tasa de Crecimiento
-            </summary>
-            <param name="it"></param>
-            <param name="itEmergencia"></param>
-            <param name="ModCobCoefA"></param>
-            <param name="ModCobCoefB"></param>
-            <param name="ModCobCoefC"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.RecomendacionRiegoMm(System.Double,System.Double,System.Int32,System.Double,System.Int32,System.Double,System.Double)">
@@ -1000,18 +989,11 @@
             <summary>
             Retorna a la tabla de umbrales la clase de estres.
             Ordena la tabla por el valor umbral.
-            Retonar la descripción del maxímo umbral que puede superar el indiceEstes
+            Retonar la descripción del maxímo umbral que puede superar el indiceEstres
             </summary>
             <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/></param>
-            <param name="indiceEstes">ie<see cref="T:System.Double"/></param>
+            <param name="indiceEstres">ie<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.String"/></returns>
-        </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.MaxUmbralEstres(System.String)">
-            <summary>
-            Devuelve el máximo valor de la tabla de umbrales para el tipo de estres indicado por idTipoEstres
-            </summary>
-            <param name="idTipoEstres"></param>
-            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.CalculaLineaBalance(DatosOptiaqua.UnidadCultivoDatosHidricos,Models.LineaBalance,System.DateTime)">
             <summary>

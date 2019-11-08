@@ -3,7 +3,6 @@
     using NPoco;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using webapi.Utiles;
 
     /// <summary>
@@ -62,7 +61,7 @@
         /// <param name="ModCobCoefB"></param>
         /// <param name="ModCobCoefC"></param>
         /// <returns></returns>
-        public static double TcCob(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
+        public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -73,15 +72,15 @@
             if (nEtapa == 1 && it < itEmergencia) {
                 ret = 0;
             } else {
-                //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
                 if (ModCobCoefC != null && ModCobCoefC != 0) {
-                    ret = ((ModCobCoefA) * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
+                    ret = ModCobCoefA * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC)) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
                 } else {
                     ret = ModCobCoefB;
                 }
             }
             return ret;
         }
+
 
         /// <summary>
         /// Calculo de la altura por el método de la Tasa de crecimiento
@@ -93,7 +92,7 @@
         /// <param name="ModAltCoefB"></param>
         /// <param name="ModAltCoefC"></param>
         /// <returns></returns>
-        public static double TcAlt(double it, int nEtapa, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
+        public static double TasaCrecimientoAltura(double it, int nEtapa, double itEmergencia, double ModAltCoefA, double ModAltCoefB, double? ModAltCoefC) {
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -107,7 +106,7 @@
             } else {
                 //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
                 if (ModAltCoefC != null && ModAltCoefC != 0) {
-                    ret = (ModAltCoefA * ModAltCoefB * Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))) / Math.Pow((1 + Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))), 2);
+                    ret = ModAltCoefA * ModAltCoefB * Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC)) / Math.Pow((1 + Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))), 2);
                 } else {
                     ret = ModAltCoefB;
                 }
@@ -125,7 +124,7 @@
         /// <param name="pUnidadCultivoCultivosEtapas"></param>
         /// <param name="pCultivoEtapas"></param>
         /// <returns></returns>
-        public static int NEtapaDesarrollo(DateTime fecha, double cobertura, int currentnEtapa, List<UnidadCultivoCultivoEtapas> pUnidadCultivoCultivosEtapas, List<CultivoEtapas> pCultivoEtapas) {
+        public static int NumeroEtapaDesarrollo(DateTime fecha, double cobertura, int currentnEtapa, List<UnidadCultivoCultivoEtapas> pUnidadCultivoCultivosEtapas, List<CultivoEtapas> pCultivoEtapas) {
             int nEtapaBase0 = currentnEtapa - 1 > 0 ? currentnEtapa - 1 : 0; // situación anómala
             int ret = currentnEtapa;
             if (pUnidadCultivoCultivosEtapas.Count < currentnEtapa)
@@ -172,32 +171,40 @@
         /// <param name="fecha"></param>
         /// <param name="cob"></param>
         /// <param name="unidadCultivoCultivosEtapasList"></param>
+        /// <param name="cultivoEtapasList"></param>
         /// <returns></returns>
-        public static double Kc(int nEtapa, DateTime fecha, double cob, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
+        public static double Kc(int nEtapa, DateTime fecha, double cob, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList,List<CultivoEtapas> cultivoEtapasList) {
             double ret = 0;
             int nEtapaIndex = nEtapa - 1 > 0 ? nEtapa - 1 : 0; // la etapa está en base 1
             if (unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial == unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal) {
-                ret = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
+                ret = unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial;
             } else {
                 if (unidadCultivoCultivosEtapasList[nEtapaIndex].DefinicionPorDias == true) {
-                    double nDias = (fecha - unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa).Days;
-                    DateTime fechaSigEtapa = fecha;
-                    if (nEtapaIndex + 1 < unidadCultivoCultivosEtapasList.Count)
-                        fechaSigEtapa = unidadCultivoCultivosEtapasList[nEtapaIndex + 1].FechaInicioEtapa;
-
-                    double nDiasEtapaActual = (fechaSigEtapa - unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa).Days;
-                    if (nDias > nDiasEtapaActual)
-                        nDias = nDiasEtapaActual;
-                    ret = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial + (unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal - unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial) * nDias / nDiasEtapaActual);
+                    DateTime fechaInicioEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa;
+                    DateTime fechaFinEtapaActual = fecha;
+                    var nDias = (fecha - fechaInicioEtapaActual).Days;
+                    if (unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada != null)
+                        fechaFinEtapaActual = (DateTime) unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada;
+                    else {
+                        if (nEtapaIndex + 1 < unidadCultivoCultivosEtapasList.Count)
+                            fechaFinEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex + 1].FechaInicioEtapa;
+                        else {// última fase
+                            var diasTeoricosFase= cultivoEtapasList[nEtapaIndex].DuracionDiasEtapa;
+                            fechaFinEtapaActual = fechaInicioEtapaActual.AddDays(diasTeoricosFase);
+                        }
+                    }
+                    var duracionDiasEtapaActual = (fechaFinEtapaActual - fechaInicioEtapaActual).Days;
+                    if (nDias > duracionDiasEtapaActual)
+                        nDias = duracionDiasEtapaActual;
+                    double kcInicial = unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial;
+                    double kcFinal = unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal;
+                    ret = kcInicial + ((kcFinal - kcInicial) * (nDias / duracionDiasEtapaActual));
                 } else {
                     double kcIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
                     double cobIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobInicial);
                     double kcFin = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal);
                     double cobFin = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobFinal);
-                    // calcular cobertura usando formulas tabla cultivo 
-                    // usando cobertura cultivo obtener kc
                     ret = kcIni + (cob - cobIni) * (kcFin - kcIni) / (cobFin - cobIni);
-                    // si la cobertura actual > cobFin ==> cambio etapa
                 }
             }
             return ret;
@@ -286,13 +293,13 @@
         }
 
         /// <summary>
-        /// Caculo de RAW2
+        /// Caculo de AguaFacilmenteExtraibleFija - RAW2
         /// </summary>
         /// <param name="taw"></param>
         /// <param name="nEtapa"></param>
         /// <param name="unidadCultivoCultivosEtapasList"></param>
         /// <returns></returns>
-        public static double RAW2(double taw, int nEtapa, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
+        public static double AguaFacilmenteExtraibleFija(double taw, int nEtapa, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList) {
             int nEtapaBase0 = nEtapa > 0 ? nEtapa - 1 : 0;
             double ret = taw * Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaBase0].FactorDeAgotamiento);
             return ret;
@@ -333,13 +340,13 @@
         }
 
         /// <summary>
-        /// Calculo de Ks
+        /// Calculo de Coeficiente de estrés hídrico Ks
         /// </summary>
         /// <param name="taw"></param>
         /// <param name="raw"></param>
         /// <param name="dr"></param>
         /// <returns></returns>
-        public static double Ks(double taw, double raw, double dr) {
+        public static double CoeficienteEstresHidrico(double taw, double raw, double dr) {
             double ret = dr < raw ? 1 : (taw - dr) / (taw - raw);
             return ret;
         }
@@ -383,9 +390,7 @@
         /// <param name="riego"></param>
         /// <param name="eficienciaRiego"></param>
         /// <returns></returns>
-        public static double RiegoEfectivo(double riego,double eficienciaRiego) {
-            return riego * eficienciaRiego;
-        }
+        public static double RiegoEfectivo(double riego, double eficienciaRiego) => riego * eficienciaRiego;
 
         /// <summary>
         /// Calcula la Cobertura a una fecha dada. Tiene en cuenta si se han indicado datos extra.
@@ -407,22 +412,18 @@
         /// </summary>
         /// <param name="antAlt"></param>
         /// <param name="tcAlt"></param>
-        /// <param name="incT"></param>
-        /// <param name="modAltCoefC"></param>
+        /// <param name="incT"></param>        
         /// <param name="alturaFinal"></param>
         /// <param name="datoExtra"></param>
         /// <returns></returns>
-        public static double Altura(double antAlt, double tcAlt, double incT, double? modAltCoefC, double? alturaFinal, UnidadCultivoDatosExtra datoExtra) {
+        public static double Altura(double antAlt, double tcAlt, double incT, double? alturaFinal, UnidadCultivoDatosExtra datoExtra) {
             double ret = 0;
             if (datoExtra?.Altura != null)
-                return datoExtra.Altura ?? 0;
-            if (modAltCoefC == 0 || modAltCoefC == null) {
-                ret = antAlt + tcAlt * incT;
-            } else {
-                ret = antAlt + tcAlt;
-            }
-            if (ret > alturaFinal)
-                ret = alturaFinal ?? 0;
+                ret = datoExtra.Altura ?? 0;
+            else
+                ret = (antAlt + tcAlt * incT);
+            if (alturaFinal != null && alturaFinal > 0 && ret > alturaFinal)
+                ret = (double)alturaFinal;
             return ret;
         }
 
@@ -443,7 +444,7 @@
         }
 
         /// <summary>
-        /// CalculaDriEnd
+        /// Agotamiento al final del día CalculaDriEnd
         /// </summary>
         /// <param name="taw">taw<see cref="double"/></param>
         /// <param name="EtcAdj">EtcAdj<see cref="double"/></param>
@@ -456,7 +457,7 @@
         /// <param name="lbAnt">lbAnt<see cref="LineaBalance"/></param>
         /// <param name="datoExtra">datoExtra<see cref="UnidadCultivoDatosExtra"/></param>
         /// <returns><see cref="double"/></returns>
-        public static double DriEnd(double taw, double EtcAdj, double rieEfec, double pef, double driStart, double dp, double escorrentia, double pSaturacion, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
+        public static double AgotamientoFinalDia(double taw, double EtcAdj, double rieEfec, double pef, double driStart, double dp, double escorrentia, double pSaturacion, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
             double ret = 0;
             if (datoExtra?.DriEnd != null) {// si existen datos extra prevalecen sobre los calculados.
                 return datoExtra.DriEnd ?? 0;
@@ -482,31 +483,6 @@
         public static double DrenajeEnProdundidad(double ETcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart) {
             double ret = rieEfec + pef + aguaAportadaCrecRaiz - ETcAdj - driStart;
             if (ret < 0) ret = 0;
-            return ret;
-        }
-
-        /// <summary>
-        /// calculo de la Cobertura por el método de la Tasa de Crecimiento
-        /// </summary>
-        /// <param name="it"></param>
-        /// <param name="itEmergencia"></param>
-        /// <param name="ModCobCoefA"></param>
-        /// <param name="ModCobCoefB"></param>
-        /// <param name="ModCobCoefC"></param>
-        /// <returns></returns>
-        public static double TcCob(double it, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
-
-            double ret;
-
-            if (it < itEmergencia) {
-                ret = 0;
-            } else {
-                if (ModCobCoefC != null && ModCobCoefC != 0) {
-                    ret = ((ModCobCoefA) * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - ModCobCoefC ?? 0))) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
-                } else {
-                    ret = ModCobCoefB;
-                }
-            }
             return ret;
         }
 
@@ -587,30 +563,30 @@
         /// <summary>
         /// Retorna a la tabla de umbrales la clase de estres.
         /// Ordena la tabla por el valor umbral.
-        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstes
+        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstres
         /// </summary>
         /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
-        /// <param name="indiceEstes">ie<see cref="double"/></param>
+        /// <param name="indiceEstres">ie<see cref="double"/></param>
         /// <returns><see cref="string"/></returns>
-        public static string ClaseEstres(string idTipoEstres, double indiceEstes) {
+        public static string ClaseEstres(string idTipoEstres, double indiceEstres) {
             string ret = "";
             List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
             if (ltu?.Count == 0)
                 return ret;
             ret = ltu[0].Descripcion;
             int i = 0;
-            while (indiceEstes > ltu[i].Umbral) {
+            while (indiceEstres > ltu[i].Umbral) {
                 ret = ltu[++i].Descripcion;
             }
             return ret;
         }
 
 
-        public static double LimiteOptimoRefClima(double lo, double pm) => lo-pm;
-        public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo-pm;
-        public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os-pm;
+        public static double LimiteOptimoRefClima(double lo, double pm) => lo - pm;
+        public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo - pm;
+        public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os - pm;
         public static double PuntoMarchitezRefPuntoMarchitezMm() => 0;
-        public static double CapacidadCampoRefPuntoMarchitezMm(double cc, double pm) => cc-pm;
+        public static double CapacidadCampoRefPuntoMarchitezMm(double cc, double pm) => cc - pm;
 
 
         /// <summary>
@@ -631,13 +607,13 @@
             if (lbAnt?.Fecha == null) incT = 0; // el primero es 0
 
             UnidadCultivoDatosExtra datoExtra = dh.DatoExtra(fecha);
-            // Parámetros de desarrollo del cultivo
+
             lb.IntegralTermica = (lbAnt.IntegralTermica + incT);
-            lb.TasaCrecimientoCobertura = TcCob(lb.IntegralTermica, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
+            lb.TasaCrecimientoCobertura = TasaCrecimientoCobertura(lb.IntegralTermica, lbAnt.NumeroEtapaDesarrollo, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC);
+            lb.TasaCrecimientoAltura = TasaCrecimientoAltura(lb.IntegralTermica, lbAnt.NumeroEtapaDesarrollo, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
             lb.Cobertura = Cobertura(lbAnt.Cobertura, lb.TasaCrecimientoCobertura, incT, datoExtra);
-            lb.NumeroEtapaDesarrollo = NEtapaDesarrollo(fecha, lb.Cobertura, lbAnt.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList, dh.CultivoEtapasList);
-            lb.TasaCrecimientoAltura = TcAlt(lb.IntegralTermica, lb.NumeroEtapaDesarrollo, dh.CultivoIntegralEmergencia, dh.CultivoModAltCoefA, dh.CultivoModAltCoefB, dh.CultivoModAltCoefC);
-            lb.AlturaCultivo = Altura(lbAnt.AlturaCultivo, lb.TasaCrecimientoAltura, incT, dh.CultivoModAltCoefC, dh.CultivoAlturaFinal, datoExtra);
+            lb.NumeroEtapaDesarrollo = NumeroEtapaDesarrollo(fecha, lb.Cobertura, lbAnt.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList, dh.CultivoEtapasList);
+            lb.AlturaCultivo = Altura(lbAnt.AlturaCultivo, lb.TasaCrecimientoAltura, incT, dh.CultivoAlturaFinal, datoExtra);
             lb.LongitudRaiz = RaizLongitud(lbAnt, incT, dh.CultivoProfRaizInicial, dh.CultivoModRaizCoefB, dh.CultivoProfRaizMax);
 
             lb.DiasMaduracion = lbAnt.DiasMaduracion > 0 ? lb.DiasMaduracion = lbAnt.DiasMaduracion + 1 : lb.Cobertura > 0.8 ? 1 : 0;
@@ -657,34 +633,37 @@
 
             // Parámetros de cálculo del balance
             lb.AgotamientoInicioDia = lbAnt.AgotamientoFinalDia;
-            lb.Kc = Kc(lb.NumeroEtapaDesarrollo, fecha, lb.Cobertura, dh.UnidadCultivoCultivoEtapasList);
+            lb.Kc = Kc(lb.NumeroEtapaDesarrollo, fecha, lb.Cobertura, dh.UnidadCultivoCultivoEtapasList,dh.CultivoEtapasList);
             lb.KcAjustadoClima = KcAdjClima(lb.Kc, lb.AlturaCultivo, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
 
             // Parámetros de estrés en suelo
             lb.FraccionAgotamiento = DepletionFactor(lb.KcAjustadoClima * dh.Eto(fecha), lb.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList);
             lb.AguaFacilmenteExtraible = lb.FraccionAgotamiento * lb.AguaDisponibleTotal; // depletion factor f(ETc)
-            lb.AguaFacilmenteExtraibleFija = RAW2(lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList); 
+            lb.AguaFacilmenteExtraibleFija = AguaFacilmenteExtraibleFija(lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, dh.UnidadCultivoCultivoEtapasList);
             lb.LimiteAgotamiento = (lb.CapacidadCampo - lb.AguaFacilmenteExtraible); // depletion factor f(ETc)
             lb.LimiteAgotamientoFijo = (lb.CapacidadCampo - lb.AguaFacilmenteExtraibleFija); // depletion factor fijo
-            lb.CoeficienteEstresHidrico = Ks(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
+            lb.CoeficienteEstresHidrico = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
 
             lb.EtcAjustadoClima = EtcAdj(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
 
             lb.DrenajeProfundidad = DrenajeEnProdundidad(lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia);
-            lb.AgotamientoFinalDia = DriEnd(lb.AguaDisponibleTotal, lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, 0.8, lbAnt, datoExtra);
+            lb.AgotamientoFinalDia = AgotamientoFinalDia(lb.AguaDisponibleTotal, lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, 0.8, lbAnt, datoExtra);
             lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
 
-            lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
-            lb.ClaseEstes= dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
+            //lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
+            double CoeficienteEstresHidricoFinalDelDia = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoFinalDia);
+            lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
+
+            lb.ClaseEstres = dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
             lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres), dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres));
             lb.RecomendacionRiegoNeto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
             lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;
 
             lb.CapacidadCampoRefPM = CapacidadCampoRefPuntoMarchitezMm(lb.CapacidadCampo, lb.PuntoMarchitez);
             lb.PuntoMarchitezRefPM = PuntoMarchitezRefPuntoMarchitezMm();
-            lb.ContenidoAguaSueloRefPM = ContenidoAguaSuelRefPuntoMarchitezMm(lb.ContenidoAguaSuelo , lb.PuntoMarchitez);
-            lb.LimiteAgotamientoRefPM =     LimiteOptimoRefClima(lb.LimiteAgotamiento , lb.PuntoMarchitez);
-            lb.LimiteAgotamientoFijoRefPM = LimiteOptimoFijoRefClima(lb.LimiteAgotamientoFijo , lb.PuntoMarchitez);
+            lb.ContenidoAguaSueloRefPM = ContenidoAguaSuelRefPuntoMarchitezMm(lb.ContenidoAguaSuelo, lb.PuntoMarchitez);
+            lb.LimiteAgotamientoRefPM = LimiteOptimoRefClima(lb.LimiteAgotamiento, lb.PuntoMarchitez);
+            lb.LimiteAgotamientoFijoRefPM = LimiteOptimoFijoRefClima(lb.LimiteAgotamientoFijo, lb.PuntoMarchitez);
             return lb;
         }
 

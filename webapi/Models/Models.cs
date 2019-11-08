@@ -208,7 +208,7 @@ namespace Models {
         public int IdEtapaCultivo { get; set; }
         public string Etapa { get; set; }
         public DateTime FechaInicioEtapa { get; set; }
-        public DateTime? FechaFinEtapaConfirmada { get; set; }        
+        public DateTime? FechaFinEtapaConfirmada { get; set; }
         public bool DefinicionPorDias { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
@@ -341,7 +341,7 @@ namespace Models {
         public double RecomendacionRiegoBruto { set; get; }
 
         public double IndiceEstres { set; get; }
-        public string ClaseEstes { set; get; }
+        public string ClaseEstres { set; get; }
     }
 
     [TableName("Temporada")]
