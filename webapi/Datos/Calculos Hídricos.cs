@@ -654,8 +654,7 @@
             lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
 
             lb.ClaseEstres = dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
-            var limiteInferior = dh.ClaseEstresUmbralInferior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres);
-            var limiteSuperior = dh.ClaseEstresUmbralSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres);
+            dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out var limiteInferior, out var limiteSuperior);
             lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, limiteInferior, limiteSuperior);
             lb.RecomendacionRiegoNeto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
             lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;

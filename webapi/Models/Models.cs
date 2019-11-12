@@ -556,9 +556,8 @@ namespace Models {
     public class TipoEstres {
         public string IdTipoEstres { get; set; }
         public string Estres { get; set; }
-        public bool ADemanda { get; set; }
-        public double RiegoLimiteInferior { get; set; }
-        public double RiegoLimiteSuperior { get; set; }
+        public int? IdUmbralInferiorRiego { get; set; }
+        public int? IdUmbralSuperiorRiego { get; set; }
     }
 
     [TableName("TipoEstresUmbral")]
@@ -567,7 +566,9 @@ namespace Models {
         public string IdTipoEstres { get; set; }
         public int IdUmbral { get; set; }
         public string Descripcion { get; set; }
+        public string Mensaje { get; set; }
         public double Umbral { get; set; }
+        public int Color { get; set; }
     }
 
     public class ParamPostUnidadCultivoSuelo {

@@ -1188,6 +1188,39 @@
             La cadena de conexión Nebula se define como parámetro de la aplicación.
             </summary>
         </member>
+        <member name="T:DatosOptiaqua.DB.TypeModo">
+            <summary>
+            Defines the TypeModo
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.DB.TypeModo.Real">
+            <summary>
+            Defines the Real
+            </summary>
+        </member>
+        <member name="F:DatosOptiaqua.DB.TypeModo.Pruebas">
+            <summary>
+            Defines the Pruebas
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.DB.Modo">
+            <summary>
+            Gets or sets the Modo
+            </summary>
+        </member>
+        <member name="P:DatosOptiaqua.DB.CadenaConexionOptiAqua">
+            <summary>
+            Gets the CadenaConexionOptiAqua
+            </summary>
+        </member>
+        <member name="M:DatosOptiaqua.DB.IsCorrectPassword(Models.LoginRequest,Models.Regante@)">
+            <summary>
+            The IsCorrectPassword
+            </summary>
+            <param name="login">The login<see cref="T:Models.LoginRequest"/></param>
+            <param name="regante">The regante<see cref="M:DatosOptiaqua.DB.Regante(System.Nullable{System.Int32})"/></param>
+            <returns>The <see cref="T:System.Boolean"/></returns>
+        </member>
         <member name="M:DatosOptiaqua.DB.IsCorrectPassword(System.String,System.String)">
             <summary>
             Retorna si el password es correcto para en nif indicado.
@@ -1251,6 +1284,13 @@
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
             <returns><see cref="T:System.Object"/></returns>
         </member>
+        <member name="M:DatosOptiaqua.DB.TipoEstres(System.String)">
+            <summary>
+            Devuele el registro TipoEstres inficado por su identificador.
+            </summary>
+            <param name="idTipoEstres">The idTipoEstres<see cref="T:System.String"/></param>
+            <returns>The <see cref="M:DatosOptiaqua.DB.TipoEstres(System.String)"/></returns>
+        </member>
         <member name="M:DatosOptiaqua.DB.UnidadCultivoTemporadaCosteM3Agua(System.String,System.String)">
             <summary>
             UnidadCultivoTemporadaCosteM3Agua
@@ -1281,6 +1321,7 @@
             <param name="idUnidadCultivo"></param>
             <param name="idTemporada"></param>
             <param name="idTemporadaAnterior"></param>
+            <returns>The <see cref="T:System.Boolean"/></returns>
         </member>
         <member name="M:DatosOptiaqua.DB.CultivoSueloSave(System.String,System.String,System.String)">
             <summary>
@@ -1862,6 +1903,13 @@
             </summary>
             <param name="parametro">parametro<see cref="T:System.String"/></param>
             <param name="valor">valor<see cref="T:System.String"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.DB.TemporadaExists(System.String)">
+            <summary>
+            The TemporadaExists
+            </summary>
+            <param name="idTemporada">The idTemporada<see cref="T:System.String"/></param>
+            <returns>The <see cref="T:System.Boolean"/></returns>
         </member>
         <member name="T:DatosOptiaqua.Importacion">
             <summary>

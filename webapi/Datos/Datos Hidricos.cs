@@ -258,19 +258,25 @@
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
         public int EtapaInicioRiego => cultivo.EtapaInicioRiego;
 
-        public double ClaseEstresUmbralInferior(int nEtapa,double indiceEstres) {            
+        public void ClaseEstresUmbralInferiorYSuperior(int nEtapa,double indiceEstres, out double limiteInferior, out double limiteSuperior) {            
             int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
             string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
             var estres = DB.TipoEstres(idTipoEstres);
-            return estres.RiegoLimiteInferior;
-        }
-
-        public double ClaseEstresUmbralSuperior(int nEtapa, double indiceEstres) {
-            int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
-            string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
-            var estres = DB.TipoEstres(idTipoEstres);
-            return estres.RiegoLimiteSuperior;
-        }
+            var idInferior = estres.IdUmbralInferiorRiego;
+            var idSuperior= estres.IdUmbralSuperiorRiego;
+            var lUmbrales = DB.TipoEstresUmbralOrderList(idTipoEstres);
+            if (lUmbrales.Count<2)
+                throw new Exception("No se han definido al menos dos umbrales para el tipo de estres: " + idTipoEstres);
+            if (idInferior == null)
+                throw new Exception("No se ha definido IdUmbraInferior para el tipo de estres: " + idTipoEstres);
+            if (idSuperior == null)
+                throw new Exception("No se ha definido IdUmbraSuperior para el tipo de estres: " + idTipoEstres);
+            if (idInferior == 0)
+                limiteInferior = -1;
+            else
+                limiteInferior = lUmbrales[(int)idInferior - 1].Umbral;
+            limiteSuperior = lUmbrales[(int)idSuperior].Umbral;            
+        }  
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnidadCultivoDatosHidricos"/> class.
@@ -382,8 +388,7 @@
             if (UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada != null)
                 ret = (DateTime)UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada;
             else
-                ret = UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa.AddDays(50);
-
+                ret = UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa.AddDays(10);
             if (ret >= DateTime.Today) {
                 ret = DateTime.Today;
             }
