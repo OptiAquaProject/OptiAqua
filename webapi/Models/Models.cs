@@ -567,8 +567,8 @@ namespace Models {
         public int IdUmbral { get; set; }
         public string Descripcion { get; set; }
         public string Mensaje { get; set; }
-        public double Umbral { get; set; }
-        public int Color { get; set; }
+        public double UmbralMaximo { get; set; }
+        public string Color { get; set; }
     }
 
     public class ParamPostUnidadCultivoSuelo {

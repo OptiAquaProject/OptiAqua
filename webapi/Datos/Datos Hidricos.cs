@@ -274,8 +274,8 @@
             if (idInferior == 0)
                 limiteInferior = -1;
             else
-                limiteInferior = lUmbrales[(int)idInferior - 1].Umbral;
-            limiteSuperior = lUmbrales[(int)idSuperior].Umbral;            
+                limiteInferior = lUmbrales[(int)idInferior - 1].UmbralMaximo;
+            limiteSuperior = lUmbrales[(int)idSuperior].UmbralMaximo;            
         }  
 
         /// <summary>

@@ -181,7 +181,7 @@
             } else {
                 if (unidadCultivoCultivosEtapasList[nEtapaIndex].DefinicionPorDias == true) {
                     DateTime fechaInicioEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa;
-                    DateTime fechaFinEtapaActual = fecha;
+                    DateTime fechaFinEtapaActual;
                     var nDias = (fecha - fechaInicioEtapaActual).Days;
                     if (unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada != null)
                         fechaFinEtapaActual = (DateTime) unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada;
@@ -575,7 +575,7 @@
                 return ret;
             ret = ltu[0].Descripcion;
             int i = 0;
-            while (indiceEstres > ltu[i].Umbral) {
+            while (indiceEstres > ltu[i].UmbralMaximo) {
                 ret = ltu[++i].Descripcion;
             }
             return ret;
@@ -655,8 +655,9 @@
 
             lb.ClaseEstres = dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
             dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out var limiteInferior, out var limiteSuperior);
-            lb.RecomendacionRiegoBruto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, limiteInferior, limiteSuperior);
-            lb.RecomendacionRiegoNeto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
+
+            lb.RecomendacionRiegoNeto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, limiteInferior, limiteSuperior);
+            lb.RecomendacionRiegoBruto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
             lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;
 
             lb.CapacidadCampoRefPM = CapacidadCampoRefPuntoMarchitezMm(lb.CapacidadCampo, lb.PuntoMarchitez);
