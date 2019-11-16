@@ -72,6 +72,7 @@
             if (nEtapa == 1 && it < itEmergencia) {
                 ret = 0;
             } else {
+                it = it - itEmergencia;
                 if (ModCobCoefC != null && ModCobCoefC != 0) {
                     ret = ModCobCoefA * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC)) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
                 } else {
@@ -80,7 +81,6 @@
             }
             return ret;
         }
-
 
         /// <summary>
         /// Calculo de la altura por el método de la Tasa de crecimiento
@@ -104,7 +104,7 @@
             if (nEtapa == 1 && it < itEmergencia) {
                 ret = 0;
             } else {
-                //it = it - itEmergencia; La IT de emergencia NO se debe usar para calcular la TcCob
+                it = it - itEmergencia;
                 if (ModAltCoefC != null && ModAltCoefC != 0) {
                     ret = ModAltCoefA * ModAltCoefB * Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC)) / Math.Pow((1 + Math.Exp(-ModAltCoefB * (it - (double)ModAltCoefC))), 2);
                 } else {
@@ -173,7 +173,7 @@
         /// <param name="unidadCultivoCultivosEtapasList"></param>
         /// <param name="cultivoEtapasList"></param>
         /// <returns></returns>
-        public static double Kc(int nEtapa, DateTime fecha, double cob, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList,List<CultivoEtapas> cultivoEtapasList) {
+        public static double Kc(int nEtapa, DateTime fecha, double cob, List<UnidadCultivoCultivoEtapas> unidadCultivoCultivosEtapasList, List<CultivoEtapas> cultivoEtapasList) {
             double ret = 0;
             int nEtapaIndex = nEtapa - 1 > 0 ? nEtapa - 1 : 0; // la etapa está en base 1
             if (unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial == unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal) {
@@ -182,18 +182,18 @@
                 if (unidadCultivoCultivosEtapasList[nEtapaIndex].DefinicionPorDias == true) {
                     DateTime fechaInicioEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa;
                     DateTime fechaFinEtapaActual;
-                    var nDias = (fecha - fechaInicioEtapaActual).Days;
+                    int nDias = (fecha - fechaInicioEtapaActual).Days;
                     if (unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada != null)
-                        fechaFinEtapaActual = (DateTime) unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada;
+                        fechaFinEtapaActual = (DateTime)unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada;
                     else {
                         if (nEtapaIndex + 1 < unidadCultivoCultivosEtapasList.Count)
                             fechaFinEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex + 1].FechaInicioEtapa;
                         else {// última fase
-                            var diasTeoricosFase= cultivoEtapasList[nEtapaIndex].DuracionDiasEtapa;
+                            int diasTeoricosFase = cultivoEtapasList[nEtapaIndex].DuracionDiasEtapa;
                             fechaFinEtapaActual = fechaInicioEtapaActual.AddDays(diasTeoricosFase);
                         }
                     }
-                    var duracionDiasEtapaActual = (fechaFinEtapaActual - fechaInicioEtapaActual).Days;
+                    int duracionDiasEtapaActual = (fechaFinEtapaActual - fechaInicioEtapaActual).Days;
                     if (nDias > duracionDiasEtapaActual)
                         nDias = duracionDiasEtapaActual;
                     double kcInicial = unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial;
@@ -358,40 +358,18 @@
         /// <param name="kcAdj">The kcAdj<see cref="double"/></param>
         /// <param name="ks">The ks<see cref="double"/></param>
         /// <returns>The <see cref="double"/></returns>
-        public static double EtcAdj(double et0, double kcAdj, double ks) =>
+        public static double EtcFinal(double et0, double kcAdj, double ks) =>
             //ETc ajustada por clima y estrés
             et0 * kcAdj * ks;
 
-        /// <summary>
-        /// Calcula el Coeficiente de Cultivo ajustado
-        /// </summary>
-        /// <param name="KcAdjClima"></param>
-        /// <param name="ks"></param>
-        /// <returns></returns>
-        public static double CoeficienteCultivoAjustado(double KcAdjClima, double ks) {
-            double ret = KcAdjClima * ks;
-            return ret;
-        }
-
-        /// <summary>
-        /// Calcula la evotranspiración ajustada
-        /// </summary>
-        /// <param name="kcAdj"></param>
-        /// <param name="eto"></param>
-        /// <returns></returns>
-        public static double EvoTranspiracionAjustada(double kcAdj, double eto) {
-            double ret = kcAdj * eto;
-            return ret;
-        }
-
-        /// <summary>
+           /// <summary>
         /// Cálculo del riego efectivo
         /// </summary>
         /// <param name="riego"></param>
         /// <param name="eficienciaRiego"></param>
         /// <returns></returns>
         public static double RiegoEfectivo(double riego, double eficienciaRiego) => riego * eficienciaRiego;
-
+        
         /// <summary>
         /// Calcula la Cobertura a una fecha dada. Tiene en cuenta si se han indicado datos extra.
         /// </summary>
@@ -412,7 +390,7 @@
         /// </summary>
         /// <param name="antAlt"></param>
         /// <param name="tcAlt"></param>
-        /// <param name="incT"></param>        
+        /// <param name="incT"></param>
         /// <param name="alturaFinal"></param>
         /// <param name="datoExtra"></param>
         /// <returns></returns>
@@ -444,44 +422,46 @@
         }
 
         /// <summary>
-        /// Agotamiento al final del día CalculaDriEnd
+        /// The AgotamientoFinalDia
         /// </summary>
-        /// <param name="taw">taw<see cref="double"/></param>
-        /// <param name="EtcAdj">EtcAdj<see cref="double"/></param>
-        /// <param name="rieEfec">rieEfec<see cref="double"/></param>
-        /// <param name="pef">pef<see cref="double"/></param>
-        /// <param name="driStart">driStart<see cref="double"/></param>
-        /// <param name="dp">dp<see cref="double"/></param>
-        /// <param name="escorrentia">escorrentia<see cref="double"/></param>
-        /// <param name="pSaturacion">pSaturacion<see cref="double"/></param>
-        /// <param name="lbAnt">lbAnt<see cref="LineaBalance"/></param>
-        /// <param name="datoExtra">datoExtra<see cref="UnidadCultivoDatosExtra"/></param>
-        /// <returns><see cref="double"/></returns>
-        public static double AgotamientoFinalDia(double taw, double EtcAdj, double rieEfec, double pef, double driStart, double dp, double escorrentia, double pSaturacion, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
+        /// <param name="taw">The taw<see cref="double"/></param>
+        /// <param name="EtcAdj">The EtcAdj<see cref="double"/></param>
+        /// <param name="rieEfec">The rieEfec<see cref="double"/></param>
+        /// <param name="pef">The pef<see cref="double"/></param>
+        /// <param name="aguaAportadaCrecRaiz">The aguaAportadaCrecRaiz<see cref="double"/></param>
+        /// <param name="driStart">The driStart<see cref="double"/></param>
+        /// <param name="dp">The dp<see cref="double"/></param>
+        /// <param name="escorrentia">The escorrentia<see cref="double"/></param>
+        /// <param name="lbAnt">The lbAnt<see cref="LineaBalance"/></param>
+        /// <param name="datoExtra">The datoExtra<see cref="UnidadCultivoDatosExtra"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double AgotamientoFinalDia(double taw, double EtcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart, double dp, double escorrentia, LineaBalance lbAnt, UnidadCultivoDatosExtra datoExtra) {
             double ret = 0;
             if (datoExtra?.DriEnd != null) {// si existen datos extra prevalecen sobre los calculados.
                 return datoExtra.DriEnd ?? 0;
             }
-            if (lbAnt.Fecha == null) {
-                ret = (1 - pSaturacion) * taw;
-            } else {
-                double aguaAportadaCrecRaiz = pSaturacion * (taw - lbAnt.AguaDisponibleTotal);
-                ret = driStart - rieEfec - pef - aguaAportadaCrecRaiz + EtcAdj + dp + escorrentia;
-            }
+            if (lbAnt.Fecha == null)
+                driStart = taw; // el día 1 el "depósito" está vacío
+            ret = driStart - rieEfec - pef - aguaAportadaCrecRaiz + EtcAdj + dp + escorrentia;
             return ret;
         }
 
         /// <summary>
-        /// Drenaje en profundidad
+        /// The DrenajeEnProdundidad
         /// </summary>
-        /// <param name="ETcAdj"></param>
-        /// <param name="rieEfec"></param>
-        /// <param name="pef"></param>
-        /// <param name="aguaAportadaCrecRaiz"></param>
-        /// <param name="driStart"></param>
-        /// <returns></returns>
-        public static double DrenajeEnProdundidad(double ETcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart) {
-            double ret = rieEfec + pef + aguaAportadaCrecRaiz - ETcAdj - driStart;
+        /// <param name="lbAnt">The lbAnt<see cref="LineaBalance"/></param>
+        /// <param name="taw">The taw<see cref="double"/></param>
+        /// <param name="ETcAdj">The ETcAdj<see cref="double"/></param>
+        /// <param name="rieEfec">The rieEfec<see cref="double"/></param>
+        /// <param name="pef">The pef<see cref="double"/></param>
+        /// <param name="aguaAportadaCrecRaiz">The aguaAportadaCrecRaiz<see cref="double"/></param>
+        /// <param name="driStart">The driStart<see cref="double"/></param>
+        /// <param name="escorrentia">The escorrentia<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double DrenajeEnProdundidad(LineaBalance lbAnt, double taw, double ETcAdj, double rieEfec, double pef, double aguaAportadaCrecRaiz, double driStart, double escorrentia) {
+            if (lbAnt.Fecha == null)
+                driStart = taw; // el día 1 el "depósito" está vacío
+            double ret = rieEfec + pef + aguaAportadaCrecRaiz - (ETcAdj + driStart + escorrentia);
             if (ret < 0) ret = 0;
             return ret;
         }
@@ -561,32 +541,63 @@
         }
 
         /// <summary>
-        /// Retorna a la tabla de umbrales la clase de estres.
+        /// Retorna a la tabla de umbrales la clase de estrés.
         /// Ordena la tabla por el valor umbral.
         /// Retonar la descripción del maxímo umbral que puede superar el indiceEstres
         /// </summary>
         /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
         /// <param name="indiceEstres">ie<see cref="double"/></param>
         /// <returns><see cref="string"/></returns>
-        public static string ClaseEstres(string idTipoEstres, double indiceEstres) {
-            string ret = "";
+        public static TipoEstresUmbral TipoEstresUmbral(string idTipoEstres, double indiceEstres) {
+            TipoEstresUmbral ret = null;
             List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
             if (ltu?.Count == 0)
                 return ret;
-            ret = ltu[0].Descripcion;
+            ret = ltu[0];
             int i = 0;
             while (indiceEstres > ltu[i].UmbralMaximo) {
-                ret = ltu[++i].Descripcion;
+                ret = ltu[++i];
             }
             return ret;
         }
 
+        /// <summary>
+        /// The LimiteOptimoRefClima
+        /// </summary>
+        /// <param name="lo">The lo<see cref="double"/></param>
+        /// <param name="pm">The pm<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
         public static double LimiteOptimoRefClima(double lo, double pm) => lo - pm;
-        public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo - pm;
-        public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os - pm;
-        public static double PuntoMarchitezRefPuntoMarchitezMm() => 0;
-        public static double CapacidadCampoRefPuntoMarchitezMm(double cc, double pm) => cc - pm;
 
+        /// <summary>
+        /// The LimiteOptimoFijoRefClima
+        /// </summary>
+        /// <param name="loFijo">The loFijo<see cref="double"/></param>
+        /// <param name="pm">The pm<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double LimiteOptimoFijoRefClima(double loFijo, double pm) => loFijo - pm;
+
+        /// <summary>
+        /// The ContenidoAguaSuelRefPuntoMarchitezMm
+        /// </summary>
+        /// <param name="os">The os<see cref="double"/></param>
+        /// <param name="pm">The pm<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double ContenidoAguaSuelRefPuntoMarchitezMm(double os, double pm) => os - pm;
+
+        /// <summary>
+        /// The PuntoMarchitezRefPuntoMarchitezMm
+        /// </summary>
+        /// <returns>The <see cref="double"/></returns>
+        public static double PuntoMarchitezRefPuntoMarchitezMm() => 0;
+
+        /// <summary>
+        /// The CapacidadCampoRefPuntoMarchitezMm
+        /// </summary>
+        /// <param name="cc">The cc<see cref="double"/></param>
+        /// <param name="pm">The pm<see cref="double"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double CapacidadCampoRefPuntoMarchitezMm(double cc, double pm) => cc - pm;
 
         /// <summary>
         /// CalculaLineaBalance
@@ -632,7 +643,7 @@
 
             // Parámetros de cálculo del balance
             lb.AgotamientoInicioDia = lbAnt.AgotamientoFinalDia;
-            lb.Kc = Kc(lb.NumeroEtapaDesarrollo, fecha, lb.Cobertura, dh.UnidadCultivoCultivoEtapasList,dh.CultivoEtapasList);
+            lb.Kc = Kc(lb.NumeroEtapaDesarrollo, fecha, lb.Cobertura, dh.UnidadCultivoCultivoEtapasList, dh.CultivoEtapasList);
             lb.KcAjustadoClima = KcAdjClima(lb.Kc, lb.AlturaCultivo, dh.VelocidadViento(fecha), dh.HumedadMedia(fecha));
 
             // Parámetros de estrés en suelo
@@ -643,21 +654,24 @@
             lb.LimiteAgotamientoFijo = (lb.CapacidadCampo - lb.AguaFacilmenteExtraibleFija); // depletion factor fijo
             lb.CoeficienteEstresHidrico = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
 
-            lb.EtcAjustadoClima = EtcAdj(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
+            lb.EtcFinal = EtcFinal(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
 
-            lb.DrenajeProfundidad = DrenajeEnProdundidad(lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia);
-            lb.AgotamientoFinalDia = AgotamientoFinalDia(lb.AguaDisponibleTotal, lb.EtcAjustadoClima, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, 0.8, lbAnt, datoExtra);
+            lb.DrenajeProfundidad = DrenajeEnProdundidad(lbAnt, lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, 0);
+            lb.AgotamientoFinalDia = AgotamientoFinalDia(lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, lbAnt, datoExtra);
             lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
-
-            //lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
+            
             double CoeficienteEstresHidricoFinalDelDia = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoFinalDia);
             lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
 
-            lb.ClaseEstres = dh.ClaseEstres(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
-            dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out var limiteInferior, out var limiteSuperior);
+            dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out double limiteInferior, out double limiteSuperior);
+
+            var tipoEstresUmbral = dh.TipoEstresUmbral(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);            
+            lb.MensajeEstres = tipoEstresUmbral.Mensaje;
+            lb.DescripcionEstres = tipoEstresUmbral.Descripcion;
+            lb.ColorEstres = tipoEstresUmbral.Color;
 
             lb.RecomendacionRiegoNeto = RecomendacionRiegoMm(lb.AguaFacilmenteExtraible, lb.AguaDisponibleTotal, lb.NumeroEtapaDesarrollo, lb.AgotamientoFinalDia, dh.EtapaInicioRiego, limiteInferior, limiteSuperior);
-            lb.RecomendacionRiegoBruto = lb.RecomendacionRiegoBruto / dh.EficienciaRiego;
+            lb.RecomendacionRiegoBruto = lb.RecomendacionRiegoNeto / dh.EficienciaRiego;
             lb.RecomendacionRiegoTiempo = lb.RecomendacionRiegoBruto / dh.Pluviometria;
 
             lb.CapacidadCampoRefPM = CapacidadCampoRefPuntoMarchitezMm(lb.CapacidadCampo, lb.PuntoMarchitez);
@@ -667,7 +681,6 @@
             lb.LimiteAgotamientoFijoRefPM = LimiteOptimoFijoRefClima(lb.LimiteAgotamientoFijo, lb.PuntoMarchitez);
             return lb;
         }
-
 
         /// <summary>
         /// Retorna listado de datos hídricos filtrados por los parámetros indicados.
@@ -748,13 +761,12 @@
                         NParcelas = dh.NParcelas,
                         Textura = "",
                         GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas),
-                        Status = "ERROR:" + ex.Message,
+                        Status = "ERROR:" + ex.Message
                     };
                     ret.Add(datosEstadoHidrico);
                 }
             }
             return ret;
         }
-
     }
 }

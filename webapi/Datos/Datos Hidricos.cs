@@ -261,16 +261,18 @@
         public void ClaseEstresUmbralInferiorYSuperior(int nEtapa,double indiceEstres, out double limiteInferior, out double limiteSuperior) {            
             int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
             string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
+            if (idTipoEstres == null)
+                throw new Exception("No se ha definido tipo de estrés");
             var estres = DB.TipoEstres(idTipoEstres);
             var idInferior = estres.IdUmbralInferiorRiego;
             var idSuperior= estres.IdUmbralSuperiorRiego;
             var lUmbrales = DB.TipoEstresUmbralOrderList(idTipoEstres);
             if (lUmbrales.Count<2)
-                throw new Exception("No se han definido al menos dos umbrales para el tipo de estres: " + idTipoEstres);
+                throw new Exception("No se han definido al menos dos umbrales para el tipo de estrés: " + idTipoEstres);
             if (idInferior == null)
-                throw new Exception("No se ha definido IdUmbraInferior para el tipo de estres: " + idTipoEstres);
+                throw new Exception("No se ha definido IdUmbraInferior para el tipo de estrés: " + idTipoEstres);
             if (idSuperior == null)
-                throw new Exception("No se ha definido IdUmbraSuperior para el tipo de estres: " + idTipoEstres);
+                throw new Exception("No se ha definido IdUmbraSuperior para el tipo de estrés: " + idTipoEstres);
             if (idInferior == 0)
                 limiteInferior = -1;
             else
@@ -461,14 +463,14 @@
         public double Eto(DateTime fecha) => (lDatosClimaticos.Find(d => d.Fecha == fecha)?.Eto) ?? 0;// temperatura media
 
         /// <summary>
-        /// Retorna la definición de la clase de estres.
+        /// Retorna la definición de la clase de estrés.
         /// </summary>
         /// <param name="indiceEstres">The ie<see cref="double"/></param>
         /// <param name="nEtapa">The nEtapa<see cref="int"/></param>
         /// <returns>The <see cref="string"/></returns>
-        public string ClaseEstres(double indiceEstres, int nEtapa) {
+        public TipoEstresUmbral TipoEstresUmbral(double indiceEstres, int nEtapa) {
             int nEtapaBase0 = nEtapa - 1;
-            return CalculosHidricos.ClaseEstres(UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres, indiceEstres);
-        }        
+            return CalculosHidricos.TipoEstresUmbral(UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres, indiceEstres);
+        }
     }
 }

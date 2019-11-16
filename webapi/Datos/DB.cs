@@ -378,7 +378,7 @@
         /// <returns><see cref="List{TipoEstresUmbral}"/></returns>
         internal static List<TipoEstresUmbral> TipoEstresUmbralOrderList(string idTipoEstres) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            string sql = $"SELECT * FROM TipoEstresUmbral Where IdTipoEstres='{idTipoEstres}' order by umbral";
+            string sql = $"SELECT * FROM TipoEstresUmbral Where IdTipoEstres='{idTipoEstres}' order by umbralMaximo";
             List<TipoEstresUmbral> ret = db.Fetch<TipoEstresUmbral>(sql);
             return ret;
         }

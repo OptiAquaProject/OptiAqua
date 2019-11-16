@@ -845,7 +845,7 @@
             <param name="dr"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.EtcAdj(System.Double,System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.EtcFinal(System.Double,System.Double,System.Double)">
             <summary>
             The EtcAdj
             </summary>
@@ -853,22 +853,6 @@
             <param name="kcAdj">The kcAdj<see cref="T:System.Double"/></param>
             <param name="ks">The ks<see cref="T:System.Double"/></param>
             <returns>The <see cref="T:System.Double"/></returns>
-        </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.CoeficienteCultivoAjustado(System.Double,System.Double)">
-            <summary>
-            Calcula el Coeficiente de Cultivo ajustado
-            </summary>
-            <param name="KcAdjClima"></param>
-            <param name="ks"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.EvoTranspiracionAjustada(System.Double,System.Double)">
-            <summary>
-            Calcula la evotranspiración ajustada
-            </summary>
-            <param name="kcAdj"></param>
-            <param name="eto"></param>
-            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.RiegoEfectivo(System.Double,System.Double)">
             <summary>
@@ -894,7 +878,7 @@
             </summary>
             <param name="antAlt"></param>
             <param name="tcAlt"></param>
-            <param name="incT"></param>        
+            <param name="incT"></param>
             <param name="alturaFinal"></param>
             <param name="datoExtra"></param>
             <returns></returns>
@@ -910,30 +894,33 @@
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.AgotamientoFinalDia(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,Models.LineaBalance,Models.UnidadCultivoDatosExtra)">
             <summary>
-            Agotamiento al final del día CalculaDriEnd
+            The AgotamientoFinalDia
             </summary>
-            <param name="taw">taw<see cref="T:System.Double"/></param>
-            <param name="EtcAdj">EtcAdj<see cref="T:System.Double"/></param>
-            <param name="rieEfec">rieEfec<see cref="T:System.Double"/></param>
-            <param name="pef">pef<see cref="T:System.Double"/></param>
-            <param name="driStart">driStart<see cref="T:System.Double"/></param>
-            <param name="dp">dp<see cref="T:System.Double"/></param>
-            <param name="escorrentia">escorrentia<see cref="T:System.Double"/></param>
-            <param name="pSaturacion">pSaturacion<see cref="T:System.Double"/></param>
-            <param name="lbAnt">lbAnt<see cref="T:Models.LineaBalance"/></param>
-            <param name="datoExtra">datoExtra<see cref="T:Models.UnidadCultivoDatosExtra"/></param>
-            <returns><see cref="T:System.Double"/></returns>
+            <param name="taw">The taw<see cref="T:System.Double"/></param>
+            <param name="EtcAdj">The EtcAdj<see cref="T:System.Double"/></param>
+            <param name="rieEfec">The rieEfec<see cref="T:System.Double"/></param>
+            <param name="pef">The pef<see cref="T:System.Double"/></param>
+            <param name="aguaAportadaCrecRaiz">The aguaAportadaCrecRaiz<see cref="T:System.Double"/></param>
+            <param name="driStart">The driStart<see cref="T:System.Double"/></param>
+            <param name="dp">The dp<see cref="T:System.Double"/></param>
+            <param name="escorrentia">The escorrentia<see cref="T:System.Double"/></param>
+            <param name="lbAnt">The lbAnt<see cref="T:Models.LineaBalance"/></param>
+            <param name="datoExtra">The datoExtra<see cref="T:Models.UnidadCultivoDatosExtra"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.DrenajeEnProdundidad(System.Double,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.DrenajeEnProdundidad(Models.LineaBalance,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
             <summary>
-            Drenaje en profundidad
+            The DrenajeEnProdundidad
             </summary>
-            <param name="ETcAdj"></param>
-            <param name="rieEfec"></param>
-            <param name="pef"></param>
-            <param name="aguaAportadaCrecRaiz"></param>
-            <param name="driStart"></param>
-            <returns></returns>
+            <param name="lbAnt">The lbAnt<see cref="T:Models.LineaBalance"/></param>
+            <param name="taw">The taw<see cref="T:System.Double"/></param>
+            <param name="ETcAdj">The ETcAdj<see cref="T:System.Double"/></param>
+            <param name="rieEfec">The rieEfec<see cref="T:System.Double"/></param>
+            <param name="pef">The pef<see cref="T:System.Double"/></param>
+            <param name="aguaAportadaCrecRaiz">The aguaAportadaCrecRaiz<see cref="T:System.Double"/></param>
+            <param name="driStart">The driStart<see cref="T:System.Double"/></param>
+            <param name="escorrentia">The escorrentia<see cref="T:System.Double"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.RecomendacionRiegoMm(System.Double,System.Double,System.Int32,System.Double,System.Int32,System.Double,System.Double)">
             <summary>
@@ -985,15 +972,53 @@
             <param name="cc"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.ClaseEstres(System.String,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.TipoEstresUmbral(System.String,System.Double)">
             <summary>
-            Retorna a la tabla de umbrales la clase de estres.
+            Retorna a la tabla de umbrales la clase de estrés.
             Ordena la tabla por el valor umbral.
             Retonar la descripción del maxímo umbral que puede superar el indiceEstres
             </summary>
             <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/></param>
             <param name="indiceEstres">ie<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.LimiteOptimoRefClima(System.Double,System.Double)">
+            <summary>
+            The LimiteOptimoRefClima
+            </summary>
+            <param name="lo">The lo<see cref="T:System.Double"/></param>
+            <param name="pm">The pm<see cref="T:System.Double"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.LimiteOptimoFijoRefClima(System.Double,System.Double)">
+            <summary>
+            The LimiteOptimoFijoRefClima
+            </summary>
+            <param name="loFijo">The loFijo<see cref="T:System.Double"/></param>
+            <param name="pm">The pm<see cref="T:System.Double"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.ContenidoAguaSuelRefPuntoMarchitezMm(System.Double,System.Double)">
+            <summary>
+            The ContenidoAguaSuelRefPuntoMarchitezMm
+            </summary>
+            <param name="os">The os<see cref="T:System.Double"/></param>
+            <param name="pm">The pm<see cref="T:System.Double"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.PuntoMarchitezRefPuntoMarchitezMm">
+            <summary>
+            The PuntoMarchitezRefPuntoMarchitezMm
+            </summary>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.CapacidadCampoRefPuntoMarchitezMm(System.Double,System.Double)">
+            <summary>
+            The CapacidadCampoRefPuntoMarchitezMm
+            </summary>
+            <param name="cc">The cc<see cref="T:System.Double"/></param>
+            <param name="pm">The pm<see cref="T:System.Double"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.CalculaLineaBalance(DatosOptiaqua.UnidadCultivoDatosHidricos,Models.LineaBalance,System.DateTime)">
             <summary>
@@ -2345,9 +2370,9 @@
             <param name="fecha"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.ClaseEstres(System.Double,System.Int32)">
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.TipoEstresUmbral(System.Double,System.Int32)">
             <summary>
-            Retorna la definición de la clase de estres.
+            Retorna la definición de la clase de estrés.
             </summary>
             <param name="indiceEstres">The ie<see cref="T:System.Double"/></param>
             <param name="nEtapa">The nEtapa<see cref="T:System.Int32"/></param>

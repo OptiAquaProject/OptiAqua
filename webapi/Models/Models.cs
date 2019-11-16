@@ -308,7 +308,7 @@ namespace Models {
         public double Kc { get; set; }
         public double KcAjustadoClima { get; set; }
         public double CoeficienteEstresHidrico { get; set; }
-        public double EtcAjustadoClima { get; set; }
+        public double EtcFinal { get; set; }
         public double LongitudRaiz { get; set; }
         public double AguaDisponibleTotal { get; set; }
         public double FraccionAgotamiento { get; set; }
@@ -341,7 +341,9 @@ namespace Models {
         public double RecomendacionRiegoBruto { set; get; }
 
         public double IndiceEstres { set; get; }
-        public string ClaseEstres { set; get; }
+        public string MensajeEstres { set; get; }
+        public string DescripcionEstres { set; get; }
+        public string ColorEstres { set; get; }
     }
 
     [TableName("Temporada")]
@@ -393,6 +395,12 @@ namespace Models {
         public int? NParcelas { set; get; }
         public double? SuperficieM2 { set; get; }
         public string Textura { set; get; }
+
+        public double IndiceEstres { set; get; }        
+        public string MensajeEstres { set; get; }
+        public string DescripcionEstres { set; get; }
+        public string ColorEstres { set; get; }
+
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
     }
 
@@ -425,9 +433,12 @@ namespace Models {
 
         public double AguaHastaCapacidadCampo { set; get; }
         public double RecomendacionRiegoNeto { set; get; }
-        public double RecomendacionRiegoTiempo { set; get; } 
-        public double IndiceEstres { set; get; }
-        public string ClaseEstres { set; get; }
+        public double RecomendacionRiegoTiempo { set; get; }
+
+        public double IndiceEstres { set; get; }        
+        public string MensajeEstres { set; get; }
+        public string DescripcionEstres { set; get; }
+        public string ColorEstres { set; get; }
 
         public double CapacidadCampoRefPM { get; set; }
         public double PuntoMarchitezRefPM { get; set; }

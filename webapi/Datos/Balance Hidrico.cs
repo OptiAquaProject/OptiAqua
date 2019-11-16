@@ -137,9 +137,9 @@
             double suma = 0;
             double? etc1, etc2, etc3;
             int c = LineasBalance.Count;
-            etc1 = LineasBalance.Find(x => x.Fecha == fecha)?.EtcAjustadoClima;
-            etc2 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-1))?.EtcAjustadoClima;
-            etc3 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-2))?.EtcAjustadoClima;
+            etc1 = LineasBalance.Find(x => x.Fecha == fecha)?.EtcFinal;
+            etc2 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-1))?.EtcFinal;
+            etc3 = LineasBalance.Find(x => x.Fecha == fecha.AddDays(-2))?.EtcFinal;
             if (etc1 != null) {
                 nItem++;
                 suma += (double)etc1;
@@ -226,8 +226,6 @@
             if (unidadCultivoDatosHidricos.nEtapas <= 0)
                 throw new Exception("No se han definido etapas para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
             while (fecha <= fechaFinalEstudio) {
-                if (dda == 83)
-                    dda = 83;
                 LineaBalance lineaBalance = CalculosHidricos.CalculaLineaBalance(unidadCultivoDatosHidricos, lbAnt, fecha);
                 lineaBalance.DDA = dda++;
                 Debug.Print(dda.ToString());
@@ -274,7 +272,7 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
         /// <returns>The <see cref="double"/></returns>
         public double SumaConsumoAguaCultivo(DateTime fecha) {
-            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.EtcAjustadoClima);
+            double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.EtcFinal);
             return ret;
         }
 
@@ -326,6 +324,10 @@
                 NDiasEstres = NDIasEstres(fecha),
                 EstadoHidrico = IndiceEstadoHidrico(fecha),
                 Textura = unidadCultivoDatosHidricos.TipoSueloDescripcion,
+                IndiceEstres= linBalAFecha.IndiceEstres,
+                DescripcionEstres= linBalAFecha.DescripcionEstres,
+                ColorEstres= linBalAFecha.ColorEstres,
+                MensajeEstres= linBalAFecha.MensajeEstres,                       
                 Status = "OK",
             };
             return ret;
@@ -379,21 +381,23 @@
                 ret.ContenidoAguaSueloPorcentaje = double.NaN;
             }
 
-
             ret.DrenajeProfundidad = lb.DrenajeProfundidad;
             ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DrenajeProfundidad);
 
             ret.AguaHastaCapacidadCampo = ret.CapacidadCampo - ret.ContenidoAguaSuelo;
             ret.RecomendacionRiegoNeto = lb.RecomendacionRiegoNeto;
             ret.RecomendacionRiegoTiempo = lb.RecomendacionRiegoTiempo;
-            ret.IndiceEstres = CalculosHidricos.IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, lb.CoeficienteEstresHidrico, lb.CapacidadCampo);
-            ret.ClaseEstres = unidadCultivoDatosHidricos.ClaseEstres(ret.IndiceEstres, lb.NumeroEtapaDesarrollo);
+
+            ret.IndiceEstres = lb.IndiceEstres;            
+            ret.MensajeEstres = lb.MensajeEstres;
+            ret.DescripcionEstres = lb.DescripcionEstres;
+            ret.ColorEstres = lb.ColorEstres;            
 
             ret.CapacidadCampoRefPM = lb.CapacidadCampoRefPM;
             ret.PuntoMarchitezRefPM = lb.PuntoMarchitezRefPM;
             ret.ContenidoAguaSueloRefPM = lb.ContenidoAguaSueloRefPM;
             ret.LimiteAgotamientoRefPM = lb.LimiteAgotamientoRefPM;
-            ret.LimiteAgotamientoFijoRefPM = lb.LimiteAgotamientoFijoRefPM;
+            ret.LimiteAgotamientoFijoRefPM = lb.LimiteAgotamientoFijoRefPM;            
 
             return ret;
         }
