@@ -222,13 +222,12 @@
             LineaBalance lbAnt = new LineaBalance();
             DateTime fecha = unidadCultivoDatosHidricos.FechaSiembra();
             DateTime fechaFinalEstudio = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
-            int dda = 1;
+            int diasDesdeSiembra = 1;
             if (unidadCultivoDatosHidricos.nEtapas <= 0)
                 throw new Exception("No se han definido etapas para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
             while (fecha <= fechaFinalEstudio) {
                 LineaBalance lineaBalance = CalculosHidricos.CalculaLineaBalance(unidadCultivoDatosHidricos, lbAnt, fecha);
-                lineaBalance.DDA = dda++;
-                Debug.Print(dda.ToString());
+                lineaBalance.DiasDesdeSiembra = diasDesdeSiembra++;                
                 LineasBalance.Add(lineaBalance);
                 lbAnt = lineaBalance;
                 fecha = fecha.AddDays(1);

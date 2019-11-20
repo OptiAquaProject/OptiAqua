@@ -117,16 +117,18 @@
         /// <param name="idUnidadCultivo"></param>
         /// <param name="idTemporada"></param>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [Route("api/Lluvias/{idUnidadCultivo}/{idTemporada}")]
         public IHttpActionResult GetLluvias(string idUnidadCultivo, string idTemporada) {
             try {
+                /*
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idRegante, idTemporada) == false) {
                     return Unauthorized();
                 }
+                */
                 return Json(DB.DatosLluviaList(idUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

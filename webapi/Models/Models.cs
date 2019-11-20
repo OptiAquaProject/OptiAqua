@@ -296,7 +296,7 @@ namespace Models {
 
     public class LineaBalance {
         public DateTime? Fecha { get; set; } = null;
-        public int DDA { get; set; }
+        public int DiasDesdeSiembra { get; set; }
         public double IntegralTermica { get; set; }
         public double TasaCrecimientoCobertura { get; set; }
         public double Cobertura { get; set; }

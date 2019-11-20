@@ -712,16 +712,16 @@
             Clase estática en la que se implementan las funciones hídricas
             </summary>
         </member>
+        <!-- El comentario XML con formato incorrecto se ha omitido para el miembro "M:DatosOptiaqua.CalculosHidricos.PuntoDeMarchitez(Models.UnidadCultivoSuelo)" -->
         <member name="M:DatosOptiaqua.CalculosHidricos.CapacidadCampo(Models.UnidadCultivoSuelo)">
             <summary>
-            CapacidadCampo. Función definida como extensi´no de UnidadCultivoSuelo
-            </summary>
-            <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/></param>
-            <returns>The <see cref="T:System.Double"/></returns>
-        </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.PuntoDeMarchitez(Models.UnidadCultivoSuelo)">
-            <summary>
-            PuntoDeMarchitez. Función definida como extensi´no de UnidadCultivoSuelo
+            Calcula de la capacidad de campo
+            Abreviaturas
+            suelo.Arena/Arcilla/ElementosGruesos:     % arena, % arcilla, % Elementos Gruesos (%w)
+            mo100:   materia Orgánica, (%w)
+            O33t:    humedad a 33 kPa, primera solución (%v)
+            O33:     humedad 33 kPa, densidad normal (%v)
+            PAW33:   cantidad de agua disponible a 33 kPa
             </summary>
             <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/></param>
             <returns>The <see cref="T:System.Double"/></returns>

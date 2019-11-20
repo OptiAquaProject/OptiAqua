@@ -3,52 +3,51 @@
     using NPoco;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using webapi.Utiles;
 
     /// <summary>
     /// Clase estática en la que se implementan las funciones hídricas
     /// </summary>
-    public static class CalculosHidricos {
-        /// <summary>
-        /// CapacidadCampo. Función definida como extensi´no de UnidadCultivoSuelo
-        /// </summary>
-        /// <param name="suelo">The suelo<see cref="UnidadCultivoSuelo"/></param>
-        /// <returns>The <see cref="double"/></returns>
-        public static double CapacidadCampo(this UnidadCultivoSuelo suelo) {
-            double mo100 = suelo.MateriaOrganica * 100;
-            double N = -0.251 * suelo.Arena + 0.195 * suelo.Arcilla + 0.011 * mo100 + 0.006 * (suelo.Arena * mo100) - 0.027 * (suelo.Arcilla * mo100) + 0.452 * (suelo.Arena * suelo.Arcilla) + 0.299;
-            double P = 0.278 * suelo.Arena + 0.034 * suelo.Arcilla + 0.022 * mo100 - 0.018 * (suelo.Arena * mo100) - 0.027 * (suelo.Arcilla * mo100) - 0.584 * (suelo.Arena * suelo.Arcilla) + 0.078;
-            double O = P + (0.636 * P - 0.107);
-            double M = -0.024 * suelo.Arena + 0.487 * suelo.Arcilla + 0.006 * mo100 + 0.005 * (suelo.Arena * mo100) - 0.013 * (suelo.Arcilla * mo100) + 0.068 * (suelo.Arena * suelo.Arcilla) + 0.031;
-            double H = M + (0.14 * M - 0.02);
-            double G = N + (1.283 * (N * N) - 0.374 * (N) - 0.015);
-            double I = G + O - 0.097 * suelo.Arena + 0.043;
-            double J = (1 - I) * 2.65;
-            double K = ((J / 2.65) * suelo.ElementosGruesos) / (1 - suelo.ElementosGruesos * (1 - (J / 2.65)));
-            double L = J * (1 - K) + (K * 2.65);
-            double r = G * (1 - suelo.ElementosGruesos);
-            return r;
-        }
+    public static class CalculosHidricos {      
 
         /// <summary>
-        /// PuntoDeMarchitez. Función definida como extensi´no de UnidadCultivoSuelo
+        /// Calculo del punto de marchitez
+        /// Segun formula Saxton&Rawls (2006)
+        /// Abreviaturas
+        /// suelo.Arena/Arcilla/ElementosGruesos:     % arena, % arcilla, % Elementos Gruesos (%w)
+        /// mo100:   materia Orgánica, (%w)
+        /// O1500t:  humedad a 1500 kPa, primera solución (%v)
+        /// O1500:   humedad a 1500 kPa, (%v)
+        /// PAW1500: cantidad de agua disponible a 1500 kPa
         /// </summary>
         /// <param name="suelo">The suelo<see cref="UnidadCultivoSuelo"/></param>
         /// <returns>The <see cref="double"/></returns>
         public static double PuntoDeMarchitez(this UnidadCultivoSuelo suelo) {
-            double mo100 = suelo.MateriaOrganica * 100;
-            double N = 0.251 * suelo.Arena + 0.195 * suelo.Arcilla + 0.011 * mo100 + 0.006 * (suelo.Arena * mo100) - 0.027 * (suelo.Arcilla * mo100) + 0.452 * (suelo.Arena * suelo.Arcilla) + 0.299;
-            double P = 0.278 * suelo.Arena + 0.034 * suelo.Arcilla + 0.022 * mo100 - 0.018 * (suelo.Arena * mo100) - 0.027 * (suelo.Arcilla * mo100) - 0.584 * (suelo.Arena * suelo.Arcilla) + 0.078;
-            double O = P + (0.636 * P - 0.107);
-            double M = -0.024 * suelo.Arena + 0.487 * suelo.Arcilla + 0.006 * mo100 + 0.005 * (suelo.Arena * mo100) - 0.013 * (suelo.Arcilla * mo100) + 0.068 * (suelo.Arena * suelo.Arcilla) + 0.031;
-            double H = M + (0.14 * M - 0.02);
-            double G = N + (1.283 * (N * N) - 0.374 * (N) - 0.015);
-            double I = G + O - 0.097 * suelo.Arena + 0.043;
-            double J = (1 - I) * 2.65;
-            double K = ((J / 2.65) * suelo.ElementosGruesos) / (1 - suelo.ElementosGruesos * (1 - (J / 2.65)));
-            double L = J * (1 - K) + (K * 2.65);
-            double r = H * (1 - suelo.ElementosGruesos);
-            return r;
+            double mo100 = suelo.MateriaOrganica * 100; //Nota: esta conversión es porque en BBDD no se apunta %M.O. como valor porcentual
+            double o1500t = -0.024 * suelo.Arena + 0.487 * suelo.Arcilla + 0.006 * mo100 + 0.005 * (suelo.Arena * mo100) - 0.013 * (suelo.Arcilla * mo100) + 0.068 * (suelo.Arena * suelo.Arcilla) + 0.031;
+            double o1500 = o1500t + (0.14 * o1500t - 0.02);
+            double paw1500 = o1500 * (1 - suelo.ElementosGruesos);            
+            return paw1500;
+        }
+
+        /// <summary>
+        /// Calcula de la capacidad de campo
+        /// Abreviaturas
+        /// suelo.Arena/Arcilla/ElementosGruesos:     % arena, % arcilla, % Elementos Gruesos (%w)
+        /// mo100:   materia Orgánica, (%w)
+        /// O33t:    humedad a 33 kPa, primera solución (%v)
+        /// O33:     humedad 33 kPa, densidad normal (%v)
+        /// PAW33:   cantidad de agua disponible a 33 kPa
+        /// </summary>
+        /// <param name="suelo">The suelo<see cref="UnidadCultivoSuelo"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public static double CapacidadCampo(this UnidadCultivoSuelo suelo) {
+            double mo100 = suelo.MateriaOrganica * 100; //Nota: esta conversión es porque en BBDD no se apunta %M.O. como valor porcentual
+            double o33t = -0.251 * suelo.Arena + 0.195 * suelo.Arcilla + 0.011 * mo100 + 0.006 * (suelo.Arena * mo100) - 0.027 * (suelo.Arcilla * mo100) + 0.452 * (suelo.Arena * suelo.Arcilla) + 0.299;
+            double o33 = o33t + (1.283 * (o33t * o33t) - 0.374 * (o33t) - 0.015);
+            double paw33 = o33 * (1 - suelo.ElementosGruesos);            
+            return paw33;
         }
 
         /// <summary>
@@ -198,7 +197,7 @@
                         nDias = duracionDiasEtapaActual;
                     double kcInicial = unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial;
                     double kcFinal = unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal;
-                    ret = kcInicial + ((kcFinal - kcInicial) * (nDias / duracionDiasEtapaActual));
+                    ret = kcInicial + ((kcFinal - kcInicial) * ((double)nDias / duracionDiasEtapaActual));
                 } else {
                     double kcIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
                     double cobIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobInicial);
@@ -362,14 +361,14 @@
             //ETc ajustada por clima y estrés
             et0 * kcAdj * ks;
 
-           /// <summary>
+        /// <summary>
         /// Cálculo del riego efectivo
         /// </summary>
         /// <param name="riego"></param>
         /// <param name="eficienciaRiego"></param>
         /// <returns></returns>
         public static double RiegoEfectivo(double riego, double eficienciaRiego) => riego * eficienciaRiego;
-        
+
         /// <summary>
         /// Calcula la Cobertura a una fecha dada. Tiene en cuenta si se han indicado datos extra.
         /// </summary>
@@ -659,13 +658,13 @@
             lb.DrenajeProfundidad = DrenajeEnProdundidad(lbAnt, lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, 0);
             lb.AgotamientoFinalDia = AgotamientoFinalDia(lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, lb.DrenajeProfundidad, 0, lbAnt, datoExtra);
             lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
-            
+
             double CoeficienteEstresHidricoFinalDelDia = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoFinalDia);
             lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
 
             dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out double limiteInferior, out double limiteSuperior);
 
-            var tipoEstresUmbral = dh.TipoEstresUmbral(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);            
+            TipoEstresUmbral tipoEstresUmbral = dh.TipoEstresUmbral(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
             lb.MensajeEstres = tipoEstresUmbral.Mensaje;
             lb.DescripcionEstres = tipoEstresUmbral.Descripcion;
             lb.ColorEstres = tipoEstresUmbral.Color;
