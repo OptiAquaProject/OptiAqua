@@ -734,7 +734,7 @@
                     datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
                     ret.Add(datosEstadoHidrico);
                 } catch (Exception ex) {
-                    dh.ObtenerMunicicioParaje(out string municipios, out string parajes);
+                    dh.ObtenerMunicicioParaje(out string provincias,out string municipios, out string parajes);
                     datosEstadoHidrico = new DatosEstadoHidrico {
                         Fecha = fecha,
                         Pluviometria = dh.Pluviometria,

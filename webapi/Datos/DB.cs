@@ -38,6 +38,7 @@
         /// Gets the CadenaConexionOptiAqua
         /// </summary>
         public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";
+        public static string CadenaConexionNebula => "CadenaConexionNebula";
 
         /// <summary>
         /// The IsCorrectPassword
@@ -185,6 +186,8 @@
             sql = "Select DISTINCT IdUnidadCultivo, IdParcelaInt, IdRegante from UnidadCultivoParcela where IdTemporada=@0 ";
             List<UnidadCultivoConSuperficieYGeoLoc> l = db.Fetch<UnidadCultivoConSuperficieYGeoLoc>(sql, idTemporada);
             foreach (UnidadCultivoConSuperficieYGeoLoc item in l) {
+                var lValvulas = DB.UnidadCultivoParcelasValculas(item.IdUnidadCultivo, idTemporada);
+                item.ParcelasValvulasJson = Newtonsoft.Json.JsonConvert.SerializeObject(lValvulas);
                 item.SuperficieM2 = UnidadCultivoExtensionM2(item.IdUnidadCultivo, idTemporada);
                 List<GeoLocParcela> lGeoLocParcelas = DB.GeoLocParcelasList(item.IdUnidadCultivo, idTemporada);
                 item.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
@@ -391,7 +394,7 @@
         /// <param name="hastaFecha">hastaFecha<see cref="DateTime"/></param>
         /// <returns><see cref="List{Riego}"/></returns>
         public static List<Riego> RiegosNebulaList(string idUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
-            Database db = new Database("CadenaConexionNebula");
+            Database db = new Database(DB.CadenaConexionNebula);
             string sql = $"SELECT IdUnidadCultivo, RiegoM3, Fecha from riegos where idUnidadCultivo='{idUnidadCultivo}' AND  fecha >=@0 and fecha<=@1";
             List<Riego> ret = db.Fetch<Riego>(sql, desdeFecha, hastaFecha);
             return ret;
@@ -572,7 +575,7 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/></param>
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
         /// <returns><see cref="object"/></returns>
-        public static object UnidadCultivoDatosAmpliados(string idTemporada, string idUnidadCultivo) {
+        public static List<UnidadCultivoDatosAmpliados> UnidadCultivoDatosAmpliados(string idTemporada, string idUnidadCultivo) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string filtro = "";
             if (idTemporada != "''") {
@@ -587,7 +590,14 @@
             }
 
             string sql = $"SELECT * FROM UnidadCultivoDatosAmpliados " + filtro;
-            return db.Fetch<object>(sql);
+            var ret=db.Fetch<UnidadCultivoDatosAmpliados>(sql);
+            foreach (var dat in ret) {
+                ObtenerMunicicioParaje(idTemporada, dat.IdUnidadCultivo, out string provincias, out string municipios, out string parajes);
+                dat.Provincia = provincias;
+                dat.Municipio= municipios;
+                dat.Paraje = parajes ;
+            }
+            return ret;
         }
 
         /// <summary>
@@ -1428,14 +1438,16 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
         /// <param name="municipios">municipios<see cref="string"/></param>
         /// <param name="parajes">parajes<see cref="string"/></param>
-        public static void ObtenerMunicicioParaje(string idTemporada, string idUnidadCultivo, out string municipios, out string parajes) {
+        public static void ObtenerMunicicioParaje(string idTemporada, string idUnidadCultivo,out string provincias, out string municipios, out string parajes) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            string sql = "Select Municipio, Paraje from UnidadCultivoParaje where idTemporada=@0 and IdUnidadCultivo=@1";
-            List<MunicipioParaje> lMunicipioParaje = db.Fetch<MunicipioParaje>(sql, idTemporada, idUnidadCultivo);
-            IEnumerable<string> lmunicicipos = lMunicipioParaje.Select(x => x.Municipio).Distinct();
-            IEnumerable<string> lParajes = lMunicipioParaje.Select(x => x.Paraje).Distinct();
-            municipios = string.Join("'", lmunicicipos);
-            parajes = string.Join("'", lParajes);
+            string sql = "Select Provincia,Municipio, Paraje from UnidadCultivoParaje where idTemporada=@0 and IdUnidadCultivo=@1";
+            List<ProvinciaMunicipioParaje> lMunicipioProvinciaParaje = db.Fetch<ProvinciaMunicipioParaje>(sql, idTemporada, idUnidadCultivo);
+            IEnumerable<string> lmunicicipos = lMunicipioProvinciaParaje.Select(x => x.Municipio).Distinct();
+            IEnumerable<string> lParajes = lMunicipioProvinciaParaje.Select(x => x.Paraje).Distinct();
+            IEnumerable<string> lProvincias = lMunicipioProvinciaParaje.Select(x => x.Provincia).Distinct();
+            municipios = string.Join(",", lmunicicipos);
+            parajes = string.Join(",", lParajes);
+            provincias = string.Join(",", lProvincias);
         }
 
         /// <summary>
@@ -1661,6 +1673,13 @@
         internal static bool TemporadaExists(string idTemporada) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             bool ret = db.Exists<Temporada>(idTemporada);
+            return ret;
+        }
+
+        internal static List<UnidadDeCultivoParcelasValvulas> UnidadCultivoParcelasValculas(string idUnidadCultivo, string idTemporada) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            var sql =$"Select * from UnidadDeCultivoParcelasValvulas where IdUnidadCultivo='{idUnidadCultivo}' And idTemporada='{idTemporada}'";
+            var ret = db.FetchOneToMany<UnidadDeCultivoParcelasValvulas>(x => x.LIdValvula, sql);          
             return ret;
         }
     }

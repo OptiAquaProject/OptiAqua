@@ -286,7 +286,7 @@
             if (fecha > unidadCultivoDatosHidricos.FechaFinalDeEstudio())
                 fecha = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
             LineaBalance linBalAFecha = LineasBalance.Find(x => x.Fecha == fecha);
-            unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string municipios, out string parajes);
+            unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);
             DatosEstadoHidrico ret = new DatosEstadoHidrico {
                 Fecha = fecha,
                 Eficiencia = unidadCultivoDatosHidricos.EficienciaRiego,

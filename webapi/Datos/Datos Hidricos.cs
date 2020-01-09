@@ -371,9 +371,10 @@
         /// <summary>
         /// ObtenerMunicicioParaje
         /// </summary>
+        /// <param name="provincias"></param>
         /// <param name="municipios">The municipios<see cref="string"/></param>
         /// <param name="parajes">The parajes<see cref="string"/></param>
-        public void ObtenerMunicicioParaje(out string municipios, out string parajes) => DB.ObtenerMunicicioParaje(temporada.IdTemporada, unidadCultivo.IdUnidadCultivo, out municipios, out parajes);
+        public void ObtenerMunicicioParaje(out string provincias,out string municipios, out string parajes) => DB.ObtenerMunicicioParaje(temporada.IdTemporada,  unidadCultivo.IdUnidadCultivo, out provincias, out municipios, out parajes);
 
         /// <summary>
         /// Retonar el cálculo de la fecha de fin de estudio.

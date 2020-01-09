@@ -325,13 +325,13 @@ namespace Models {
         public double CapacidadCampo { get; set; }
         public double PuntoMarchitez { get; set; }
         public double ContenidoAguaSuelo { get; set; }
-        public double LimiteAgotamiento { get; set; } 
+        public double LimiteAgotamiento { get; set; }
         public double LimiteAgotamientoFijo { get; set; }
 
         public double CapacidadCampoRefPM { get; set; }
         public double PuntoMarchitezRefPM { get; set; }
         public double ContenidoAguaSueloRefPM { get; set; }
-        public double LimiteAgotamientoRefPM { get; set; } 
+        public double LimiteAgotamientoRefPM { get; set; }
         public double LimiteAgotamientoFijoRefPM { get; set; }
 
         public double AguaCrecRaiz { set; get; }
@@ -396,7 +396,7 @@ namespace Models {
         public double? SuperficieM2 { set; get; }
         public string Textura { set; get; }
 
-        public double IndiceEstres { set; get; }        
+        public double IndiceEstres { set; get; }
         public string MensajeEstres { set; get; }
         public string DescripcionEstres { set; get; }
         public string ColorEstres { set; get; }
@@ -413,7 +413,7 @@ namespace Models {
         public double AguaPerdida { set; get; }
         public double ConsumoAguaCultivo { set; get; }
         public int DiasEstres { set; get; }
-        public double DeficitRiego{ set; get; }       
+        public double DeficitRiego { set; get; }
         public double CosteDeficitRiego { set; get; }
         public double CosteAguaRiego { set; get; }
         public double CosteAguaDrenaje { set; get; }
@@ -429,13 +429,13 @@ namespace Models {
         public double ContenidoAguaSueloPorcentaje { set; get; }
 
         public double DrenajeProfundidad { set; get; }
-        public bool AvisoDrenaje{ set; get; }
+        public bool AvisoDrenaje { set; get; }
 
         public double AguaHastaCapacidadCampo { set; get; }
         public double RecomendacionRiegoNeto { set; get; }
         public double RecomendacionRiegoTiempo { set; get; }
 
-        public double IndiceEstres { set; get; }        
+        public double IndiceEstres { set; get; }
         public string MensajeEstres { set; get; }
         public string DescripcionEstres { set; get; }
         public string ColorEstres { set; get; }
@@ -610,13 +610,54 @@ namespace Models {
         public string Alias { get; set; }
         public float? SuperficieM2 { get; set; }
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
+        public string ParcelasValvulasJson { set; get; }  // List<UnidadCultivoParcelasValvulas> ->Json 
     }
 
-    public class MunicipioParaje {
+    public class ProvinciaMunicipioParaje {
+        public string Provincia { set; get; }
         public string Municipio { set; get; }
         public string Paraje { set; get; }
     }
 
+    public class UnidadCultivoDatosAmpliados {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public int IdRegante { get; set; }
+        public int IdCultivo { get; set; }
+        public int IdTipoRiego { get; set; }
+        public DateTime? FechaSiembra { get; set; }
+        public double? Pluviometria { get; set; }
+        public string TemporadaDescripcion { get; set; }
+        public string Nombre { get; set; }
+        public string NombreEstacion { get; set; }
+        public string TipoRiego { get; set; }
+        public double EficienciaRiego { get; set; }
+        public double PluviometriaTipicaTipoRiego { get; set; }
+        public int IdEstacion { get; set; }
+        public string Alias { get; set; }
+        public string Provincia { get; set; }
+        public string Municipio { get; set; }
+        public string Paraje { get; set; }
+        public string TipoSueloDescripcion { get; set; }
+    }
+
+    public class Valvula {
+        public int IdValvula { set; get; }
+    }
+
+    public class UnidadDeCultivoParcelasValvulas {
+        public string IdUnidadCultivo { get; set; }
+        public string IdTemporada { get; set; }
+        public int IdParcelaInt { get; set; }        
+        public double SuperficieM2 { get; set; }
+        public string RefCatastral { get; set; }
+        public int IdProvincia { get; set; }
+        public int IdPoligono { get; set; }
+        public string IdParcela { get; set; }
+        public string Paraje { get; set; }
+        public string Municipio { get; set; }
+        public List<Valvula> LIdValvula { get; set; }
+    }
 
 }
 

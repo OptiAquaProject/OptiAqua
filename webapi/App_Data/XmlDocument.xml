@@ -1832,7 +1832,7 @@
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
             <returns><see cref="!:int?"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.ObtenerMunicicioParaje(System.String,System.String,System.String@,System.String@)">
+        <member name="M:DatosOptiaqua.DB.ObtenerMunicicioParaje(System.String,System.String,System.String@,System.String@,System.String@)">
             <summary>
             ObtenerMunicicioParaje
             </summary>
@@ -2305,10 +2305,11 @@
             <param name="fecha"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.ObtenerMunicicioParaje(System.String@,System.String@)">
+        <member name="M:DatosOptiaqua.UnidadCultivoDatosHidricos.ObtenerMunicicioParaje(System.String@,System.String@,System.String@)">
             <summary>
             ObtenerMunicicioParaje
             </summary>
+            <param name="provincias"></param>
             <param name="municipios">The municipios<see cref="T:System.String"/></param>
             <param name="parajes">The parajes<see cref="T:System.String"/></param>
         </member>
