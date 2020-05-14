@@ -34,15 +34,16 @@
         /// <summary>
         /// Lista de parcelas de una unidad de cultivo en una temporada
         /// </summary>
-        /// <param name="idTemporada"></param>
+        /// <param name="Fecha"></param>
         /// <param name="IdUnidadCultivo"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/ParcelasDeUnidadDeCultivo/{IdUnidadCultivo}/{IdTemporada}")]
-        public IHttpActionResult GetParcelasDeUnidadDeCultivo(string idTemporada, string IdUnidadCultivo) {
+        [Route("api/ParcelasDeUnidadDeCultivo/{IdUnidadCultivo}/{Fecha}")]
+        public IHttpActionResult GetParcelasDeUnidadDeCultivo(string Fecha, string IdUnidadCultivo) {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(IdUnidadCultivo, idRegante, idTemporada) == false)
                     return BadRequest("La unidad de cultivo no pertenece al regante");
@@ -69,7 +70,7 @@
         /// <summary>
         /// Lista con datos ampliados de las parcelas con filtros.
         /// </summary>
-        /// <param name="IdTemporada"></param>
+        /// <param name="Fecha"></param>
         /// <param name="IdParcela"></param>
         /// <param name="IdRegante"></param>
         /// <param name="IdMunicipio"></param>
@@ -77,9 +78,9 @@
         /// <returns></returns>
         [Authorize]
         [Route("api/ParcelaList/{IdTemporada}/{IdParcela}/{IdRegante}/{IdMunicipio}/{Search}")]
-        public IHttpActionResult GetParcelaList(string IdTemporada, string IdParcela, string IdRegante, string IdMunicipio, string Search) {
-            try {
-                return Json(DB.ParcelaList(IdTemporada, IdParcela, IdRegante, IdMunicipio, Search));
+        public IHttpActionResult GetParcelaList(string Fecha, string IdParcela, string IdRegante, string IdMunicipio, string Search) {
+            try {                
+                return Json(DB.ParcelaList(Fecha, IdParcela, IdRegante, IdMunicipio, Search));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

@@ -38,7 +38,7 @@
             <div class="file-field">
                 <p>Seleccione fichero que desea importar</p>
                 <a class="btn-default .form-control-lg ">
-                    <input id="file-id" class="form-control col-lg-9 float-left" type="file">
+                    <input id="IdFileName" class="form-control col-lg-9 float-left" type="file">
                 </a>
             </div>
             <div class="float-left" style="padding-left:10px">
@@ -57,7 +57,7 @@
 
     <script>
         function OnImportar() {
-            var file = document.getElementById("file-id").files[0];
+            var file = document.getElementById("IdFileName").files[0];
             var NifRegante = document.getElementById("NifRegante").value;
             var PassRegante = document.getElementById("PassRegante").value;
             var IdTemporada= document.getElementById("IdTemporada").value;

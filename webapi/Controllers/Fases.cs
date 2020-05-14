@@ -11,12 +11,13 @@
         /// Etapas de una unidad de cultivo en una temporada.
         /// </summary>
         /// <param name="IdUnidadCultivo"></param>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/etapas/{IdUnidadCultivo}/{idTemporada}")]
-        public IHttpActionResult Get(string IdUnidadCultivo, string idTemporada) {
+        [Route("api/etapas/{IdUnidadCultivo}/{fecha}")]
+        public IHttpActionResult Get(string IdUnidadCultivo, string fecha) {
             try {
+                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(fecha));
                 return Json(DB.Etapas(IdUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -45,7 +46,7 @@
             /// <summary>
             /// Gets or sets the FechaConfirmada
             /// </summary>
-            public string FechaConfirmada { set; get; }
+            public string FechaStrConfirmada { set; get; }
 
             /// <summary>
             /// Gets or sets the IdTipoEstres
@@ -62,7 +63,7 @@
         [Authorize]
         public IHttpActionResult Post([FromBody] EtapasPost param) {
             try {
-                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTtemporada, param.nEtapa, DateTime.Parse(param.FechaConfirmada));
+                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTtemporada, param.nEtapa, DateTime.Parse(param.FechaStrConfirmada));
                 return Ok();
             } catch {
                 return BadRequest();

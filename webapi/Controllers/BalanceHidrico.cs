@@ -14,14 +14,13 @@
         /// Balance hídrico de una unidad de cultivo en una temporada.
         /// </summary>
         /// <param name="idUnidadCultivo">Identificador de la unidad de cultivo</param>
-        /// <param name="idTemporada">Identificador de la temporada</param>
+        /// <param name="fecha">Identificador de la temporada</param>
         /// <param name="actualizaFechasEtapas">Activar si se desea recalcular las fechas de las etapas para la parcela indicada</param>
         /// <returns></returns>
-        [Route("api/balancehidrico/{idUnidadCultivo}/{idTemporada}/{actualizaFechasEtapas}")]
-        public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string idTemporada, bool actualizaFechasEtapas) {
-            try {
-                UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUnidadCultivo, idTemporada);
-                BalanceHidrico bh = new BalanceHidrico(dh, actualizaFechasEtapas);
+        [Route("api/balancehidrico/{idUnidadCultivo}/{fecha}/{actualizaFechasEtapas}")]
+        public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string fecha, bool actualizaFechasEtapas) {
+            try {                
+                var bh = BalanceHidrico.Balance(idUnidadCultivo, DateTime.Parse(fecha),actualizaFechasEtapas);
                 return Json(bh.LineasBalance);
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -46,10 +45,9 @@
                     return Unauthorized();
                 }
                 */
-                string idTemporada = DB.TemporadaDeFecha(DateTime.Parse(fecha));
-                UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUnidadCultivo, idTemporada);
-                BalanceHidrico bh = new BalanceHidrico(dh, true);
-                return Json(bh.DatosEstadoHidrico(DateTime.Parse(fecha)));
+                DateTime dFecha = DateTime.Parse(fecha);
+                var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
+                return Json(bh.DatosEstadoHidrico(dFecha));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -82,7 +80,8 @@
                     return Unauthorized();
                     */
                 var isAdmin = true;
-                object lDatosHidricos = CalculosHidricos.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, DateTime.Parse(fecha), isAdmin);
+                object lDatosHidricos = CalculosHidricos.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, isAdmin);
+                //CacheDatosHidricos.RecreateAll(DateTime.Parse(fecha));
                 return Json(lDatosHidricos);
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -93,12 +92,13 @@
         /// Retornar los Riegos de una unidad de cultivo en una temporada
         /// </summary>
         /// <param name="idUnidadCultivo"></param>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/Riegos/{idUnidadCultivo}/{idTemporada}")]
-        public IHttpActionResult GetRiegos(string idUnidadCultivo, string idTemporada) {
+        [Route("api/Riegos/{idUnidadCultivo}/{fecha}")]
+        public IHttpActionResult GetRiegos(string idUnidadCultivo, string fecha) {
             try {
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
@@ -115,11 +115,11 @@
         /// Retornar las lluvias registradas para una unidad de cultivo en una temporada
         /// </summary>
         /// <param name="idUnidadCultivo"></param>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <returns></returns>
         //[Authorize]
-        [Route("api/Lluvias/{idUnidadCultivo}/{idTemporada}")]
-        public IHttpActionResult GetLluvias(string idUnidadCultivo, string idTemporada) {
+        [Route("api/Lluvias/{idUnidadCultivo}/{fecha}")]
+        public IHttpActionResult GetLluvias(string idUnidadCultivo, string fecha) {
             try {
                 /*
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
@@ -129,6 +129,7 @@
                     return Unauthorized();
                 }
                 */
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
                 return Json(DB.DatosLluviaList(idUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -139,11 +140,11 @@
         ///  ResumenDiario
         /// </summary>
         /// <param name="idUnidadCultivo">The idUnidadCultivo<see cref="string"/></param>
-        /// <param name="fechaStr"></param>                
+        /// <param name="fecha"></param>                
         /// <returns>The <see cref="IHttpActionResult"/></returns>
         [HttpGet]
-        [Route("api/ResumenDiario/{idUnidadCultivo}/{fechaStr}")]
-        public IHttpActionResult ResumenDiario(string idUnidadCultivo, string fechaStr) {
+        [Route("api/ResumenDiario/{idUnidadCultivo}/{fecha}")]
+        public IHttpActionResult ResumenDiario(string idUnidadCultivo, string fecha) {
             try {
                 //payaso
                 /*
@@ -154,11 +155,9 @@
                     return Unauthorized();
                 }
                 */
-                DateTime fecha = DateTime.Parse(fechaStr);
-                var idTemporada = DB.TemporadaDeFecha(fecha);
-                UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUnidadCultivo, idTemporada);
-                BalanceHidrico bh = new BalanceHidrico(dh, true);
-                return Json(bh.ResumenDiario(fecha));
+                var dFecha = DateTime.Parse(fecha);
+                var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
+                return Json(bh.ResumenDiario(dFecha));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

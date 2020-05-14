@@ -13,7 +13,7 @@
 
         /// <summary>
         /// Calculo del punto de marchitez
-        /// Segun formula Saxton&Rawls (2006)
+        /// Segun formula Saxton-Rawls (2006)
         /// Abreviaturas
         /// suelo.Arena/Arcilla/ElementosGruesos:     % arena, % arcilla, % Elementos Gruesos (%w)
         /// mo100:   materia Orgánica, (%w)
@@ -539,26 +539,7 @@
                 return ks - 1;
         }
 
-        /// <summary>
-        /// Retorna a la tabla de umbrales la clase de estrés.
-        /// Ordena la tabla por el valor umbral.
-        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstres
-        /// </summary>
-        /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
-        /// <param name="indiceEstres">ie<see cref="double"/></param>
-        /// <returns><see cref="string"/></returns>
-        public static TipoEstresUmbral TipoEstresUmbral(string idTipoEstres, double indiceEstres) {
-            TipoEstresUmbral ret = null;
-            List<TipoEstresUmbral> ltu = DB.TipoEstresUmbralOrderList(idTipoEstres);
-            if (ltu?.Count == 0)
-                return ret;
-            ret = ltu[0];
-            int i = 0;
-            while (indiceEstres > ltu[i].UmbralMaximo) {
-                ret = ltu[++i];
-            }
-            return ret;
-        }
+    
 
         /// <summary>
         /// The LimiteOptimoRefClima
@@ -662,7 +643,7 @@
             double CoeficienteEstresHidricoFinalDelDia = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoFinalDia);
             lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
 
-            dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, lb.IndiceEstres, out double limiteInferior, out double limiteSuperior);
+            dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, out double limiteInferior, out double limiteSuperior);
 
             TipoEstresUmbral tipoEstresUmbral = dh.TipoEstresUmbral(lb.IndiceEstres, lb.NumeroEtapaDesarrollo);
             lb.MensajeEstres = tipoEstresUmbral.Mensaje;
@@ -689,14 +670,13 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/></param>
         /// <param name="idMunicipio">idMunicipio<see cref="int?"/></param>
         /// <param name="idCultivo">idCultivo<see cref="string"/></param>
-        /// <param name="fecha">fecha<see cref="DateTime"/></param>
+        /// <param name="fechaStr">fecha</param>
         /// <param name="isAdmin">isAdmin<see cref="bool"/></param>
         /// <returns><see cref="object"/></returns>
-        public static object DatosHidricosList(int? idCliente, string idUnidadCultivo, int? idMunicipio, string idCultivo, DateTime fecha, bool isAdmin) {
+        public static object DatosHidricosList(int? idCliente, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fechaStr, bool isAdmin) {
             List<DatosEstadoHidrico> ret = new List<DatosEstadoHidrico>();
             List<string> lIdUnidadCultivo = null;
-            string idTemporada = DB.TemporadaDeFecha(fecha);
-            idUnidadCultivo = idUnidadCultivo.Unquoted();
+            idUnidadCultivo = idUnidadCultivo.Unquoted();            
             if (idUnidadCultivo != "") {
                 lIdUnidadCultivo = new List<string> {
                     idUnidadCultivo
@@ -721,22 +701,27 @@
                 lIdUnidadCultivo = db.Fetch<string>(sql);
             }
 
+            if (!DateTime.TryParse(fechaStr, out var dFecha))
+                dFecha = DateTime.Now.Date;
+            
             DatosEstadoHidrico datosEstadoHidrico = null;
             UnidadCultivoDatosHidricos dh = null;
+            BalanceHidrico bh = null;
             List<GeoLocParcela> lGeoLocParcelas = null;
             foreach (string idUc in lIdUnidadCultivo) {
                 try {
                     lGeoLocParcelas = null;
-                    lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);
-                    dh = new UnidadCultivoDatosHidricos(idUc, idTemporada);
-                    BalanceHidrico bh = new BalanceHidrico(dh, true);
-                    datosEstadoHidrico = bh.DatosEstadoHidrico(fecha);
+                    string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                    lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);                    
+                    bh = BalanceHidrico.Balance(idUc, dFecha);                    
+                    datosEstadoHidrico = bh.DatosEstadoHidrico(dFecha);
                     datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
                     ret.Add(datosEstadoHidrico);
                 } catch (Exception ex) {
+                    dh = bh.unidadCultivoDatosHidricos;
                     dh.ObtenerMunicicioParaje(out string provincias,out string municipios, out string parajes);
                     datosEstadoHidrico = new DatosEstadoHidrico {
-                        Fecha = fecha,
+                        Fecha = dFecha,
                         Pluviometria = dh.Pluviometria,
                         TipoRiego = dh.TipoRiego,
                         FechaSiembra = dh.FechaSiembra(),

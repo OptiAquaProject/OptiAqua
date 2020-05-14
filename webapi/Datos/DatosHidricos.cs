@@ -14,6 +14,9 @@
         /// Defines the lDatosClimaticos
         /// </summary>
         private List<DatoClimatico> lDatosClimaticos;
+        private Dictionary<string, TipoEstres> lTiposEstres;
+        private Dictionary<string, List<TipoEstresUmbral>> lTipoEstresUmbralList;
+
 
         /// <summary>
         /// Defines the unidadCultivo
@@ -23,7 +26,7 @@
         /// <summary>
         /// Defines the pUnidadCultivoExtensionM2
         /// </summary>
-        private float pUnidadCultivoExtensionM2;
+        private double pUnidadCultivoExtensionM2;
 
         /// <summary>
         /// Defines the cultivo
@@ -258,51 +261,80 @@
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
         public int EtapaInicioRiego => cultivo.EtapaInicioRiego;
 
-        public void ClaseEstresUmbralInferiorYSuperior(int nEtapa,double indiceEstres, out double limiteInferior, out double limiteSuperior) {            
+        // Devuelve los límites inferior y superior para la etapa indicada.
+        // de la etapa se optiene el tipo de estres (con idUmbralInferior Riego y idUmbralSuperiorRiego)
+        // Los valores de los límite inferior y superior se obtienen de la lista de umbrales. Buscando por identificador.
+        public void ClaseEstresUmbralInferiorYSuperior(int nEtapa,out double limiteInferior, out double limiteSuperior) {            
             int nEtapaBase0 = nEtapa - 1 > 0 ? nEtapa - 1 : 0;
             string idTipoEstres = UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres;
             if (idTipoEstres == null)
-                throw new Exception("No se ha definido tipo de estrés");
-            var estres = DB.TipoEstres(idTipoEstres);
+                throw new Exception("No se ha definido tipo de estrés");                        
+            TipoEstres estres = lTiposEstres[idTipoEstres];
             var idInferior = estres.IdUmbralInferiorRiego;
             var idSuperior= estres.IdUmbralSuperiorRiego;
-            var lUmbrales = DB.TipoEstresUmbralOrderList(idTipoEstres);
-            if (lUmbrales.Count<2)
-                throw new Exception("No se han definido al menos dos umbrales para el tipo de estrés: " + idTipoEstres);
+            var lUmbrales = lTipoEstresUmbralList[idTipoEstres];
+            lUmbrales = lTipoEstresUmbralList[idTipoEstres];
+
             if (idInferior == null)
                 throw new Exception("No se ha definido IdUmbraInferior para el tipo de estrés: " + idTipoEstres);
             if (idSuperior == null)
                 throw new Exception("No se ha definido IdUmbraSuperior para el tipo de estrés: " + idTipoEstres);
-            if (idInferior == 0)
-                limiteInferior = -1;
-            else
-                limiteInferior = lUmbrales[(int)idInferior - 1].UmbralMaximo;
-            limiteSuperior = lUmbrales[(int)idSuperior].UmbralMaximo;            
-        }  
+            var valInferior = lUmbrales.Find(x => x.IdUmbral == idInferior)?.UmbralMaximo;
+            var valSuperior = lUmbrales.Find(x => x.IdUmbral == idSuperior)?.UmbralMaximo;
+            if (valInferior==null || valSuperior == null) {
+                throw new Exception("Umbrales para el tipo de estes mal definidos: " + idTipoEstres);
+            }
+            limiteInferior = (double)valInferior;
+            limiteSuperior = (double)valSuperior;
+        }
+
+        /// <summary>
+        /// Retorna a la tabla de umbrales la clase de estrés.
+        /// Ordena la tabla por el valor umbral.
+        /// Retonar la descripción del maxímo umbral que puede superar el indiceEstres
+        /// </summary>
+        /// <param name="idTipoEstres">idTipoEstres<see cref="string"/></param>
+        /// <param name="indiceEstres">ie<see cref="double"/></param>
+        /// <returns><see cref="string"/></returns>
+        public TipoEstresUmbral TipoEstresUmbral(string idTipoEstres, double indiceEstres) {
+            TipoEstresUmbral ret = null;
+            List<TipoEstresUmbral> ltu = lTipoEstresUmbralList[idTipoEstres];//DB.TipoEstresUmbralOrderList(idTipoEstres);
+            if (ltu?.Count == 0)
+                return ret;
+            ret = ltu[0];
+            int i = 0;
+            while (indiceEstres > ltu[i].UmbralMaximo) {
+                ret = ltu[++i];
+            }
+            return ret;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnidadCultivoDatosHidricos"/> class.
         /// </summary>
-        /// <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="string"/></param>
-        /// <param name="idTemporada">The idTemporada<see cref="string"/></param>
-        public UnidadCultivoDatosHidricos(string IdUnidadCultivo, string idTemporada) {
+        /// <param name="idUnidadCultivo">The IdUnidadCultivo<see cref="string"/></param>
+        /// <param name="fecha">The idTemporada<see cref="string"/></param>
+        public UnidadCultivoDatosHidricos(string idUnidadCultivo, DateTime fecha) {
+            var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,fecha);
             if ((temporada = DB.Temporada(idTemporada)) == null)
                 throw new Exception($"Imposible cargar datos de la temporada {idTemporada}.");
 
-            if ((unidadCultivo = DB.UnidadCultivo(IdUnidadCultivo)) == null)
-                throw new Exception($"Imposible cargar datos del cultivo {IdUnidadCultivo}.");
+            if ((unidadCultivo = DB.UnidadCultivo(idUnidadCultivo)) == null)
+                throw new Exception($"Imposible cargar datos del cultivo {idUnidadCultivo}.");
 
-            pUnidadCultivoExtensionM2 = DB.UnidadCultivoExtensionM2(IdUnidadCultivo, idTemporada);
+            pUnidadCultivoExtensionM2 = DB.UnidadCultivoExtensionM2(idUnidadCultivo, idTemporada);
 
-            if ((UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(IdUnidadCultivo, idTemporada)).Count == 0)
-                throw new Exception($"Imposible cargar las etapas para la unidad de cultivo {IdUnidadCultivo}.");
+            if ((UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(idUnidadCultivo, idTemporada)).Count == 0)
+                throw new Exception($"Imposible cargar las etapas para la unidad de cultivo {idUnidadCultivo}.");
 
-            if ((unidadCultivoCultivo = DB.UnidadCultivoCultivo(IdUnidadCultivo, idTemporada)) == null)
+            if ((unidadCultivoCultivo = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada)) == null)
                 throw new Exception("Imposible datos del cultivo en la temporada indicada.");
 
+            lTiposEstres = DB.ListaTipoEstres();
+            lTipoEstresUmbralList = DB.ListaEstresUmbral();
 
             // Poner al día los datos climáticos (si no lo están) con el api del Siar.
-            DB.DatosClimaticosRefresh();
+            //DB.DatosClimaticosRefresh();
             if ((lDatosClimaticos = DB.DatosClimaticosList(FechaSiembra(), FechaFinalDeEstudio(), unidadCultivo.IdEstacion)) == null)
                 throw new Exception($"Imposible cargar datos climáticos para la estación {unidadCultivo.IdEstacion}  en el intervalo de fechas de {FechaSiembra()} a {FechaFinalDeEstudio()}");
 
@@ -310,55 +342,19 @@
             estacion = DB.Estacion(unidadCultivo.IdEstacion);
             regante = (Regante)DB.Regante(unidadCultivoCultivo.IdRegante);
 
-            if ((ListaUcSuelo = DB.UnidadCultivoSueloList(idTemporada, IdUnidadCultivo)) == null)
-                throw new Exception("No se ha definido suelo para la unidad de Cultivo:" + IdUnidadCultivo);
+            if ((ListaUcSuelo = DB.UnidadCultivoSueloList(idTemporada, idUnidadCultivo)) == null)
+                throw new Exception("No se ha definido suelo para la unidad de Cultivo:" + idUnidadCultivo);
 
             riegoTipo = DB.RiegoTipo(unidadCultivoCultivo.IdTipoRiego);
 
             DateTime fechaSiembra = FechaSiembra();
-            DateTime fechaFinal = FechaFinalDeEstudio();
-            lDatosRiego = DB.RiegosList(IdUnidadCultivo, fechaSiembra, fechaFinal);
+            DateTime fechaFinal = fecha;
+            lDatosRiego = DB.RiegosList(idUnidadCultivo, fechaSiembra, fechaFinal);
 
-            lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(IdUnidadCultivo, fechaSiembra, fechaFinal);
+            lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(idUnidadCultivo, fechaSiembra, fechaFinal);
 
             if ((CultivoEtapasList = DB.CultivoEtapasList(unidadCultivoCultivo.IdCultivo)) == null)
                 throw new Exception($"Imposible cargar datos etapas para el cultivo para el cultivo: {unidadCultivoCultivo.IdCultivo}");
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnidadCultivoDatosHidricos"/> class.
-        /// </summary>
-        public UnidadCultivoDatosHidricos() {
-        }
-
-        /// <summary>
-        /// DatosCalculoGet
-        /// </summary>
-        /// <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="string"/></param>
-        /// <param name="idTemporada">The idTemporada<see cref="string"/></param>
-        /// <returns>The <see cref="UnidadCultivoDatosHidricos"/></returns>
-        public static UnidadCultivoDatosHidricos DatosCalculoGet(string IdUnidadCultivo, string idTemporada) {
-            UnidadCultivoDatosHidricos ret = new UnidadCultivoDatosHidricos {
-                temporada = DB.Temporada(idTemporada),
-                unidadCultivo = DB.UnidadCultivo(IdUnidadCultivo),
-                pUnidadCultivoExtensionM2 = DB.UnidadCultivoExtensionM2(IdUnidadCultivo, idTemporada),
-                UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(IdUnidadCultivo, idTemporada),
-                unidadCultivoCultivo = DB.UnidadCultivoCultivo(IdUnidadCultivo, idTemporada)
-            };
-            DB.DatosClimaticosRefresh();
-            DateTime? fechaSiembra = ret.unidadCultivoCultivo?.FechaSiembra;
-            DateTime? fechaFinal = ret.FechaFinalDeEstudio();
-            ret.lDatosClimaticos = DB.DatosClimaticosList(fechaSiembra, fechaFinal, ret.unidadCultivo?.IdEstacion);
-            ret.cultivo = DB.Cultivo(ret.unidadCultivoCultivo?.IdCultivo);
-            ret.estacion = DB.Estacion(ret.unidadCultivo?.IdEstacion);
-            ret.regante = (Regante)DB.Regante(ret.unidadCultivoCultivo?.IdRegante);
-            ret.ListaUcSuelo = DB.UnidadCultivoSueloList(idTemporada, IdUnidadCultivo);
-            ret.riegoTipo = DB.RiegoTipo(ret.unidadCultivoCultivo?.IdTipoRiego);
-            ret.lDatosRiego = DB.RiegosList(IdUnidadCultivo, (DateTime)fechaSiembra, (DateTime)fechaFinal);
-            ret.lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(IdUnidadCultivo, fechaSiembra, fechaFinal);
-            ret.CultivoEtapasList = DB.CultivoEtapasList(ret.unidadCultivoCultivo?.IdCultivo);
-
-            return ret;
         }
 
         /// <summary>
@@ -471,7 +467,7 @@
         /// <returns>The <see cref="string"/></returns>
         public TipoEstresUmbral TipoEstresUmbral(double indiceEstres, int nEtapa) {
             int nEtapaBase0 = nEtapa - 1;
-            return CalculosHidricos.TipoEstresUmbral(UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres, indiceEstres);
+            return TipoEstresUmbral(UnidadCultivoCultivoEtapasList[nEtapaBase0].IdTipoEstres, indiceEstres);            
         }
     }
 }

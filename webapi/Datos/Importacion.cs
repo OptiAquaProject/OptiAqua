@@ -42,6 +42,7 @@
             /// </summary>
             public string IdSueloTipo { set; get; }
 
+            public string IdTemporada { set; get; }
             /// <summary>
             /// Gets or sets the IdParcelaInt
             /// </summary>
@@ -62,7 +63,7 @@
             /// <summary>
             /// Gets or sets the SuperficieM2
             /// </summary>
-            public double SuperficieM2 { set; get; }
+            public double? SuperficieM2 { set; get; }
         }
 
         /// <summary>
@@ -94,7 +95,7 @@
                 try {
                     if (linea == lineas.First())
                         continue;
-                    if (linea.Length < 3)
+                    if (linea.Length < 10)
                         continue;
                     string[] lItemsLinea = linea.Split(';');
                     ImportItem item = new ImportItem {
@@ -103,11 +104,12 @@
                         IdEstacion = int.Parse(lItemsLinea[2]),
                         Alias = lItemsLinea[3],
                         IdSueloTipo = lItemsLinea[4],
-                        IdParcelaIntList = lItemsLinea[5].Split(',').Select(int.Parse).ToList(),
-                        IdCultivo = int.Parse(lItemsLinea[6]),
-                        FechaSiembra = DateTime.Parse(lItemsLinea[7]),
-                        IdTipoRiego = int.Parse(lItemsLinea[8]),
-                        SuperficieM2 = double.Parse(lItemsLinea[9])
+                        IdTemporada=lItemsLinea[5],
+                        IdParcelaIntList = lItemsLinea[6].Split(',').Select(int.Parse).ToList(),
+                        IdCultivo = int.Parse(lItemsLinea[7]),
+                        FechaSiembra = DateTime.Parse(lItemsLinea[8]),
+                        IdTipoRiego = int.Parse(lItemsLinea[9]),
+                        SuperficieM2 = double.Parse(lItemsLinea[10])
                     };
                     Importar(item, param.IdTemporada, param.IdTemporadaAnterior);
                 } catch (Exception ex) {
@@ -139,8 +141,8 @@
                 UnidadCultivoParcelaSave(db, item.IdUnidadCultivo, idTemporada, item.IdRegante, item.IdParcelaIntList);
 
                 // Sólo si se indicar un valor la superficie se almacena valor. En caso contrario se calculará porla parcelas indicadas
-                if (item.SuperficieM2 != 0)
-                    UnidadCultivoSuperficieSave(db, item.IdUnidadCultivo, idTemporada, item.SuperficieM2);
+                if ( item.SuperficieM2==null || item.SuperficieM2 != 0)
+                    UnidadCultivoSuperficieSave(db, item.IdUnidadCultivo, idTemporada, (double)item.SuperficieM2);
                 {
                     // Si se indica un tipo de suelo se replica el suelo tipo para la nueva temporada.
                     // Si no se indica tipo de suelo se duplica el de la temporada anterior para la nueva temporada.

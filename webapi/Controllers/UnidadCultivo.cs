@@ -3,6 +3,7 @@
     using Models;
     using System;
     using System.Web.Http;
+    using webapi.Utiles;
 
     /// <summary>
     /// Proporciona los datos de las unidades de cultivo y las propiedades de su suelo.
@@ -26,13 +27,14 @@
         /// <summary>
         /// Lista de las unidades de Cultivo para una temporada
         /// </summary>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/UnidadesDeCultivo/{idTemporada}")]
-        public IHttpActionResult GetUnidadesDeCultivo(string idTemporada) {
+        [Route("api/UnidadesDeCultivo/{fecha}")]
+        public IHttpActionResult GetUnidadesDeCultivo(string fecha) {
             try {
-                return Json(DB.UnidadesDeCultivoList(idTemporada));
+                var lTemporadas = DB.TemporadasDeFecha(DateTime.Parse(fecha));
+                return Json(DB.UnidadesDeCultivoList(lTemporadas));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -41,14 +43,15 @@
         /// <summary>
         /// Datos de los horizontes de una unidad de cultivo. Si idHorizonte="ALL" retorna todos los horizontes.
         /// </summary>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <param name="idUnidadCultivo"></param>
         /// <param name="idHorizonte"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/UnidadCultivo/{idTemporada}/{idUnidadCultivo}/{idHorizonte}")]
-        public IHttpActionResult GetHorizontes(string idTemporada, string idUnidadCultivo, string idHorizonte) {
+        [Route("api/UnidadCultivo/{fecha}/{idUnidadCultivo}/{idHorizonte}")]
+        public IHttpActionResult GetHorizontes(string fecha, string idUnidadCultivo, string idHorizonte) {
             try {
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, DateTime.Parse(fecha));
                 return Json(DB.UnidadCultivoHorizonte(idTemporada, idUnidadCultivo, idHorizonte));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -67,7 +70,7 @@
             /// <summary>
             /// Gets or sets the IdTemporada
             /// </summary>
-            public string IdTemporada { set; get; }
+            public string Fecha { set; get; }
 
             /// <summary>
             /// Gets or sets the IdHorizonte
@@ -114,7 +117,8 @@
         [HttpPost]
         public IHttpActionResult PostHorizonte([FromBody] ParamPostHorizonte param) {
             try {
-                DB.UnidadCultivoSueloSave(param.IdUnidadCultivo, param.IdTemporada, param.IdHorizonte, param.Limo, param.Arcilla, param.Arena, param.MatOrg, param.EleGru, param.Prof);
+                var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
+                DB.UnidadCultivoSueloSave(param.IdUnidadCultivo, idTemporada, param.IdHorizonte, param.Limo, param.Arcilla, param.Arena, param.MatOrg, param.EleGru, param.Prof);
                 return Ok();
             } catch (Exception) {
                 return BadRequest();
@@ -131,7 +135,8 @@
         [Route("api/UnidadCultivoCultivo/")]
         public IHttpActionResult UnidadCultivoCultivo([FromBody] ParamPostUnidadCultivoCultivo param) {
             try {
-                DB.UnidadCultivoCultivoTemporadaSave(param.IdUnidadCultivo, param.IdTemporada, param.IdCultivo, param.IdRegante, param.IdTipoRiego, param.FechaSiembra);
+                var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
+                DB.UnidadCultivoCultivoTemporadaSave(param.IdUnidadCultivo, idTemporada, param.IdCultivo, param.IdRegante, param.IdTipoRiego, param.FechaSiembra);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -146,10 +151,11 @@
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        [Route("api/UnidadCultivoSuelo/{IdTemporada}/{IdUnidadCultivo}/{IdSueloTipo}")]
+        [Route("api/UnidadCultivoSuelo/{fecha}/{IdUnidadCultivo}/{IdSueloTipo}")]
         public IHttpActionResult UnidadCultivoSuelo([FromBody] ParamPostUnidadCultivoSuelo param) {
             try {
-                DB.CultivoSueloSave(param.IdUnidadCultivo, param.idTemporada, param.IdSueloTipo);
+                var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
+                DB.CultivoSueloSave(param.IdUnidadCultivo, idTemporada, param.IdSueloTipo);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -159,7 +165,7 @@
         /// <summary>
         /// Lista datos ampliados de unidades de cultivos con filtros
         /// </summary>
-        /// <param name="IdTemporada"></param>
+        /// <param name="Fecha"></param>
         /// <param name="IdUnidadCultivo"></param>
         /// <param name="IdRegante"></param>
         /// <param name="IdCultivo"></param>
@@ -169,10 +175,15 @@
         /// <param name="Search"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/UnidadCultivoList/{IdTemporada}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{Search}")]
-        public IHttpActionResult GetUnidadCultivoList(string IdTemporada, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
+        [Route("api/UnidadCultivoList/{Fecha}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{Search}")]
+        public IHttpActionResult GetUnidadCultivoList(string Fecha, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
             try {
-                return Json(DB.UnidadCultivoList(IdTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search));
+                var idTemporada = "";
+                if (DateTime.TryParse(Fecha, out var dFecha))
+                    idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo.Unquoted(), dFecha);
+                else
+                    idTemporada = DB.TemporadaActiva();
+                return Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -188,7 +199,8 @@
         [Route("api/pluviometria/")]
         public IHttpActionResult PostPluviometria([FromBody] ParamPostPluviometria param) {
             try {
-                DB.PluviometriaSave(param.IdTemporada, param.IdUnidadCultivo, param.Valor);
+                var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
+                DB.PluviometriaSave(idTemporada, param.IdUnidadCultivo, param.Valor);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -197,18 +209,23 @@
 
         /// <summary>
         /// Retornar datos ampliados de la unidad de cultivo.
-        /// IdTemporada puede ser '' para presentar todos
+        /// Fecha puede ser '' para presentar todos
         /// IdUnidadCultivo puede ser '' para presentar todos
         /// </summary>
-        /// <param name="IdTemporada"></param>
+        /// <param name="Fecha"></param>
         /// <param name="IdUnidadCultivo"></param>
         /// <returns></returns>
         [Authorize]
         [HttpGet]
-        [Route("api/UnidadCultivoDatosAmpliados/{IdTemporada}/{IdUnidadCultivo}")]
-        public IHttpActionResult GetUnidadCultivoDatosAmpliados(string IdTemporada, string IdUnidadCultivo) {
+        [Route("api/UnidadCultivoDatosAmpliados/{Fecha}/{IdUnidadCultivo}")]
+        public IHttpActionResult GetUnidadCultivoDatosAmpliados(string Fecha, string IdUnidadCultivo) {
             try {
-                return Json(DB.UnidadCultivoDatosAmpliados(IdTemporada, IdUnidadCultivo));
+                string idTemporada;
+                if (string.IsNullOrWhiteSpace(Fecha))
+                    idTemporada = "";
+                else
+                    idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
+                return Json(DB.UnidadCultivoDatosAmpliados(idTemporada, IdUnidadCultivo));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -217,15 +234,16 @@
         /// <summary>
         ///  UnidadCultivoTemporadaCosteM3Agua
         /// </summary>
-        /// <param name="IdTemporada">The IdTemporada<see cref="string"/></param>
+        /// <param name="Fecha">Fecha<see cref="string"/></param>
         /// <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="string"/></param>
         /// <returns>The <see cref="IHttpActionResult"/></returns>
         [Authorize]
         [HttpGet]
-        [Route("api/UnidadCultivoTemporadaCosteM3Agua/{IdUnidadCultivo}/{IdTemporada}")]
-        public IHttpActionResult UnidadCultivoTemporadaCosteM3Agua(string IdTemporada, string IdUnidadCultivo) {
+        [Route("api/UnidadCultivoTemporadaCosteM3Agua/{IdUnidadCultivo}/{Fecha}")]
+        public IHttpActionResult UnidadCultivoTemporadaCosteM3Agua(string Fecha, string IdUnidadCultivo) {
             try {
-                return Json(DB.UnidadCultivoTemporadaCosteM3Agua(IdUnidadCultivo, IdTemporada));
+                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(Fecha));
+                return Json(DB.UnidadCultivoTemporadaCosteM3Agua(IdUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

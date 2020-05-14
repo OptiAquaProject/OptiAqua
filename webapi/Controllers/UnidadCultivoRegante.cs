@@ -11,13 +11,13 @@
         /// Unidades de cultivo asociadas a un regante en una temporada
         /// </summary>
         /// <param name="idRegante"></param>
-        /// <param name="idTemporada"></param>
+        /// <param name="fecha"></param>
         /// <returns>The <see cref="IHttpActionResult"/></returns>
         [Authorize]
-        [Route("api/UnidadCultivoRegante/{idRegante}/{idTemporada}")]
-        public IHttpActionResult Get(int idRegante, string idTemporada) {
-            try {
-                return Json(DB.UnidadesCultivoList(idRegante, idTemporada));
+        [Route("api/UnidadCultivoRegante/{idRegante}/{fecha}")]
+        public IHttpActionResult Get(int idRegante, string fecha) {
+            try {                
+                return Json(DB.UnidadesCultivoList(idRegante, DateTime.Parse(fecha)));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

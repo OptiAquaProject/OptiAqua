@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatosOptiaqua;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -26,6 +27,10 @@ namespace webapi
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            var cronExp = "0 0 1 * * ?";// cada dia a las 1:00
+            //var cronExp = "0 0 1 * * ?";// cada dia 30 min
+            ScheduledTasks.JobScheduler.Start(cronExp).GetAwaiter().GetResult();
+            CacheDatosHidricos.RecreateAll(DateTime.Now.Date);
         }
     }
 }

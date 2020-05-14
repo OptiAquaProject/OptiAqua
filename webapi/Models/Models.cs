@@ -255,7 +255,7 @@ namespace Models {
     public class Riego {
         public DateTime Fecha { get; set; }
         public string IdUnidadCultivo { get; set; }
-        public double? RiegoM3 { get; set; }
+        public double RiegoM3 { get; set; }
     }
 
     [TableName("SueloTipo")]
@@ -583,21 +583,21 @@ namespace Models {
     }
 
     public class ParamPostUnidadCultivoSuelo {
-        public string idTemporada { set; get; }
+        public string Fecha { set; get; }
         public string IdUnidadCultivo { set; get; }
         public string IdSueloTipo { set; get; }
     }
 
     //Establecer la pluviometria para una unidad de cultivo.
     public class ParamPostPluviometria {
-        public string IdTemporada { set; get; }
+        public string Fecha { set; get; }
         public string IdUnidadCultivo { set; get; }
         public double Valor { set; get; }
     }
 
     public class ParamPostUnidadCultivoCultivo {
         public string IdUnidadCultivo { set; get; }
-        public string IdTemporada { set; get; }
+        public string Fecha { set; get; }
         public int IdCultivo { set; get; }
         public int IdRegante { set; get; }
         public int IdTipoRiego { set; get; }
@@ -608,7 +608,7 @@ namespace Models {
         public string IdUnidadCultivo { get; set; }
         public int? IdRegante { get; set; }
         public string Alias { get; set; }
-        public float? SuperficieM2 { get; set; }
+        public double? SuperficieM2 { get; set; }
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
         public string ParcelasValvulasJson { set; get; }  // List<UnidadCultivoParcelasValvulas> ->Json 
     }

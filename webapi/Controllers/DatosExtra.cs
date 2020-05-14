@@ -92,7 +92,12 @@
             /// <summary>
             /// Gets or sets the Riego
             /// </summary>
-            public double? Riego { set; get; }
+            public double? RiegoM3 { set; get; }
+
+            /// <summary>
+            /// Gets or sets the Riego
+            /// </summary>
+            public double? RiegoMm { set; get; }
         }
 
         /// <summary>
@@ -106,7 +111,7 @@
         [HttpPost]
         public IHttpActionResult Post([FromBody] PostDatosExtraParam param) {
             try {
-                DB.DatosExtraSave(param.IdUnidadCultivo, param.Fecha, param.Cobertura, param.Altura, param.Lluvia, param.DriEnd, param.Riego);
+                DB.DatosExtraSave(param.IdUnidadCultivo, param.Fecha, param.Cobertura, param.Altura, param.Lluvia, param.DriEnd, param.RiegoM3, param.RiegoMm);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

@@ -55,17 +55,18 @@
         /// <summary>
         /// Lista datos ampliados de regantes con filtros
         /// </summary>
-        /// <param name="IdTemporada"></param>
+        /// <param name="Fecha"></param>
         /// <param name="IdRegante"></param>
         /// <param name="IdUnidadCultivo"></param>
         /// <param name="IdParcela"></param>
         /// <param name="Search"></param>
         /// <returns></returns>
         [Authorize]
-        [Route("api/ReganteList/{IdTemporada}/{IdRegante}/{IdUnidadCultivo}/{IdParcela}/{Search}")]
-        public IHttpActionResult GetReganteList(string IdTemporada, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
+        [Route("api/ReganteList/{Fecha}/{IdRegante}/{IdUnidadCultivo}/{IdParcela}/{Search}")]
+        public IHttpActionResult GetReganteList(string Fecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
             try {
-                return Json(DB.ReganteList(IdTemporada, IdRegante, IdUnidadCultivo, IdParcela, Search));
+                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(Fecha));
+                return Json(DB.ReganteList(idTemporada, IdRegante, IdUnidadCultivo, IdParcela, Search));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
