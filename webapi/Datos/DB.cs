@@ -8,6 +8,7 @@
     using System.Net;
     using webapi;
     using webapi.Utiles;
+    using static WebApi.DatosExtraController;
 
     /// <summary>
     /// Capa de acceso a las base de datos OptiAqua y Nebula en SQl Server
@@ -918,41 +919,44 @@
             return ret;
         }
 
-        /// <summary>
-        /// DatosExtraSave
-        /// </summary>
-        /// <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="string"/></param>
-        /// <param name="fecha">fecha<see cref="string"/></param>
-        /// <param name="cobertura">cobertura<see cref="double?"/></param>
-        /// <param name="altura">altura<see cref="double?"/></param>
-        /// <param name="lluvia">lluvia<see cref="double?"/></param>
-        /// <param name="driEnd">driEnd<see cref="double?"/></param>
-        /// <param name="riegoM3">riego<see cref="double?"/></param>
-        /// <param name="riegoMm">riego<see cref="double?"/></param>
-        public static void DatosExtraSave(string IdUnidadCultivo, string fecha, double? cobertura, double? altura, double? lluvia, double? driEnd, double? riegoM3, double? riegoMm) {
+        
+        public static void DatosExtraSave(PostDatosExtraParam param) {
             try {
-                if (DateTime.TryParse(fecha, out DateTime fs) == false) {
+                if (DateTime.TryParse(param.Fecha, out DateTime fs) == false) {
                     throw new Exception("Error. El formato de la fecha no es correcto.\n");
                 }
                 Database db = new Database(DB.CadenaConexionOptiAqua);
-                UnidadCultivoDatosExtra dat = new UnidadCultivoDatosExtra() { IdUnidadCultivo = IdUnidadCultivo, Fecha = fs };
+                UnidadCultivoDatosExtra dat = new UnidadCultivoDatosExtra() { IdUnidadCultivo = param.IdUnidadCultivo, Fecha = fs };
                 dat = db.SingleOrDefaultById<UnidadCultivoDatosExtra>(dat);
                 if (dat == null)
                     dat = new UnidadCultivoDatosExtra();
-                dat.IdUnidadCultivo = IdUnidadCultivo;
+                dat.IdUnidadCultivo = param.IdUnidadCultivo;
                 dat.Fecha = fs;
-                if (cobertura != -1)
-                    dat.Cobertura = cobertura;
-                if (lluvia != -1)
-                    dat.LluviaMm = lluvia;
-                if (altura != -1)
-                    dat.Altura = altura;
-                if (driEnd != -1)
-                    dat.DriEnd = driEnd;
-                if (riegoM3 != -1)
-                    dat.RiegoM3 = riegoM3;
-                if (riegoMm != -1)
-                    dat.RiegoM3 = DB.ConversionMmAM3((double)riegoMm,IdUnidadCultivo,fs);
+                if (param.Cobertura != -1)
+                    dat.Cobertura = param.Cobertura;
+                if (param.Lluvia != -1)
+                    dat.LluviaMm = param.Lluvia;
+                if (param.Altura != -1)
+                    dat.Altura = param.Altura;
+                if (param.DriEnd != -1)
+                    dat.DriEnd = param.DriEnd;
+                if (param.RiegoM3 != -1) {
+                    dat.RiegoM3 = param.RiegoM3;
+                    if (dat.RiegoM3 != null)
+                        param.RiegoHr = DB.ConversionM3AHorasRiego((double)param.RiegoM3, param.IdUnidadCultivo, fs);
+                    else
+                        param.RiegoHr = null;
+                } else {
+                    if (param.RiegoHr!= -1 ) {
+                        if (param.RiegoHr != null) {
+                            dat.RiegoM3 = DB.ConversionHorasRiegoAM3((double)param.RiegoHr, param.IdUnidadCultivo, fs);
+                            param.RiegoM3 = dat.RiegoM3;
+                        } else {
+                            param.RiegoM3 = null;
+                            dat.RiegoM3 = null;
+                        }
+                    }
+                }
                 db.Save(dat);
             } catch (Exception ex) {
                 string msgErr = "Error al guardar datos extra.\n ";
@@ -961,13 +965,25 @@
             }
         }
 
-        private static double ConversionMmAM3(double riegoMm, string idUnidadCultivo,DateTime fecha) {
+        private static double ConversionHorasRiegoAM3(double horasRiego, string idUnidadCultivo, DateTime fecha) {
             string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, fecha);
+            double supertificeM2 = UnidadCultivoExtensionM2(idUnidadCultivo, idTemporada);            
+            double pluviometriaRiego = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada).Pluviometria;
+            double m3 = horasRiego * pluviometriaRiego * supertificeM2 / 1000;
+            return m3;
+        }
+
+        private static double ConversionM3AHorasRiego(double m3, string idUnidadCultivo, DateTime fecha) {
+            string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, fecha);
+            if (idTemporada == null)
+                throw new Exception("No hay definida una temporada para unidad de cultivo y fecha.");
             double supertificeM2 = UnidadCultivoExtensionM2(idUnidadCultivo, idTemporada);
-            var cultivo = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada);
-            var tipoRiego = DB.RiegoTipo(cultivo.IdTipoRiego);
-            double ret = riegoMm*supertificeM2/1000/(1-tipoRiego.Eficiencia);
-            return ret;
+            double pluviometriaRiego = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada).Pluviometria;
+            double divisor = pluviometriaRiego * supertificeM2 / 1000;
+            double horasRiego = 0;
+            if (divisor !=0)
+                horasRiego = m3 /divisor;
+            return horasRiego;
         }
 
         /// <summary>
@@ -1668,7 +1684,7 @@
                 return DB.TemporadaActiva();
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string sql = $"SELECT * FROM TemporadaDeFecha(@0,@1)";
-            return db.Single<string>(sql, idUC, fecha);
+            return db.SingleOrDefault<string>(sql, idUC, fecha);
         }
 
         public static List<string> TemporadasDeFecha(DateTime fecha) {

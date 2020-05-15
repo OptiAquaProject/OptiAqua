@@ -97,7 +97,7 @@
             /// <summary>
             /// Gets or sets the Riego
             /// </summary>
-            public double? RiegoMm { set; get; }
+            public double? RiegoHr { set; get; }
         }
 
         /// <summary>
@@ -111,8 +111,8 @@
         [HttpPost]
         public IHttpActionResult Post([FromBody] PostDatosExtraParam param) {
             try {
-                DB.DatosExtraSave(param.IdUnidadCultivo, param.Fecha, param.Cobertura, param.Altura, param.Lluvia, param.DriEnd, param.RiegoM3, param.RiegoMm);
-                return Ok();
+                DB.DatosExtraSave(param);
+                return Ok(Newtonsoft.Json.JsonConvert.SerializeObject(param));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

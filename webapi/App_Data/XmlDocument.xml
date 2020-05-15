@@ -511,7 +511,7 @@
             Gets or sets the Riego
             </summary>
         </member>
-        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.RiegoMm">
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.RiegoHr">
             <summary>
             Gets or sets the Riego
             </summary>
@@ -1965,19 +1965,6 @@
             MateriaOrganicaTipo
             </summary>
             <returns><see cref="T:System.Collections.Generic.List`1"/></returns>
-        </member>
-        <member name="M:DatosOptiaqua.DB.DatosExtraSave(System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double},System.Nullable{System.Double})">
-            <summary>
-            DatosExtraSave
-            </summary>
-            <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
-            <param name="fecha">fecha<see cref="T:System.String"/></param>
-            <param name="cobertura">cobertura<see cref="!:double?"/></param>
-            <param name="altura">altura<see cref="!:double?"/></param>
-            <param name="lluvia">lluvia<see cref="!:double?"/></param>
-            <param name="driEnd">driEnd<see cref="!:double?"/></param>
-            <param name="riegoM3">riego<see cref="!:double?"/></param>
-            <param name="riegoMm">riego<see cref="!:double?"/></param>
         </member>
         <member name="M:DatosOptiaqua.DB.ElementosGruesosTipo(System.String)">
             <summary>
