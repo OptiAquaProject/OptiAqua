@@ -659,5 +659,38 @@ namespace Models {
         public List<Valvula> LIdValvula { get; set; }
     }
 
+    [TableName("Multimedia")]
+    [PrimaryKey("IdMultimedia", AutoIncrement = true)]
+    public class Multimedia {
+        public int IdMultimedia { get; set; }
+        public int IdMultimediaTipo { get; set; }
+        public string Autor { get; set; }
+        public DateTime? Fecha { get; set; }
+        public string Titulo { get; set; }
+        public string Descripcion { get; set; }
+        public string Url { get; set; }
+        public DateTime? Expira { get; set; }
+    }
+
+    public class MultimediaPost {
+        public int IdMultimedia { get; set; }
+        public int IdMultimediaTipo { get; set; }
+        public string Autor { get; set; }
+        public string Fecha { get; set; }
+        public string Titulo { get; set; }
+        public string Descripcion { get; set; }
+        public string Url { get; set; }
+        public string Expira { get; set; }
+    }
+
+
+    [TableName("MultimediaTipo")]
+    [PrimaryKey("IdMultimediaTipo", AutoIncrement = true)]
+    public class Multimedia_Tipo {
+        public int IdMultimediaTipo { get; set; }
+        public string MultimediaTipo { get; set; }
+        public string Icono { get; set; }
+    }
+
 }
 

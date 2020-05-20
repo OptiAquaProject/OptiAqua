@@ -184,23 +184,10 @@
             <param name="regante"></param>
             <returns></returns>
         </member>
-        <member name="T:WebApi.AvisosController">
+        <member name="T:WebApi.MultimediaController">
             <summary>
             Sistema de avisos.
             </summary>
-        </member>
-        <member name="M:WebApi.AvisosController.Get(System.String,System.Nullable{System.Int32},System.String,System.String,System.String,System.String,System.String)">
-            <summary>
-            Lista de Avisos
-            </summary>
-            <param name="idAviso"></param>
-            <param name="idAvisoTipo"></param>
-            <param name="fInicio"></param>
-            <param name="fFin"></param>
-            <param name="de"></param>
-            <param name="para"></param>
-            <param name="search"></param>
-            <returns></returns>
         </member>
         <member name="T:WebApi.TablasMaestrasController">
             <summary>
@@ -1763,7 +1750,7 @@
             <summary>
             ReganteList
             </summary>
-            <param name="IdTemporada">IdTemporada<see cref="T:System.String"/></param>
+            <param name="strFecha">strFecha<see cref="T:System.String"/></param>
             <param name="IdRegante">IdRegante<see cref="T:System.String"/></param>
             <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="T:System.String"/></param>
             <param name="IdParcela">IdParcela<see cref="T:System.String"/></param>

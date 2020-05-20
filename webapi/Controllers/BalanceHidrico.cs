@@ -99,6 +99,8 @@
         public IHttpActionResult GetRiegos(string idUnidadCultivo, string fecha) {
             try {
                 var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
+                if (idTemporada==null)
+                    return BadRequest("La unidad de cultivo no está definida para la temporada");
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";

@@ -107,6 +107,26 @@
             return db.Fetch<object>(sql);
         }
 
+        public static object MultimediaList(int? idMultimedia, int? idMultimediaTipo, DateTime? fInicio, DateTime? fFin, int? activa, string search) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);            
+            string strFInicio = fInicio?.ToString().Quoted() ?? "''";
+            string strFFin = fFin?.ToString().Quoted() ?? "''";
+            string strIdMultimedia = idMultimedia?.ToString() ?? "''";
+            string strIdMultimediaTipo = idMultimediaTipo?.ToString() ?? "''";
+            string strActiva = activa?.ToString() ?? "''";
+            search = search.Quoted();
+            string sql = $"SELECT * FROM MultimediaList({strIdMultimedia},{strIdMultimediaTipo},{strFInicio},{strFFin},{strActiva},{search})";
+            return db.Fetch<object>(sql);
+        }
+
+        public static object MultimediaTipoList(int? idMultimediaTipo,string search) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            string strIdMultimediaTipo = idMultimediaTipo?.ToString() ?? "''";
+            search = search.Quoted();
+            string sql = $"SELECT * FROM MultimediaTipoList({strIdMultimediaTipo},{search})";
+            return db.Fetch<object>(sql);
+        }
+
         /// <summary>
         /// Crea y almacena contraseña por defecto para regante.
         /// </summary>
@@ -147,6 +167,43 @@
         public static object TemporadaSave(Temporada temporada) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             db.Save(temporada);
+            return "OK";
+        }
+
+        public static object MultimediaSave(MultimediaPost multimedia) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            DateTime? fechaExpira =null;
+            if (DateTime.TryParse(multimedia.Expira, out var tempFecha))
+                fechaExpira = tempFecha;
+            var m = new Multimedia {
+                Autor = multimedia.Autor,
+                Descripcion = multimedia.Descripcion,
+                Expira = fechaExpira,
+                Fecha = DateTime.Parse(multimedia.Fecha),
+                IdMultimedia = multimedia.IdMultimedia,
+                IdMultimediaTipo = multimedia.IdMultimediaTipo,
+                Titulo = multimedia.Titulo,
+                Url = multimedia.Url
+            };
+            db.Save(m);
+            return m.IdMultimedia.ToString();
+        }
+
+        public static object MultimediaDelete(int idMultimedia) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            db.DeleteWhere<Multimedia>("IdMultimedia=@0",idMultimedia);
+            return "OK";
+        }
+
+        public static object MultimediaTipoSave(Multimedia_Tipo multimediaTipo) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            db.Save(multimediaTipo);
+            return multimediaTipo.IdMultimediaTipo.ToString();
+        }
+
+        public static object MultimediaTipoDelete(int idMultimediaTipo) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            db.DeleteWhere<Multimedia_Tipo>("IdMultimediaTipo=@0",idMultimediaTipo);
             return "OK";
         }
 
@@ -516,18 +573,20 @@
         /// <summary>
         /// ReganteList
         /// </summary>
-        /// <param name="IdTemporada">IdTemporada<see cref="string"/></param>
+        /// <param name="strFecha">strFecha<see cref="string"/></param>
         /// <param name="IdRegante">IdRegante<see cref="string"/></param>
         /// <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="string"/></param>
         /// <param name="IdParcela">IdParcela<see cref="string"/></param>
         /// <param name="Search">Search<see cref="string"/></param>
         /// <returns><see cref="object"/></returns>
-        public static object ReganteList(string IdTemporada, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
+        public static object ReganteList(string strFecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            IdTemporada = IdTemporada.Quoted();
+            var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(strFecha));
+            if (idTemporada == null)
+                idTemporada = TemporadaActiva();
             IdUnidadCultivo = IdUnidadCultivo.Quoted();
             Search = Search.Quoted();
-            string sql = $"SELECT * FROM ReganteList({IdTemporada},{IdRegante},{IdUnidadCultivo},{IdParcela},{Search})";
+            string sql = $"SELECT * FROM ReganteList('{idTemporada}',{IdRegante},{IdUnidadCultivo},{IdParcela},{Search})";
             return db.Fetch<object>(sql);
         }
 

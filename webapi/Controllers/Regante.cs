@@ -64,9 +64,8 @@
         [Authorize]
         [Route("api/ReganteList/{Fecha}/{IdRegante}/{IdUnidadCultivo}/{IdParcela}/{Search}")]
         public IHttpActionResult GetReganteList(string Fecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
-            try {
-                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(Fecha));
-                return Json(DB.ReganteList(idTemporada, IdRegante, IdUnidadCultivo, IdParcela, Search));
+            try {                
+                return Json(DB.ReganteList(Fecha, IdRegante, IdUnidadCultivo, IdParcela, Search));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

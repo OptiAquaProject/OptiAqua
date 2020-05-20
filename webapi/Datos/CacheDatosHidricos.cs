@@ -30,16 +30,20 @@
             return null;
         }
 
-        static public bool RecreateAll(DateTime fecha) {
-            lastUpdate = fecha;
+        static public bool RecreateAll(DateTime fechaUpdate) {
+            lastUpdate = fechaUpdate;
             //return true;
             lCacheBalances.Clear();
             lCacheEstadosHidricos.Clear();
 
             DB.DatosClimaticosSiarRefresh();
             var db = DB.ConexionOptiaqua;
-            var lTemporadas = DB.TemporadasList().Select(x=>x.IdTemporada);
-            foreach (var idTemporada in lTemporadas) {
+            var lTemporadas = DB.TemporadasList();
+            foreach (var temporada in lTemporadas) {
+                var idTemporada = temporada.IdTemporada;
+                var fechaCalculo = fechaUpdate;
+                if (fechaCalculo >= temporada.FechaFinal)
+                    fechaCalculo = temporada.FechaFinal;
                 var cacheTemporada = new Dictionary<string, BalanceHidrico>();
                 var cacheEstadosHidricosTemporada = new Dictionary<string, DatosEstadoHidrico>();
                 lCacheBalances.Add(idTemporada, cacheTemporada);
@@ -55,9 +59,9 @@
                     try {
                         lGeoLocParcelas = null;
                         lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);
-                        bh = BalanceHidrico.Balance(idUc, fecha,true,false);
+                        bh = BalanceHidrico.Balance(idUc, fechaCalculo, true,false);
                         dh = bh.unidadCultivoDatosHidricos;
-                        eh = bh.DatosEstadoHidrico(fecha);
+                        eh = bh.DatosEstadoHidrico(fechaCalculo);
                         eh.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
                         cacheTemporada.Add(idUc, bh);
                         cacheEstadosHidricosTemporada.Add(idUc, eh);
@@ -65,7 +69,7 @@
                         dh = bh.unidadCultivoDatosHidricos;
                         dh.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);
                         eh = new DatosEstadoHidrico {
-                            Fecha = fecha,
+                            Fecha = fechaCalculo,
                             Pluviometria = dh.Pluviometria,
                             TipoRiego = dh.TipoRiego,
                             FechaSiembra = dh.FechaSiembra(),

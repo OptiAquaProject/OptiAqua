@@ -211,7 +211,7 @@
     <Compile Include="Controllers\Authorize\TokenValidationHandler.cs" />
     <Compile Include="Controllers\Importacion.cs" />
     <Compile Include="Controllers\Regante.cs" />
-    <Compile Include="Controllers\Aviso.cs" />
+    <Compile Include="Controllers\Multimedia.cs" />
     <Compile Include="Controllers\TablasGenerales.cs" />
     <Compile Include="Controllers\UnidadCultivo.cs" />
     <Compile Include="Controllers\UnidadCultivoRegante.cs" />
