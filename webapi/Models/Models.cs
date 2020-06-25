@@ -692,5 +692,11 @@ namespace Models {
         public string Icono { get; set; }
     }
 
+    [TableName("Eventos")]
+    [PrimaryKey("IdEvento", AutoIncrement = true)]
+    public class EventosPoco {
+        public int IdEvento { get; set; }
+        public string Evento { get; set; }
+    }
 }
 

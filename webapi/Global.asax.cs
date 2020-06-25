@@ -30,6 +30,7 @@ namespace webapi
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             var cronExp = "0 0 1 * * ?";// cada dia a las 1:00                                        
             ScheduledTasks.JobScheduler.Start(cronExp).GetAwaiter().GetResult();
+            DB.InsertaEvento("Aplicación Start at " + DateTime.Now.ToString());
 #if DEBUG
 #else
             CacheDatosHidricos.RecreateAll(DateTime.Now.Date);

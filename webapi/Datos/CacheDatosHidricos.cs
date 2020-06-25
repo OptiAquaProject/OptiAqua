@@ -30,12 +30,20 @@
             return null;
         }
 
-        static public bool RecreateAll(DateTime fechaUpdate) {
+        static public bool  recalculando=false;
+        static public bool RecreateAll(DateTime fechaUpdate, bool forceUpdate=false) {
+            fechaUpdate = fechaUpdate.Date;
+            if (recalculando == true)
+                return false;
+            if ((forceUpdate == false) && (fechaUpdate == lastUpdate)) {                
+                return false;
+            }
+            recalculando = true;
             lastUpdate = fechaUpdate;
             //return true;
             lCacheBalances.Clear();
             lCacheEstadosHidricos.Clear();
-
+            DB.InsertaEvento("Inicia RecreateAll" + DateTime.Now.ToString());
             DB.DatosClimaticosSiarRefresh();
             var db = DB.ConexionOptiaqua;
             var lTemporadas = DB.TemporadasList();
@@ -99,6 +107,8 @@
                     }
                 }
             }
+            DB.InsertaEvento("Finaliza RecreateAll" + DateTime.Now.ToString());
+            recalculando = false;
             return true;
         }
 

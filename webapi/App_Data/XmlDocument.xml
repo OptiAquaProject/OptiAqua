@@ -1048,12 +1048,13 @@
             unidadCultivoDatosHidricos referencia al objeto que proporciona todos los datos necesarios para crear el balance hídrico
             </summary>
         </member>
-        <member name="M:DatosOptiaqua.BalanceHidrico.#ctor(DatosOptiaqua.UnidadCultivoDatosHidricos,System.Boolean)">
+        <member name="M:DatosOptiaqua.BalanceHidrico.#ctor(DatosOptiaqua.UnidadCultivoDatosHidricos,System.Boolean,System.DateTime)">
             <summary>
             Initializes a new instance of the <see cref="T:DatosOptiaqua.BalanceHidrico"/> class.
             </summary>
             <param name="unidadCultivoDatosHidricos">The unidadCultivoDatosHidricos<see cref="T:DatosOptiaqua.UnidadCultivoDatosHidricos"/></param>
             <param name="actualizaEtapas">The actualizaEtapas<see cref="T:System.Boolean"/></param>
+            <param name="fechaFinalEstudio"></param>
         </member>
         <member name="P:DatosOptiaqua.BalanceHidrico.LineasBalance">
             <summary>
@@ -1152,11 +1153,12 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="T:System.Double"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.BalanceHidrico.CalculaBalance(System.Boolean)">
+        <member name="M:DatosOptiaqua.BalanceHidrico.CalculaBalance(System.Boolean,System.DateTime)">
             <summary>
             CalculaBalance. Función de uso interno en la clase para calcular el balance. Se ejecuta una única vez para añadir las líneas de balance.
             </summary>
             <param name="actualizaEtapas">The actualizaEtapas<see cref="T:System.Boolean"/></param>
+            <param name="fechaFinalEstudio"></param>
         </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.CosteAgua(System.DateTime)">
             <summary>

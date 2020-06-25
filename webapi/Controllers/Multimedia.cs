@@ -56,9 +56,9 @@
         }
 
         [Authorize]
-        [HttpDelete]
-        [Route("api/Multimedia/")]
-        public IHttpActionResult DeleteMultimedia([FromBody] int idMultimedia) {
+        [HttpPost]
+        [Route("api/MultimediaEliminar/")]
+        public IHttpActionResult MultimediaEliminar([FromBody] int idMultimedia) {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
@@ -86,9 +86,9 @@
         }
 
         [Authorize]
-        [HttpDelete]
-        [Route("api/MultimediaTipo/")]
-        public IHttpActionResult DeleteMultimediaTipo([FromBody] int idMultimediaTipo) {
+        [HttpPost]
+        [Route("api/MultimediaTipoEliminar/")]
+        public IHttpActionResult MultimediaTipoEliminar([FromBody] int idMultimediaTipo) {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";

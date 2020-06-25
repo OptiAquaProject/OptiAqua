@@ -164,5 +164,18 @@
                 return BadRequest(ex.Message);
             }
         }
+
+      
+        [HttpGet]
+        [Route("api/Recalcula/")]
+        public IHttpActionResult Recalcula() {
+            try {
+                CacheDatosHidricos.RecreateAll(DateTime.Now.Date, true);
+                return Json("OK");
+            } catch (Exception ex) {
+                CacheDatosHidricos.recalculando = false;
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

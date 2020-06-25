@@ -12,6 +12,7 @@ namespace ScheduledTasks {
     [DisallowConcurrentExecution]
     public class TareaQuartz : IJob {
         public async Task Execute(IJobExecutionContext context) {
+            DB.InsertaEvento("Execute at " + DateTime.Now.ToString());
             CacheDatosHidricos.RecreateAll(DateTime.Now.Date);
         }
     }
@@ -41,9 +42,10 @@ namespace ScheduledTasks {
                 .Build();
             if (jobKey != null)
                 await scheduler.DeleteJob(jobKey);
-            var tim = await scheduler.ScheduleJob(job, trigger);
+            var next = await scheduler.ScheduleJob(job, trigger);
+            DB.InsertaEvento("Change prog next at:" + next.ToString());
             jobKey = job.Key;
-            return tim != null;
+            return next != null;
         }
     }
 }

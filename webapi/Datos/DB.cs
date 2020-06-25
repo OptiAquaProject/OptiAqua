@@ -43,6 +43,10 @@
 
         public static Database ConexionOptiaqua => new Database(CadenaConexionOptiAqua);
 
+        internal static void InsertaEvento(string txt) {
+            DB.ConexionOptiaqua.Insert(new EventosPoco { Evento = txt });
+        }
+
         /// <summary>
         /// The IsCorrectPassword
         /// </summary>

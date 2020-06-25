@@ -19,9 +19,10 @@
         /// </summary>
         /// <param name="unidadCultivoDatosHidricos">The unidadCultivoDatosHidricos<see cref="UnidadCultivoDatosHidricos"/></param>
         /// <param name="actualizaEtapas">The actualizaEtapas<see cref="bool"/></param>
-        public BalanceHidrico(UnidadCultivoDatosHidricos unidadCultivoDatosHidricos, bool actualizaEtapas) {
+        /// <param name="fechaFinalEstudio"></param>
+        public BalanceHidrico(UnidadCultivoDatosHidricos unidadCultivoDatosHidricos, bool actualizaEtapas, DateTime fechaFinalEstudio) {
             this.unidadCultivoDatosHidricos = unidadCultivoDatosHidricos;
-            CalculaBalance(actualizaEtapas);
+            CalculaBalance(actualizaEtapas,fechaFinalEstudio);
         }
 
         /// <summary>
@@ -36,7 +37,7 @@
                 bh=CacheDatosHidricos.Balance(idUC, fecha);
             if (bh == null) {
                 UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUC, fecha);
-                bh = new BalanceHidrico(dh, actualizaFechasEtapas);
+                bh = new BalanceHidrico(dh, actualizaFechasEtapas,fecha);
                 if (usarCache)
                     CacheDatosHidricos.Add(bh, fecha);
             }
@@ -230,10 +231,11 @@
         /// CalculaBalance. Función de uso interno en la clase para calcular el balance. Se ejecuta una única vez para añadir las líneas de balance.
         /// </summary>
         /// <param name="actualizaEtapas">The actualizaEtapas<see cref="bool"/></param>
-        private void CalculaBalance(bool actualizaEtapas) {
+        /// <param name="fechaFinalEstudio"></param>
+        private void CalculaBalance(bool actualizaEtapas,DateTime fechaFinalEstudio) {
             LineaBalance lbAnt = new LineaBalance();
             DateTime fecha = unidadCultivoDatosHidricos.FechaSiembra();
-            DateTime fechaFinalEstudio = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
+            //DateTime fechaFinalEstudio = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
             int diasDesdeSiembra = 1;
             if (unidadCultivoDatosHidricos.nEtapas <= 0)
                 throw new Exception("No se han definido etapas para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
