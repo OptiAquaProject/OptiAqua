@@ -222,7 +222,7 @@
                     IdCultivo = idCultivo,
                     IdRegante = idRegante,
                     IdTemporada = idTemporada,
-                    IdTipoRiego = idTipoRiego,
+                    IdTipoRiego = idTipoRiego,                    
                     FechaSiembra = fs,
                     Pluviometria = DB.PluviometriaTipica(idTipoRiego)
                 };
@@ -240,6 +240,7 @@
                         IdUnidadCultivo = uniCulCul.IdUnidadCultivo,
                         IdTemporada = uniCulCul.IdTemporada,
                         IdEtapaCultivo = cf.OrdenEtapa,
+                        IdTipoEstres=cf.IdTipoEstres,
                         Etapa = cf.Etapa,
                         FechaInicioEtapa = fechaEtapa
                     };

@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using webapi.Utiles;
 
     /// <summary>
@@ -119,14 +120,14 @@
         /// </summary>
         /// <param name="fecha"></param>
         /// <param name="cobertura"></param>
-        /// <param name="currentnEtapa"></param>
+        /// <param name="nEtapaActual"></param>
         /// <param name="pUnidadCultivoCultivosEtapas"></param>
         /// <param name="pCultivoEtapas"></param>
         /// <returns></returns>
-        public static int NumeroEtapaDesarrollo(DateTime fecha, double cobertura, int currentnEtapa, List<UnidadCultivoCultivoEtapas> pUnidadCultivoCultivosEtapas, List<CultivoEtapas> pCultivoEtapas) {
-            int nEtapaBase0 = currentnEtapa - 1 > 0 ? currentnEtapa - 1 : 0; // situación anómala
-            int ret = currentnEtapa;
-            if (pUnidadCultivoCultivosEtapas.Count < currentnEtapa)
+        public static int NumeroEtapaDesarrollo(DateTime fecha, double cobertura, int nEtapaActual, List<UnidadCultivoCultivoEtapas> pUnidadCultivoCultivosEtapas, List<CultivoEtapas> pCultivoEtapas) {
+            int nEtapaBase0 = nEtapaActual - 1 > 0 ? nEtapaActual - 1 : 0; // situación anómala
+            int ret = nEtapaActual;
+            if (pUnidadCultivoCultivosEtapas.Count < nEtapaActual)
                 return pUnidadCultivoCultivosEtapas.Count; // situación anómala
 
             if (pUnidadCultivoCultivosEtapas[nEtapaBase0].DefinicionPorDias == true) {
@@ -524,23 +525,35 @@
         /// <returns><see cref="bool"/></returns>
         public static bool AvisoDrenaje(double dp) => dp > Config.GetDouble("DrenajeUmbral");
 
+       
+
         /// <summary>
-        /// Cálculo del indice de estrés.
+        /// Calculo del índice de Estres
+        /// El valor estarán entre -1 y 1 + drenajeProduncidad 
+        /// Si sobrepasa el valor de 1 indica que hay exceso de agua.
         /// </summary>
-        /// <param name="os"></param>
-        /// <param name="lo"></param>
-        /// <param name="ks"></param>
-        /// <param name="cc"></param>
+        /// <param name="contenidoAguaSuelo"></param>
+        /// <param name="limiteAgotamiento"></param>
+        /// <param name="coeficienteEstresFinalDelDia"></param>
+        /// <param name="capacidadDeCampo"></param>
+        /// <param name="drenajeProfundidad"></param>
         /// <returns></returns>
-        public static double IndiceEstres(double os, double lo, double ks, double cc) {
-            if (os > lo)
-                return (os - lo) / (cc - lo);
+        public static double IndiceEstres(double contenidoAguaSuelo, double limiteAgotamiento, double coeficienteEstresFinalDelDia, double capacidadDeCampo,double drenajeProfundidad) {
+            double ret = 0;
+            if (contenidoAguaSuelo > limiteAgotamiento)
+                ret= (contenidoAguaSuelo - limiteAgotamiento) / (capacidadDeCampo - limiteAgotamiento);
             else
-                return ks - 1;
+                ret= coeficienteEstresFinalDelDia - 1;
+            if (contenidoAguaSuelo > limiteAgotamiento) {
+                ret= ((contenidoAguaSuelo + drenajeProfundidad - limiteAgotamiento) / (capacidadDeCampo - limiteAgotamiento));
+
+            } else {
+                ret= (coeficienteEstresFinalDelDia - 1);
+
+            }
+            return ret;
         }
-
-    
-
+        
         /// <summary>
         /// The LimiteOptimoRefClima
         /// </summary>
@@ -641,7 +654,7 @@
             lb.ContenidoAguaSuelo = lb.CapacidadCampo - lb.AgotamientoFinalDia;
 
             double CoeficienteEstresHidricoFinalDelDia = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoFinalDia);
-            lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo);
+            lb.IndiceEstres = IndiceEstres(lb.ContenidoAguaSuelo, lb.LimiteAgotamiento, CoeficienteEstresHidricoFinalDelDia, lb.CapacidadCampo,lb.DrenajeProfundidad);
 
             dh.ClaseEstresUmbralInferiorYSuperior(lb.NumeroEtapaDesarrollo, out double limiteInferior, out double limiteSuperior);
 
@@ -671,9 +684,10 @@
         /// <param name="idMunicipio">idMunicipio<see cref="int?"/></param>
         /// <param name="idCultivo">idCultivo<see cref="string"/></param>
         /// <param name="fechaStr">fecha</param>
-        /// <param name="isAdmin">isAdmin<see cref="bool"/></param>
+        /// <param name="roleUsuario"></param>
+        /// <param name="idUsuario"></param>        
         /// <returns><see cref="object"/></returns>
-        public static object DatosHidricosList(int? idCliente, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fechaStr, bool isAdmin) {
+        public static object DatosHidricosList(int? idCliente, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fechaStr, string roleUsuario, int idUsuario) {
             List<DatosEstadoHidrico> ret = new List<DatosEstadoHidrico>();
             List<string> lIdUnidadCultivo = null;
             idUnidadCultivo = idUnidadCultivo.Unquoted();            
@@ -684,39 +698,56 @@
             } else {
                 Database db = new Database(DB.CadenaConexionOptiAqua);
                 string sql = "SELECT Distinct IdUnidadCultivo from FiltroParcelasDatosHidricos ";
-                string join = " Where ";
+                string filtro = " Where ";
                 if (idMunicipio != null) {
-                    sql += join + "idMunicipio=" + idMunicipio.ToString();
-                    join = " and ";
+                    sql += filtro + "idMunicipio=" + idMunicipio.ToString();
+                    filtro = " and ";
                 }
 
                 if (idCultivo.Unquoted() != "") {
-                    sql += join + " IdCultivo=" + idCultivo;
-                    join = " and ";
+                    sql += filtro + " IdCultivo=" + idCultivo;
+                    filtro = " and ";
                 }
 
                 if (idCliente != null)
-                    sql += join + "IdRegante=" + idCliente.ToString();
+                    sql += filtro + "IdRegante=" + idCliente.ToString();
 
                 lIdUnidadCultivo = db.Fetch<string>(sql);
             }
 
             if (!DateTime.TryParse(fechaStr, out var dFecha))
                 dFecha = DateTime.Now.Date;
+
+            // De todas las Unidades de Cultivo quitar las que el usuario no puede ver.
+            List<string> lValidas = new List<string>();
+            if (roleUsuario == "admin") {
+                lValidas = lIdUnidadCultivo;
+            }else if (roleUsuario == "asesor") {
+                var lAsesorUCList = DB.AsesorUnidadCultivoList(idUsuario);
+                lValidas = lIdUnidadCultivo.Intersect(lAsesorUCList).ToList(); 
+            } else {// usuario
+                foreach(var uc in lIdUnidadCultivo) {
+                    string idTemporada = DB.TemporadaDeFecha(uc, dFecha);
+                    if (DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(uc, idUsuario, idTemporada))
+                        lValidas.Add(uc);
+                }
+            }
             
             DatosEstadoHidrico datosEstadoHidrico = null;
             UnidadCultivoDatosHidricos dh = null;
             BalanceHidrico bh = null;
             List<GeoLocParcela> lGeoLocParcelas = null;
-            foreach (string idUc in lIdUnidadCultivo) {
+            foreach (string idUc in lValidas) {
                 try {
                     lGeoLocParcelas = null;
-                    string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
-                    lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);                    
-                    bh = BalanceHidrico.Balance(idUc, dFecha);                    
-                    datosEstadoHidrico = bh.DatosEstadoHidrico(dFecha);
-                    datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
-                    ret.Add(datosEstadoHidrico);
+                    string idTemporada = DB.TemporadaDeFecha(idUc, dFecha);
+                    if (idTemporada != null) {
+                        lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);
+                        bh = BalanceHidrico.Balance(idUc, dFecha);
+                        datosEstadoHidrico = bh.DatosEstadoHidrico(dFecha);
+                        datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
+                        ret.Add(datosEstadoHidrico);
+                    }
                 } catch (Exception ex) {
                     dh = bh.unidadCultivoDatosHidricos;
                     dh.ObtenerMunicicioParaje(out string provincias,out string municipios, out string parajes);

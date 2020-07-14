@@ -2,6 +2,9 @@
     using DatosOptiaqua;
     using Models;
     using System;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Threading;
     using System.Web.Http;
     using webapi.Utiles;
 
@@ -178,12 +181,16 @@
         [Route("api/UnidadCultivoList/{Fecha}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{Search}")]
         public IHttpActionResult GetUnidadCultivoList(string Fecha, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
             try {
+                ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+
                 var idTemporada = "";
                 if (DateTime.TryParse(Fecha, out var dFecha))
                     idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo.Unquoted(), dFecha);
                 else
                     idTemporada = DB.TemporadaActiva();
-                return Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search));
+                return Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

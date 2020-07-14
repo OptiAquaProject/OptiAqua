@@ -43,9 +43,7 @@
 
         public static Database ConexionOptiaqua => new Database(CadenaConexionOptiAqua);
 
-        internal static void InsertaEvento(string txt) {
-            DB.ConexionOptiaqua.Insert(new EventosPoco { Evento = txt });
-        }
+        internal static void InsertaEvento(string txt) => DB.ConexionOptiaqua.Insert(new EventosPoco { Evento = txt });
 
         /// <summary>
         /// The IsCorrectPassword
@@ -112,7 +110,7 @@
         }
 
         public static object MultimediaList(int? idMultimedia, int? idMultimediaTipo, DateTime? fInicio, DateTime? fFin, int? activa, string search) {
-            Database db = new Database(DB.CadenaConexionOptiAqua);            
+            Database db = new Database(DB.CadenaConexionOptiAqua);
             string strFInicio = fInicio?.ToString().Quoted() ?? "''";
             string strFFin = fFin?.ToString().Quoted() ?? "''";
             string strIdMultimedia = idMultimedia?.ToString() ?? "''";
@@ -123,12 +121,48 @@
             return db.Fetch<object>(sql);
         }
 
-        public static object MultimediaTipoList(int? idMultimediaTipo,string search) {
+        public static object MultimediaTipoList(int? idMultimediaTipo, string search) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string strIdMultimediaTipo = idMultimediaTipo?.ToString() ?? "''";
             search = search.Quoted();
             string sql = $"SELECT * FROM MultimediaTipoList({strIdMultimediaTipo},{search})";
             return db.Fetch<object>(sql);
+        }
+
+        internal static bool EstaAutorizado(int idUsuario,string role, string idUnidadCultivo, string idTemporada) {
+            if (role == "admin")
+                return true;
+            if (role == "asesor") {
+                var lAsesor = DB.AsesorUnidadCultivoList(idUsuario);
+                return lAsesor.Contains(idUnidadCultivo);
+            }
+            if (role == "dbo")
+                return DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idUsuario, idTemporada);
+            return false;
+        }
+
+        internal static bool EstaAutorizado(int idUsuario, string role, string idUnidadCultivo) {
+            if (role == "admin")
+                return true;
+            if (role == "asesor") {
+                var lAsesor = DB.AsesorUnidadCultivoList(idUsuario);
+                return lAsesor.Contains(idUnidadCultivo);
+            }
+            if (role == "dbo")
+                return DB.LaUnidadDeCultivoPerteneceAlRegante(idUnidadCultivo, idUsuario);
+            return false;
+        }
+
+        internal static bool EstaAutorizado(int idUsuario, string role, int idParcela) {
+            if (role == "admin")
+                return true;
+            if (role == "asesor") {
+                var lAsesor = DB.AsesorUnidadCultivoList(idUsuario);
+                return lAsesor.Contains(idParcela.ToString());
+            }
+            if (role == "dbo")
+                return DB.LaParcelaPerteneceAlRegante(idUsuario, idParcela);
+            return false;
         }
 
         /// <summary>
@@ -176,10 +210,10 @@
 
         public static object MultimediaSave(MultimediaPost multimedia) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            DateTime? fechaExpira =null;
-            if (DateTime.TryParse(multimedia.Expira, out var tempFecha))
+            DateTime? fechaExpira = null;
+            if (DateTime.TryParse(multimedia.Expira, out DateTime tempFecha))
                 fechaExpira = tempFecha;
-            var m = new Multimedia {
+            Multimedia m = new Multimedia {
                 Autor = multimedia.Autor,
                 Descripcion = multimedia.Descripcion,
                 Expira = fechaExpira,
@@ -195,7 +229,7 @@
 
         public static object MultimediaDelete(int idMultimedia) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            db.DeleteWhere<Multimedia>("IdMultimedia=@0",idMultimedia);
+            db.DeleteWhere<Multimedia>("IdMultimedia=@0", idMultimedia);
             return "OK";
         }
 
@@ -207,7 +241,7 @@
 
         public static object MultimediaTipoDelete(int idMultimediaTipo) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            db.DeleteWhere<Multimedia_Tipo>("IdMultimediaTipo=@0",idMultimediaTipo);
+            db.DeleteWhere<Multimedia_Tipo>("IdMultimediaTipo=@0", idMultimediaTipo);
             return "OK";
         }
 
@@ -585,7 +619,7 @@
         /// <returns><see cref="object"/></returns>
         public static object ReganteList(string strFecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(strFecha));
+            string idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(strFecha));
             if (idTemporada == null)
                 idTemporada = TemporadaActiva();
             IdUnidadCultivo = IdUnidadCultivo.Quoted();
@@ -630,8 +664,10 @@
         /// <param name="IdTipoRiego">IdTipoRiego<see cref="string"/></param>
         /// <param name="IdEstacion">IdEstacion<see cref="string"/></param>
         /// <param name="Search">Search<see cref="string"/></param>
+        /// <param name="idUsuario"></param>
+        /// <param name="role"></param>
         /// <returns><see cref="object"/></returns>
-        public static object UnidadCultivoList(string IdTemporada, string IdUnidadCultivo, string IdRegante, string IdCultivo, string idMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
+        public static object UnidadCultivoList(string IdTemporada, string IdUnidadCultivo, string IdRegante, string IdCultivo, string idMunicipio, string IdTipoRiego, string IdEstacion, string Search, int idUsuario,string role) {
             IdTemporada = IdTemporada.Unquoted();
             Database db = new Database(DB.CadenaConexionOptiAqua);
             if (string.IsNullOrWhiteSpace(IdTemporada)) {
@@ -645,13 +681,26 @@
 
             IdTemporada = IdTemporada.Unquoted();
             List<Dictionary<string, object>> lRet = db.Fetch<Dictionary<string, object>>(sql);
-            foreach (Dictionary<string, object> dic in lRet) {
+            var lValidos = new List<Dictionary<string, object>>();
+            var lAsesor = new List<string>();
+            if (role == "asesor")
+                lAsesor = DB.AsesorUnidadCultivoList(idUsuario);
+            foreach (Dictionary<string, object> dic in lRet) {             
                 string idUC = dic["IdUnidadCultivo"] as string;
+                if (role == "asesor") {
+                    if (!lAsesor.Contains(idUC)) 
+                        continue;
+                    
+                } else if (role == "dbo") {
+                    if (DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUC, idUsuario, IdTemporada) == false) 
+                        continue;                    
+                }
+                lValidos.Add(dic);
                 List<GeoLocParcela> lGeoLocParcelas = DB.GeoLocParcelasList(idUC, IdTemporada);
                 string geo = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
                 dic.Add("GeoLocJson", geo);
             }
-            return lRet;
+            return lValidos;
         }
 
         /// <summary>
@@ -781,6 +830,11 @@
             return db.Fetch<object>(sql);
         }
 
+        internal static List<string> AsesorUnidadCultivoList(int idUsuario) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            return db.Fetch<string>("select IdUnidadCultivo from AsesorUnidadCultivo where idRegante=@0", idUsuario);
+        }
+
         /// <summary>
         /// LaUnidadDeCultivoPerteneceAlRegante
         /// </summary>
@@ -802,7 +856,7 @@
         /// <returns><see cref="bool"/></returns>
         public static bool PasswordSave(LoginRequest login) {
             Database db = new Database(DB.CadenaConexionOptiAqua);
-            Regante regante = db.SingleById<Regante>(login.NifRegante);
+            Regante regante = db.SingleOrDefault<Regante>("Where NIF=@0",login.NifRegante);
             regante.Contraseña = BuildPassword(login.NifRegante, login.Password);
             db.Save(regante);
             return true;
@@ -821,6 +875,19 @@
             string unidadCultivo = db.SingleOrDefault<string>(sql, idUnidadCultivo, idRegante, idTemporada);
             return unidadCultivo != null;
         }
+
+        public static bool LaParcelaPerteneceAlRegante(int idParcela, int idUsuario) {
+            Database db = new Database(DB.CadenaConexionOptiAqua);
+            string sql = "select idParcelaInt from Parcela where IdParcela=@0 and IdRegante=@1";
+            var pertenece = db.SingleOrDefault<int?>(sql, idParcela,idUsuario)!=null;
+            if (pertenece)
+                return true;
+            sql = "select idParcelaInt from UnidadCultivoParcela where IdParcelaInt=@0 and IdRegante=@1";
+            pertenece = db.SingleOrDefault<int?>(sql, idParcela, idUsuario) != null;
+            return pertenece;            
+        }
+
+        
 
         /// <summary>
         /// TemporadasList
@@ -982,7 +1049,7 @@
             return ret;
         }
 
-        
+
         public static void DatosExtraSave(PostDatosExtraParam param) {
             try {
                 if (DateTime.TryParse(param.Fecha, out DateTime fs) == false) {
@@ -1003,23 +1070,21 @@
                     dat.Altura = param.Altura;
                 if (param.DriEnd != -1)
                     dat.DriEnd = param.DriEnd;
+
                 if (param.RiegoM3 != -1) {
                     dat.RiegoM3 = param.RiegoM3;
-                    if (dat.RiegoM3 != null)
-                        param.RiegoHr = DB.ConversionM3AHorasRiego((double)param.RiegoM3, param.IdUnidadCultivo, fs);
-                    else
-                        param.RiegoHr = null;
-                } else {
-                    if (param.RiegoHr!= -1 ) {
-                        if (param.RiegoHr != null) {
-                            dat.RiegoM3 = DB.ConversionHorasRiegoAM3((double)param.RiegoHr, param.IdUnidadCultivo, fs);
-                            param.RiegoM3 = dat.RiegoM3;
-                        } else {
-                            param.RiegoM3 = null;
-                            dat.RiegoM3 = null;
-                        }
-                    }
+                    param.RiegoHr = DB.ConversionM3AHorasRiego((double)param.RiegoM3, param.IdUnidadCultivo, fs);
+                    param.RiegoMm = dat.RiegoM3 / 1000;
+                } else if (param.RiegoHr != -1) {
+                    dat.RiegoM3 = DB.ConversionHorasRiegoAM3((double)param.RiegoHr, param.IdUnidadCultivo, fs);
+                    param.RiegoM3 = dat.RiegoM3;
+                    param.RiegoMm = param.RiegoM3 / 1000;
+                } else if (param.RiegoMm != -1) {
+                    dat.RiegoM3 = DB.ConversionMmRiegoAM3((double)param.RiegoMm, param.IdUnidadCultivo, fs);
+                    param.RiegoM3 = dat.RiegoM3;                    
+                    param.RiegoHr = DB.ConversionM3AHorasRiego((double)param.RiegoM3, param.IdUnidadCultivo, fs);
                 }
+
                 db.Save(dat);
             } catch (Exception ex) {
                 string msgErr = "Error al guardar datos extra.\n ";
@@ -1030,10 +1095,14 @@
 
         private static double ConversionHorasRiegoAM3(double horasRiego, string idUnidadCultivo, DateTime fecha) {
             string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, fecha);
-            double supertificeM2 = UnidadCultivoExtensionM2(idUnidadCultivo, idTemporada);            
+            double supertificeM2 = UnidadCultivoExtensionM2(idUnidadCultivo, idTemporada);
             double pluviometriaRiego = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada).Pluviometria;
             double m3 = horasRiego * pluviometriaRiego * supertificeM2 / 1000;
             return m3;
+        }
+
+        private static double ConversionMmRiegoAM3(double mmRiego, string idUnidadCultivo, DateTime fecha) {
+            return mmRiego * 1000;
         }
 
         private static double ConversionM3AHorasRiego(double m3, string idUnidadCultivo, DateTime fecha) {
@@ -1044,8 +1113,8 @@
             double pluviometriaRiego = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada).Pluviometria;
             double divisor = pluviometriaRiego * supertificeM2 / 1000;
             double horasRiego = 0;
-            if (divisor !=0)
-                horasRiego = m3 /divisor;
+            if (divisor != 0)
+                horasRiego = m3 / divisor;
             return horasRiego;
         }
 
@@ -1741,13 +1810,19 @@
         /// <param name="fecha">fecha<see cref="DateTime"/></param>
         /// <returns><see cref="string"/></returns>
         public static string TemporadaDeFecha(string idUC, DateTime? fecha) {
-            if (fecha==null)
+            if (fecha == null)
                 return DB.TemporadaActiva();
             if (string.IsNullOrWhiteSpace(idUC))
                 return DB.TemporadaActiva();
             Database db = new Database(DB.CadenaConexionOptiAqua);
             string sql = $"SELECT * FROM TemporadaDeFecha(@0,@1)";
-            return db.SingleOrDefault<string>(sql, idUC, fecha);
+            string ret = db.SingleOrDefault<string>(sql, idUC, fecha);
+            if (ret != null) {
+                Temporada t = DB.Temporada(ret);
+                if (t.FechaInicial > fecha || t.FechaFinal < fecha)
+                    ret = null;
+            }
+            return ret;
         }
 
         public static List<string> TemporadasDeFecha(DateTime fecha) {

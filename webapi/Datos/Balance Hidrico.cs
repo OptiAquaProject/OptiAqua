@@ -22,7 +22,7 @@
         /// <param name="fechaFinalEstudio"></param>
         public BalanceHidrico(UnidadCultivoDatosHidricos unidadCultivoDatosHidricos, bool actualizaEtapas, DateTime fechaFinalEstudio) {
             this.unidadCultivoDatosHidricos = unidadCultivoDatosHidricos;
-            CalculaBalance(actualizaEtapas,fechaFinalEstudio);
+            CalculaBalance(actualizaEtapas, fechaFinalEstudio);
         }
 
         /// <summary>
@@ -31,13 +31,13 @@
         /// </summary>
         public List<LineaBalance> LineasBalance { get; } = new List<LineaBalance>();
 
-        public static BalanceHidrico Balance(string idUC, DateTime fecha, bool actualizaFechasEtapas = true,bool usarCache=true) {
+        public static BalanceHidrico Balance(string idUC, DateTime fecha, bool actualizaFechasEtapas = true, bool usarCache = true) {
             BalanceHidrico bh = null;
-            if (usarCache==true)
-                bh=CacheDatosHidricos.Balance(idUC, fecha);
+            if (usarCache == true)
+                bh = CacheDatosHidricos.Balance(idUC, fecha);
             if (bh == null) {
                 UnidadCultivoDatosHidricos dh = new UnidadCultivoDatosHidricos(idUC, fecha);
-                bh = new BalanceHidrico(dh, actualizaFechasEtapas,fecha);
+                bh = new BalanceHidrico(dh, actualizaFechasEtapas, fecha);
                 if (usarCache)
                     CacheDatosHidricos.Add(bh, fecha);
             }
@@ -54,7 +54,7 @@
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 return 0;
-            ret = lin.ContenidoAguaSuelo - lin.CapacidadCampo;
+            ret = lin.CapacidadCampo - lin.ContenidoAguaSuelo;
             return ret;
         }
 
@@ -77,6 +77,15 @@
             return (sumaDrenaje + sumaRiego - sumaRiegoEfec);
         }
 
+        /// <summary>
+        /// Suma agua perdida por drenaje hasta fecha
+        /// </summary>
+        /// <param name="fecha"></param>
+        /// <returns></returns>
+        public double AguaTotalPerdidaDrenaje(DateTime fecha) {
+            double ret = LineasBalance.Sum(x => x.Fecha > fecha ? 0 : x.DrenajeProfundidad);
+            return ret;
+        }
         /// <summary>
         /// SumaRiegosM3
         /// </summary>
@@ -185,6 +194,16 @@
         }
 
         /// <summary>
+        /// AguaUtilTotal
+        /// </summary>
+        /// <param name="fecha">The fecha<see cref="DateTime"/></param>
+        /// <returns>The <see cref="double"/></returns>
+        public double Consumo(DateTime fecha) {
+            double ret = LineasBalance.Sum(x => x.Fecha > fecha ? 0 : x.EtcFinal);
+            return ret;
+        }
+
+        /// <summary>
         /// RegarEnNDias
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/></param>
@@ -205,15 +224,11 @@
         /// </summary>
         /// <param name="fecha"></param>
         /// <returns></returns>
-        public double IndiceEstadoHidrico(DateTime fecha) {
+        public double IndiceEstres(DateTime fecha) {
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron datos del balance para esa fecha.");
-            if (lin.ContenidoAguaSuelo > lin.LimiteAgotamiento) {
-                return ((lin.ContenidoAguaSuelo - lin.LimiteAgotamiento) / (lin.CapacidadCampo - lin.LimiteAgotamiento));
-            } else {
-                return (lin.CoeficienteEstresHidrico - 1);
-            }
+            return lin.IndiceEstres;
         }
 
         /// <summary>
@@ -232,7 +247,7 @@
         /// </summary>
         /// <param name="actualizaEtapas">The actualizaEtapas<see cref="bool"/></param>
         /// <param name="fechaFinalEstudio"></param>
-        private void CalculaBalance(bool actualizaEtapas,DateTime fechaFinalEstudio) {
+        private void CalculaBalance(bool actualizaEtapas, DateTime fechaFinalEstudio) {
             LineaBalance lbAnt = new LineaBalance();
             DateTime fecha = unidadCultivoDatosHidricos.FechaSiembra();
             //DateTime fechaFinalEstudio = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
@@ -333,22 +348,52 @@
                 AguaUtil = AguaUtil(fecha),
                 RegarEnNDias = RegarEnNDias(fecha),
                 AguaUtilTotal = AguaUtilTotal(fecha),
+                Consumo = Consumo(fecha),
                 CapacidadDeCampo = linBalAFecha.CapacidadCampo,
                 PuntoDeMarchited = linBalAFecha.PuntoMarchitez,
                 AguaUtilOptima = AguaUtilOptima(fecha),
                 AguaPerdida = AguaPerdida(fecha),
+                AguaTotalPerdidaDrenaje = AguaTotalPerdidaDrenaje(fecha),
                 CosteAgua = CosteAgua(fecha),
                 NDiasEstres = NDIasEstres(fecha),
-                EstadoHidrico = IndiceEstadoHidrico(fecha),
+                NumDiasEstresPorDrenaje = NumDiasEstresPorDrenaje(fecha),
+                EstadoHidrico = IndiceEstres(fecha),
                 Textura = unidadCultivoDatosHidricos.TipoSueloDescripcion,
                 IndiceEstres = linBalAFecha.IndiceEstres,
                 DescripcionEstres = linBalAFecha.DescripcionEstres,
                 ColorEstres = linBalAFecha.ColorEstres,
                 MensajeEstres = linBalAFecha.MensajeEstres,
+                NumCambiosDeEtapaPendientesDeConfirmar = NumCambiosDeEtapaPendientesDeConfirmar(fecha),
                 Status = "OK",
             };
             return ret;
         }
+
+        private int NumCambiosDeEtapaPendientesDeConfirmar(DateTime fecha) {
+            int ret = 0;
+            var lin = LineasBalance.Find(x => x.Fecha == fecha);
+            if (lin != null) {
+                var etapas = unidadCultivoDatosHidricos?.UnidadCultivoCultivoEtapasList;
+                if (etapas != null) {
+                    etapas.ForEach(e => {
+                        if ( (e.IdEtapaCultivo > lin.NumeroEtapaDesarrollo) && (e.FechaFinEtapaConfirmada==null ) )
+                            ret++;
+                    });
+                }
+            }
+            return ret;
+        }
+
+        /// <summary>
+        /// Cuenta el número de días que se excede de la cantidad indicada en configuración como DrenajeDrespreciable
+        /// </summary>
+        /// <param name="fecha"></param>
+        /// <returns></returns>
+        private int NumDiasEstresPorDrenaje(DateTime fecha) {
+            var min = Config.DrenajeDespreciable();
+            int ret = LineasBalance.Count(x => x.DrenajeProfundidad > min);
+            return ret;
+        }        
 
         /// <summary>
         /// ResumenDiario

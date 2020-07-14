@@ -503,6 +503,11 @@
             Gets or sets the Riego
             </summary>
         </member>
+        <member name="P:WebApi.DatosExtraController.PostDatosExtraParam.RiegoMm">
+            <summary>
+            Gets or sets the Riego
+            </summary>
+        </member>
         <member name="M:WebApi.DatosExtraController.Post(WebApi.DatosExtraController.PostDatosExtraParam)">
             <summary>
             Añadir/Actualizar un registro en la tabla datos extra.
@@ -528,8 +533,8 @@
             <summary>
             Lista de parcelas de una unidad de cultivo en una temporada
             </summary>
-            <param name="Fecha"></param>
-            <param name="IdUnidadCultivo"></param>
+            <param name="fecha"></param>
+            <param name="idUnidadCultivo"></param>
             <returns></returns>
         </member>
         <member name="M:WebApi.ParcelaController.GetParcelas">
@@ -580,7 +585,7 @@
             <param name="idMunicipio"></param>
             <param name="idCultivo"></param>
             <param name="fecha"></param>
-            <returns></returns>
+            <returns></returns>        
         </member>
         <member name="M:WebApi.BalanceHidricoController.GetRiegos(System.String,System.String)">
             <summary>
@@ -1024,7 +1029,7 @@
             <param name="fecha">fecha<see cref="T:System.DateTime"/></param>
             <returns><see cref="T:Models.LineaBalance"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.DatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.String,System.Boolean)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.DatosHidricosList(System.Nullable{System.Int32},System.String,System.Nullable{System.Int32},System.String,System.String,System.String,System.Int32)">
             <summary>
             Retorna listado de datos hídricos filtrados por los parámetros indicados.
             Pasar '' como parametro en blanco si no se desea filtrar
@@ -1034,7 +1039,8 @@
             <param name="idMunicipio">idMunicipio<see cref="!:int?"/></param>
             <param name="idCultivo">idCultivo<see cref="T:System.String"/></param>
             <param name="fechaStr">fecha</param>
-            <param name="isAdmin">isAdmin<see cref="T:System.Boolean"/></param>
+            <param name="roleUsuario"></param>
+            <param name="idUsuario"></param>        
             <returns><see cref="T:System.Object"/></returns>
         </member>
         <member name="T:DatosOptiaqua.BalanceHidrico">
@@ -1774,7 +1780,7 @@
             <param name="idTemporada">idTemporada<see cref="T:System.String"/></param>
             <returns><see cref="M:DatosOptiaqua.DB.Temporada(System.String)"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.UnidadCultivoList(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:DatosOptiaqua.DB.UnidadCultivoList(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.Int32,System.String)">
             <summary>
             UnidadCultivoList
             </summary>
@@ -1786,6 +1792,8 @@
             <param name="IdTipoRiego">IdTipoRiego<see cref="T:System.String"/></param>
             <param name="IdEstacion">IdEstacion<see cref="T:System.String"/></param>
             <param name="Search">Search<see cref="T:System.String"/></param>
+            <param name="idUsuario"></param>
+            <param name="role"></param>
             <returns><see cref="T:System.Object"/></returns>
         </member>
         <member name="M:DatosOptiaqua.DB.TemporadaActiva">

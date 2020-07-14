@@ -18,13 +18,12 @@
         [Authorize]
         [Route("api/Parcela/{idParcela}")]
         public IHttpActionResult Get(int idParcela) {
-            try {
+            try {                
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                /*if (isAdmin == false && DB.LaParcelaPerteneceAlRegante(idParcela, idRegante) == false) {
-                    return BadRequest("La parcela no pertenece al regante");
-                }*/
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;                
+                if (!DB.EstaAutorizado(idUsuario, role, idParcela))
+                    return Unauthorized();
                 return Json(DB.Parcela(idParcela));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -34,20 +33,22 @@
         /// <summary>
         /// Lista de parcelas de una unidad de cultivo en una temporada
         /// </summary>
-        /// <param name="Fecha"></param>
-        /// <param name="IdUnidadCultivo"></param>
+        /// <param name="fecha"></param>
+        /// <param name="idUnidadCultivo"></param>
         /// <returns></returns>
         [Authorize]
         [Route("api/ParcelasDeUnidadDeCultivo/{IdUnidadCultivo}/{Fecha}")]
-        public IHttpActionResult GetParcelasDeUnidadDeCultivo(string Fecha, string IdUnidadCultivo) {
+        public IHttpActionResult GetParcelasDeUnidadDeCultivo(string fecha, string idUnidadCultivo) {
             try {
+                DateTime dFecha = DateTime.Parse(fecha);
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(IdUnidadCultivo, idRegante, idTemporada) == false)
-                    return BadRequest("La unidad de cultivo no pertenece al regante");
-                return Json(DB.ParcelasList(IdUnidadCultivo, idTemporada));
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                    return Unauthorized();
+
+                return Json(DB.ParcelasList(idUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

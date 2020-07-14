@@ -74,8 +74,8 @@
             //alert(csv);
             var param = {"IdTemporada":IdTemporada, "IdTemporadaAnterior": IdTemporadaAnterior, "ModoPruebas": ModoPruebas, "NifRegante": nifRegante, "PassRegante": passRegante, "CSV": csv };
             $.ajax({
-                type: "POST",
-                url: "/api/Importacion",
+                type: "POST",                
+                url: "@Url.Action("importacion", "api")" ,
                 data: param,
                 datatype: "json",
                 async: false,
@@ -84,7 +84,7 @@
                     try {
                         PresentaResultados(respuesta);
                     } catch (err) {
-                        alert("error");
+                        alert("Error en llamada ajax.");
                     }
                 },
                 error: function () {

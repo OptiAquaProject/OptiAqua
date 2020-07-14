@@ -19,12 +19,13 @@
         [Route("api/DatosExtra/{idUnidadCultivo}")]
         public IHttpActionResult Get(string idUnidadCultivo) {
             try {
+                DateTime dFecha = DateTime.Now.Date;
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlRegante(idUnidadCultivo, idRegante) == false) {
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                     return Unauthorized();
-                }
 
                 return Json(DB.DatosExtraList(idUnidadCultivo));
             } catch (Exception ex) {
@@ -42,14 +43,14 @@
         [Route("api/DatosExtra/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult Get(string idUnidadCultivo, string fecha) {
             try {
+                DateTime dFecha = DateTime.Now.Date;
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlRegante(idUnidadCultivo, idRegante) == false) {
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                     return Unauthorized();
-                }
-                DateTime f = DateTime.Parse(fecha);
-                return Json(DB.DatosExtraList(idUnidadCultivo, f));
+                return Json(DB.DatosExtraList(idUnidadCultivo, dFecha));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -98,6 +99,12 @@
             /// Gets or sets the Riego
             /// </summary>
             public double? RiegoHr { set; get; }
+
+            /// <summary>
+            /// Gets or sets the Riego
+            /// </summary>
+            public double? RiegoMm { set; get; }
+
         }
 
         /// <summary>
@@ -112,6 +119,7 @@
         public IHttpActionResult Post([FromBody] PostDatosExtraParam param) {
             try {
                 DB.DatosExtraSave(param);
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok(Newtonsoft.Json.JsonConvert.SerializeObject(param));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

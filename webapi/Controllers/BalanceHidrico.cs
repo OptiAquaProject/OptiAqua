@@ -33,19 +33,17 @@
         /// <param name="idUnidadCultivo"></param>
         /// <param name="fecha"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize]
         [Route("api/DatosHidricos/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult GetDatosHidricos(string idUnidadCultivo, string fecha) {
             try {
-                /*
-                ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idRegante, idTemporada) == false) {
-                    return Unauthorized();
-                }
-                */
                 DateTime dFecha = DateTime.Parse(fecha);
+                ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                    return Unauthorized();
                 var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
                 return Json(bh.DatosEstadoHidrico(dFecha));
             } catch (Exception ex) {
@@ -61,27 +59,16 @@
         /// <param name="idMunicipio"></param>
         /// <param name="idCultivo"></param>
         /// <param name="fecha"></param>
-        /// <returns></returns>
-        //[Authorize]
+        /// <returns></returns>        
         [HttpGet]
         [Route("api/DatosHidricos/{idRegante}/{idUnidadCultivo}/{idMunicipio}/{idCultivo}/{fecha}")]
         public IHttpActionResult GetDatosHidricosList(int? idRegante, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fecha) {
-            try {
-                /*
+            try {                
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idReganteClamis = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && idRegante != idReganteClamis)
-                    return Unauthorized();
-                if (isAdmin == false)
-                    idRegante = idReganteClamis;
-                string idTemporada = DB.TemporadaDeFecha(DateTime.Parse(fecha));
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, (int)idRegante, idTemporada) == false)
-                    return Unauthorized();
-                    */
-                var isAdmin = true;
-                object lDatosHidricos = CalculosHidricos.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, isAdmin);
-                //CacheDatosHidricos.RecreateAll(DateTime.Parse(fecha));
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+
+                object lDatosHidricos = CalculosHidricos.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role,idReganteClamis);
                 return Json(lDatosHidricos);
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -98,15 +85,17 @@
         [Route("api/Riegos/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult GetRiegos(string idUnidadCultivo, string fecha) {
             try {
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
+                DateTime dFecha = DateTime.Parse(fecha);
+                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,dFecha);
                 if (idTemporada==null)
                     return BadRequest("La unidad de cultivo no está definida para la temporada");
+
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idRegante, idTemporada) == false) {
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                     return Unauthorized();
-                }
+
                 return Json(DB.DatosRiegosList(idUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -119,19 +108,17 @@
         /// <param name="idUnidadCultivo"></param>
         /// <param name="fecha"></param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize]
         [Route("api/Lluvias/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult GetLluvias(string idUnidadCultivo, string fecha) {
             try {
-                /*
+                
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idRegante, idTemporada) == false) {
-                    return Unauthorized();
-                }
-                */
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role= identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value ;
                 var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
+                if (!DB.EstaAutorizado(idUsuario,role,idUnidadCultivo,idTemporada))                
+                    return Unauthorized();                
                 return Json(DB.DatosLluviaList(idUnidadCultivo, idTemporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -148,15 +135,8 @@
         [Route("api/ResumenDiario/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult ResumenDiario(string idUnidadCultivo, string fecha) {
             try {
-                //payaso
-                /*
-                ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUnidadCultivo, idRegante, idTemporada) == false) {
-                    return Unauthorized();
-                }
-                */
+
+
                 var dFecha = DateTime.Parse(fecha);
                 var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
                 return Json(bh.ResumenDiario(dFecha));
@@ -170,7 +150,7 @@
         [Route("api/Recalcula/")]
         public IHttpActionResult Recalcula() {
             try {
-                CacheDatosHidricos.RecreateAll(DateTime.Now.Date, true);
+                CacheDatosHidricos.RecreateAll();
                 return Json("OK");
             } catch (Exception ex) {
                 CacheDatosHidricos.recalculando = false;

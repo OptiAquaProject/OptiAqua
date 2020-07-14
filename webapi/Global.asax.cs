@@ -28,12 +28,14 @@ namespace webapi
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //DB.PasswordSave(new LoginRequest { NifRegante ="1", Password = "PassAQui00+" });            
             var cronExp = "0 0 1 * * ?";// cada dia a las 1:00                                        
             ScheduledTasks.JobScheduler.Start(cronExp).GetAwaiter().GetResult();
             DB.InsertaEvento("Aplicación Start at " + DateTime.Now.ToString());
+            //CacheDatosHidricos.RecreateAll();
 #if DEBUG
 #else
-            CacheDatosHidricos.RecreateAll(DateTime.Now.Date);
+            CacheDatosHidricos.RecreateAll();
 #endif
         }
     }

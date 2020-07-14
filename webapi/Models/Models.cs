@@ -402,6 +402,10 @@ namespace Models {
         public string ColorEstres { set; get; }
 
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
+        public double Consumo { get; set; }
+        public double AguaTotalPerdidaDrenaje { get; set; }
+        public int NumDiasEstresPorDrenaje { set; get; }
+        public int NumCambiosDeEtapaPendientesDeConfirmar { get; set; }
     }
 
     public class ResumenDiario {

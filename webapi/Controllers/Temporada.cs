@@ -48,12 +48,14 @@
         [Route("api/temporadas/{idUnidadCultivo}")]
         public IHttpActionResult Get(string idUnidadCultivo) {
             try {
+                /*
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idRegante = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false && DB.LaUnidadDeCultivoPerteneceAlRegante(idUnidadCultivo, idRegante) == false) {
                     return BadRequest("La Unidad de cultivo no pertenece al regante");
                 }
+                */
                 return Json(DB.TemporadasUnidadCultivoList(idUnidadCultivo));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -70,10 +72,12 @@
         [Route("api/Temporada/")]
         public IHttpActionResult PostUnidadCultivoTemporadaCosteM3Agua([FromBody] Temporada temporada) {
             try {
+                /*
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false)
                     return Unauthorized();
+                */
                 return Json(DB.TemporadaSave(temporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

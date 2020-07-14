@@ -13,7 +13,7 @@ namespace ScheduledTasks {
     public class TareaQuartz : IJob {
         public async Task Execute(IJobExecutionContext context) {
             DB.InsertaEvento("Execute at " + DateTime.Now.ToString());
-            CacheDatosHidricos.RecreateAll(DateTime.Now.Date);
+            CacheDatosHidricos.RecreateAll();
         }
     }
 
