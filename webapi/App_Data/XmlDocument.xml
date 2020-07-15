@@ -767,7 +767,7 @@
             </summary>
             <param name="fecha"></param>
             <param name="cobertura"></param>
-            <param name="currentnEtapa"></param>
+            <param name="nEtapaActual"></param>
             <param name="pUnidadCultivoCultivosEtapas"></param>
             <param name="pCultivoEtapas"></param>
             <returns></returns>
@@ -972,14 +972,17 @@
             <param name="dp">dp<see cref="T:System.Double"/></param>
             <returns><see cref="T:System.Boolean"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.IndiceEstres(System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.IndiceEstres(System.Double,System.Double,System.Double,System.Double,System.Double)">
             <summary>
-            Cálculo del indice de estrés.
+            Calculo del índice de Estres
+            El valor estarán entre -1 y 1 + drenajeProduncidad 
+            Si sobrepasa el valor de 1 indica que hay exceso de agua.
             </summary>
-            <param name="os"></param>
-            <param name="lo"></param>
-            <param name="ks"></param>
-            <param name="cc"></param>
+            <param name="contenidoAguaSuelo"></param>
+            <param name="limiteAgotamiento"></param>
+            <param name="coeficienteEstresFinalDelDia"></param>
+            <param name="capacidadDeCampo"></param>
+            <param name="drenajeProfundidad"></param>
             <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.LimiteOptimoRefClima(System.Double,System.Double)">
@@ -1082,6 +1085,13 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="T:System.Double"/></returns>
         </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaTotalPerdidaDrenaje(System.DateTime)">
+            <summary>
+            Suma agua perdida por drenaje hasta fecha
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
+        </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.SumaRiegosMm(System.DateTime)">
             <summary>
             SumaRiegosM3
@@ -1138,6 +1148,13 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="T:System.Double"/></returns>
         </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.Consumo(System.DateTime)">
+            <summary>
+            AguaUtilTotal
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
+            <returns>The <see cref="T:System.Double"/></returns>
+        </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.RegarEnNDias(System.DateTime)">
             <summary>
             RegarEnNDias
@@ -1145,7 +1162,7 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="T:System.Int32"/></returns>
         </member>
-        <member name="M:DatosOptiaqua.BalanceHidrico.IndiceEstadoHidrico(System.DateTime)">
+        <member name="M:DatosOptiaqua.BalanceHidrico.IndiceEstres(System.DateTime)">
             <summary>
             Devuelve un valor entre -1 y 1 indicando es estado hidrico a una fecha.
             </summary>
@@ -1200,6 +1217,13 @@
             </summary>
             <param name="fecha">The fecha<see cref="T:System.DateTime"/></param>
             <returns>The <see cref="M:DatosOptiaqua.BalanceHidrico.DatosEstadoHidrico(System.DateTime)"/></returns>
+        </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.NumDiasEstresPorDrenaje(System.DateTime)">
+            <summary>
+            Cuenta el número de días que se excede de la cantidad indicada en configuración como DrenajeDrespreciable
+            </summary>
+            <param name="fecha"></param>
+            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.ResumenDiario(System.DateTime)">
             <summary>
@@ -2389,6 +2413,13 @@
             </summary>
             <param name="parametro">The parametro<see cref="T:System.String"/></param>
             <param name="valor">The valor<see cref="T:System.Double"/></param>
+        </member>
+        <member name="M:DatosOptiaqua.Config.DrenajeDespreciable">
+            <summary>
+            Devuelve de la tabla de configuración el valor de "DrenajeDespreciable"
+            </summary>
+            <param name="dp"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

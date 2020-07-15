@@ -540,17 +540,15 @@
         /// <returns></returns>
         public static double IndiceEstres(double contenidoAguaSuelo, double limiteAgotamiento, double coeficienteEstresFinalDelDia, double capacidadDeCampo,double drenajeProfundidad) {
             double ret = 0;
-            if (contenidoAguaSuelo > limiteAgotamiento)
-                ret= (contenidoAguaSuelo - limiteAgotamiento) / (capacidadDeCampo - limiteAgotamiento);
-            else
-                ret= coeficienteEstresFinalDelDia - 1;
             if (contenidoAguaSuelo > limiteAgotamiento) {
-                ret= ((contenidoAguaSuelo + drenajeProfundidad - limiteAgotamiento) / (capacidadDeCampo - limiteAgotamiento));
-
+                double divisor = capacidadDeCampo - limiteAgotamiento;
+                if (divisor == 0)
+                    ret = 2;
+                else
+                    ret = ((contenidoAguaSuelo + drenajeProfundidad - limiteAgotamiento) / divisor);
             } else {
                 ret= (coeficienteEstresFinalDelDia - 1);
-
-            }
+            }            
             return ret;
         }
         

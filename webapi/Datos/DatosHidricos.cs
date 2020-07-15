@@ -298,12 +298,12 @@
         /// <returns><see cref="string"/></returns>
         public TipoEstresUmbral TipoEstresUmbral(string idTipoEstres, double indiceEstres) {
             TipoEstresUmbral ret = null;
-            List<TipoEstresUmbral> ltu = lTipoEstresUmbralList[idTipoEstres];//DB.TipoEstresUmbralOrderList(idTipoEstres);
+            List<TipoEstresUmbral> ltu = lTipoEstresUmbralList[idTipoEstres];
             if (ltu?.Count == 0)
                 return ret;
             ret = ltu[0];
             int i = 0;
-            while (indiceEstres > ltu[i].UmbralMaximo) {
+            while (indiceEstres > ltu[i].UmbralMaximo && (i+1<ltu.Count)) {
                 ret = ltu[++i];
             }
             return ret;
