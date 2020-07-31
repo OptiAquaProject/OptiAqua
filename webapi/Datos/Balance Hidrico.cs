@@ -32,6 +32,9 @@
         public List<LineaBalance> LineasBalance { get; } = new List<LineaBalance>();
 
         public static BalanceHidrico Balance(string idUC, DateTime fecha, bool actualizaFechasEtapas = true, bool usarCache = true) {
+#if DEBUG
+            usarCache = false;
+#endif
             BalanceHidrico bh = null;
             if (usarCache == true)
                 bh = CacheDatosHidricos.Balance(idUC, fecha);
@@ -389,9 +392,8 @@
         /// </summary>
         /// <param name="fecha"></param>
         /// <returns></returns>
-        private int NumDiasEstresPorDrenaje(DateTime fecha) {
-            var min = Config.DrenajeDespreciable();
-            int ret = LineasBalance.Count(x => x.DrenajeProfundidad > min);
+        private int NumDiasEstresPorDrenaje(DateTime fecha) {            
+            int ret = LineasBalance.Count(x => x.DrenajeProfundidad > 0);
             return ret;
         }        
 
@@ -446,8 +448,9 @@
             ret.DrenajeProfundidad = lb.DrenajeProfundidad;
             ret.AvisoDrenaje = CalculosHidricos.AvisoDrenaje(lb.DrenajeProfundidad);
 
-            ret.AguaHastaCapacidadCampo = ret.CapacidadCampo - ret.ContenidoAguaSuelo;
+            ret.AguaHastaCapacidadCampo = ret.CapacidadCampo - ret.ContenidoAguaSuelo; // esto no lo debería usar Daniel
             ret.RecomendacionRiegoNeto = lb.RecomendacionRiegoNeto;
+            ret.RecomendacionRiegoBruto = lb.RecomendacionRiegoBruto; // añadido SIAR 
             ret.RecomendacionRiegoTiempo = lb.RecomendacionRiegoTiempo;
 
             ret.IndiceEstres = lb.IndiceEstres;
@@ -461,6 +464,18 @@
             ret.LimiteAgotamientoRefPM = lb.LimiteAgotamientoRefPM;
             ret.LimiteAgotamientoFijoRefPM = lb.LimiteAgotamientoFijoRefPM;
 
+            ret.AlturaFinal = unidadCultivoDatosHidricos.CultivoAlturaFinal??0;
+            ret.AlturaInicial = unidadCultivoDatosHidricos.CultivoAlturaInicial??0;
+            ret.Altura = lb.AlturaCultivo;
+
+            ret.Cobertura = lb.Cobertura;
+
+            ret.ProfRaizInicial = unidadCultivoDatosHidricos.CultivoProfRaizInicial;
+            ret.ProfRaizMaxima = unidadCultivoDatosHidricos.CultivoProfRaizMax;
+            ret.LongitudRaiz = lb.LongitudRaiz;
+
+            ret.NumeroEtapaDesarrollo = lb.NumeroEtapaDesarrollo;
+            ret.NombreEtapaDesarrollo = lb.NombreEtapaDesarrollo;            
             return ret;
         }
     }

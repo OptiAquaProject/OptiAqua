@@ -2414,12 +2414,5 @@
             <param name="parametro">The parametro<see cref="T:System.String"/></param>
             <param name="valor">The valor<see cref="T:System.Double"/></param>
         </member>
-        <member name="M:DatosOptiaqua.Config.DrenajeDespreciable">
-            <summary>
-            Devuelve de la tabla de configuración el valor de "DrenajeDespreciable"
-            </summary>
-            <param name="dp"></param>
-            <returns></returns>
-        </member>
     </members>
 </doc>

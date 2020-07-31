@@ -462,7 +462,13 @@
             if (lbAnt.Fecha == null)
                 driStart = taw; // el día 1 el "depósito" está vacío
             double ret = rieEfec + pef + aguaAportadaCrecRaiz - (ETcAdj + driStart + escorrentia);
-            if (ret < 0) ret = 0;
+            if (ret < 0)
+                ret = 0;
+            if (ret > 0) {
+                double drenajeUmbral = Config.GetDouble("DrenajeUmbral");
+                if (ret < drenajeUmbral)
+                    ret = 0;
+            }                                               
             return ret;
         }
 
@@ -477,11 +483,10 @@
         /// <param name="ieUmbralRiego">The ieUmbralRiego<see cref="double"/></param>
         /// <param name="ieLimiteRiego">The ieLimiteRiego<see cref="double"/></param>
         /// <returns></returns>
-        public static double RecomendacionRiegoMm(double raw, double taw, int nEtapa, double driEnd, int etapaInicioRiego, double ieUmbralRiego, double ieLimiteRiego) {
-            // Conversion de Indices de estrés a valores de agotamiento
+        public static double RecomendacionRiegoMm(double raw, double taw, int nEtapa, double driEnd, int etapaInicioRiego, double ieUmbralRiego, double ieLimiteRiego) {            
             double drUmbralRiego = 0;
             if (ieUmbralRiego < 0)
-                drUmbralRiego = taw - (1 + ieUmbralRiego) * (taw - raw);
+                drUmbralRiego = taw - (1 + ieUmbralRiego) * (taw - raw);            
             else
                 drUmbralRiego = raw * (1 - ieUmbralRiego);
 
@@ -543,7 +548,7 @@
             if (contenidoAguaSuelo > limiteAgotamiento) {
                 double divisor = capacidadDeCampo - limiteAgotamiento;
                 if (divisor == 0)
-                    ret = 2;
+                    ret = double.PositiveInfinity;
                 else
                     ret = ((contenidoAguaSuelo + drenajeProfundidad - limiteAgotamiento) / divisor);
             } else {

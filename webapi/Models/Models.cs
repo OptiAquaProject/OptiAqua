@@ -437,6 +437,7 @@ namespace Models {
 
         public double AguaHastaCapacidadCampo { set; get; }
         public double RecomendacionRiegoNeto { set; get; }
+        public double RecomendacionRiegoBruto { set; get; }
         public double RecomendacionRiegoTiempo { set; get; }
 
         public double IndiceEstres { set; get; }
@@ -450,6 +451,15 @@ namespace Models {
         public double LimiteAgotamientoRefPM { get; set; }
         public double LimiteAgotamientoFijoRefPM { get; set; }
 
+        public double Altura { get;  set; }
+        public double Cobertura { get;  set; }
+        public string NombreEtapaDesarrollo { get;  set; }
+        public int NumeroEtapaDesarrollo { get;  set; }
+        public double LongitudRaiz { get;  set; }
+        public double AlturaFinal { get;  set; }
+        public double AlturaInicial { get;  set; }
+        public double ProfRaizInicial { get;  set; }
+        public double ProfRaizMaxima { get;  set; }
     }
 
     public class GeoLocParcela {

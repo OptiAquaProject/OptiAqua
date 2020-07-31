@@ -215,6 +215,8 @@
         /// </summary>
         public double? CultivoAlturaFinal => cultivo.AlturaFinal;
 
+        public double? CultivoAlturaInicial => cultivo.AlturaInicial ;
+
         /// <summary>
         /// Gets the CultivoModAltCoefA
         /// </summary>

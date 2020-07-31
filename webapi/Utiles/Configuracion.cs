@@ -31,11 +31,5 @@
         /// <param name="valor">The valor<see cref="double"/></param>
         public static void SetDouble(string parametro, double valor) => DB.ConfigSave(parametro, valor.ToString());
 
-        /// <summary>
-        /// Devuelve de la tabla de configuración el valor de "DrenajeDespreciable"
-        /// </summary>
-        /// <param name="dp"></param>
-        /// <returns></returns>
-        public static double DrenajeDespreciable() => Config.GetDouble("DrenajeDespreciable");
     }
 }

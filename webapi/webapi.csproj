@@ -221,7 +221,7 @@
     <Compile Include="Controllers\DatosExtra.cs" />
     <Compile Include="Controllers\Parcelas.cs" />
     <Compile Include="Controllers\BalanceHidrico.cs" />
-    <Compile Include="Controllers\Fases.cs" />
+    <Compile Include="Controllers\Etapas.cs" />
     <Compile Include="Controllers\Temporada.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Datos\Calculos Hídricos.cs" />
