@@ -196,19 +196,22 @@ namespace Models {
         public int IdCultivo { get; set; }
         public int IdRegante { get; set; }
         public int IdTipoRiego { get; set; }
-        public DateTime? FechaSiembra { get; set; }
-        public double Pluviometria { set; get; }
+        public DateTime? FechaSiembra { get {
+                return DatosOptiaqua.DB.FechaSiembra(IdUnidadCultivo, IdTemporada);
+            }
+        }
+        public double Pluviometria { set; get; }        
     }
 
     [TableName("UnidadCultivoCultivoEtapas")]
-    [PrimaryKey("IdParcela,IdTemporada,IdEtapaCultivo", AutoIncrement = false)]
+    [PrimaryKey("IdUnidadCultivo,IdTemporada,IdEtapaCultivo", AutoIncrement = false)]
     public class UnidadCultivoCultivoEtapas {
         public string IdUnidadCultivo { get; set; }
         public string IdTemporada { get; set; }
         public int IdEtapaCultivo { get; set; }
         public string Etapa { get; set; }
         public DateTime FechaInicioEtapa { get; set; }
-        public DateTime? FechaFinEtapaConfirmada { get; set; }
+        public DateTime? FechaInicioEtapaConfirmada { get; set; }
         public bool DefinicionPorDias { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
@@ -269,6 +272,7 @@ namespace Models {
         public double Arena { get; set; }
         public double ElementosGruesos { get; set; }
         public double MateriaOrganica { get; set; }
+        public string Notas { get; set; }
     }
 
     [TableName("MateriaOrganicaTipo")]
@@ -409,6 +413,7 @@ namespace Models {
     }
 
     public class ResumenDiario {
+        public string IdUnidadCultivo { get; set; }
         public DateTime FechaDeCalculo { set; get; }
         public double RiegoTotal { set; get; }
         public double RiegoEfectivoTotal { set; get; }

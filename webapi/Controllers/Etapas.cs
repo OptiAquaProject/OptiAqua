@@ -36,7 +36,7 @@
             /// <summary>
             /// Gets or sets the IdTtemporada
             /// </summary>
-            public string IdTtemporada { set; get; }
+            public string IdTemporada { set; get; }
 
             /// <summary>
             /// Gets or sets the nEtapa
@@ -63,7 +63,7 @@
         [Authorize]
         public IHttpActionResult Post([FromBody] EtapasPost param) {
             try {
-                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTtemporada, param.nEtapa, DateTime.Parse(param.FechaStrConfirmada));
+                DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTemporada, param.nEtapa, DateTime.Parse(param.FechaStrConfirmada));
                 return Ok();
             } catch {
                 return BadRequest();

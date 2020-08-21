@@ -62,6 +62,9 @@
         /// <param name="ModCobCoefC"></param>
         /// <returns></returns>
         public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC) {
+               
+            
+            
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -130,36 +133,26 @@
             if (pUnidadCultivoCultivosEtapas.Count < nEtapaActual)
                 return pUnidadCultivoCultivosEtapas.Count; // situación anómala
 
+            if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapaConfirmada != null) {
+                pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapa = (DateTime) pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapaConfirmada;
+            }
+
             if (pUnidadCultivoCultivosEtapas[nEtapaBase0].DefinicionPorDias == true) {
-                if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada != null) {
-                    if (nEtapaBase0 + 1 < pUnidadCultivoCultivosEtapas.Count)
+                if (nEtapaBase0 + 1 < pUnidadCultivoCultivosEtapas.Count) {
+                    DateTime fechaInicioSiguienteEtapa = pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapa.AddDays(pCultivoEtapas[nEtapaBase0].DuracionDiasEtapa);
+                    if (fecha >= fechaInicioSiguienteEtapa) {
                         //actualizar fecha inicio siguiente etapa
-                        pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = ((DateTime)pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada).AddDays(1);
-                    if (fecha > pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada)
+                        pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = fechaInicioSiguienteEtapa;
                         ret++;
-                } else {
-                    if (nEtapaBase0 + 1 < pUnidadCultivoCultivosEtapas.Count) {
-                        DateTime fechaInicioSiguienteEtapa = pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaInicioEtapa.AddDays(pCultivoEtapas[nEtapaBase0].DuracionDiasEtapa);
-                        if (fecha >= fechaInicioSiguienteEtapa) {
-                            //actualizar fecha inicio siguiente etapa
-                            pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = fechaInicioSiguienteEtapa;
-                            ret++;
-                        }
                     }
-                }
+                }                
             } else { // definido por integral termica
                 if (pUnidadCultivoCultivosEtapas[nEtapaBase0].CobFinal < cobertura) {
                     if (pUnidadCultivoCultivosEtapas.Count > nEtapaBase0 + 1)
                         //actulizar siguiente fecha de inicio siguiente etapa
                         pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = fecha;
                     ret++;
-                } else if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada != null) {
-                    if (pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada < fecha) {
-                        if (pUnidadCultivoCultivosEtapas.Count > nEtapaBase0 + 1)
-                            pUnidadCultivoCultivosEtapas[nEtapaBase0 + 1].FechaInicioEtapa = ((DateTime)pUnidadCultivoCultivosEtapas[nEtapaBase0].FechaFinEtapaConfirmada).AddDays(1);
-                        ret++;
-                    }
-                }
+                } 
             }
             return ret > pUnidadCultivoCultivosEtapas.Count ? pUnidadCultivoCultivosEtapas.Count : ret;
         }
@@ -181,25 +174,19 @@
             } else {
                 if (unidadCultivoCultivosEtapasList[nEtapaIndex].DefinicionPorDias == true) {
                     DateTime fechaInicioEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapa;
-                    DateTime fechaFinEtapaActual;
+                    if (unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapaConfirmada != null)
+                        fechaInicioEtapaActual = (DateTime)unidadCultivoCultivosEtapasList[nEtapaIndex].FechaInicioEtapaConfirmada;
                     int nDias = (fecha - fechaInicioEtapaActual).Days;
-                    if (unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada != null)
-                        fechaFinEtapaActual = (DateTime)unidadCultivoCultivosEtapasList[nEtapaIndex].FechaFinEtapaConfirmada;
-                    else {
-                        if (nEtapaIndex + 1 < unidadCultivoCultivosEtapasList.Count)
-                            fechaFinEtapaActual = unidadCultivoCultivosEtapasList[nEtapaIndex + 1].FechaInicioEtapa;
-                        else {// última fase
-                            int diasTeoricosFase = cultivoEtapasList[nEtapaIndex].DuracionDiasEtapa;
-                            fechaFinEtapaActual = fechaInicioEtapaActual.AddDays(diasTeoricosFase);
-                        }
-                    }
-                    int duracionDiasEtapaActual = (fechaFinEtapaActual - fechaInicioEtapaActual).Days;
-                    if (nDias > duracionDiasEtapaActual)
-                        nDias = duracionDiasEtapaActual;
+                    if (nDias < 0)
+                        nDias = 0;
+                    int diasTeoricosFase = cultivoEtapasList[nEtapaIndex].DuracionDiasEtapa;                    
+                    var fechaFinEtapaActual = fechaInicioEtapaActual.AddDays(diasTeoricosFase);
+                    if (nDias > diasTeoricosFase)
+                        nDias = diasTeoricosFase;
                     double kcInicial = unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial;
                     double kcFinal = unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal;
-                    ret = kcInicial + ((kcFinal - kcInicial) * ((double)nDias / duracionDiasEtapaActual));
-                } else {
+                    ret = kcInicial + ((kcFinal - kcInicial) * ((double)nDias / (double)diasTeoricosFase));
+                } else { // por integral termica
                     double kcIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcInicial);
                     double cobIni = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].CobInicial);
                     double kcFin = Convert.ToDouble(unidadCultivoCultivosEtapasList[nEtapaIndex].KcFinal);
@@ -382,6 +369,10 @@
             if (datoExtra?.Cobertura != null)
                 return datoExtra.Cobertura ?? 0;
             else
+                if(antCob + tcCob * incT > 1) {// !!! SIAR limitar cobertura máxima a 1
+                return (1);
+                }
+
                 return (antCob + tcCob * incT);
         }
 
@@ -443,6 +434,8 @@
             if (lbAnt.Fecha == null)
                 driStart = taw; // el día 1 el "depósito" está vacío
             ret = driStart - rieEfec - pef - aguaAportadaCrecRaiz + EtcAdj + dp + escorrentia;
+            if (ret < 0)
+                ret = 0; // !!! modificado SIAR para corregir errores debidos a la eliminación del drenaje (dp) inferiores al umbral Config.GetDouble("DrenajeUmbral")
             return ret;
         }
 
@@ -521,7 +514,22 @@
         /// <param name="temperatura">The temperatura<see cref="double"/></param>
         /// <param name="CultivoTBase">The CultivoTBase<see cref="double"/></param>
         /// <returns>The <see cref="double"/></returns>
-        public static double IncrementoTemperatura(double temperatura, double CultivoTBase) => temperatura > CultivoTBase ? temperatura - CultivoTBase : 0;
+        public static double IncrementoTemperatura(double temperatura, double CultivoTBase, bool definicionPorDias){ // !!! SIAR
+                                                                                                                     
+            // ANTES=> temperatura > CultivoTBase ? temperatura - CultivoTBase : 0;
+            double ret;
+            if (definicionPorDias) {
+                ret = 1;
+            } else {
+                if (temperatura > CultivoTBase) {
+                    ret = temperatura - CultivoTBase;
+                } else {
+                    ret = 0;
+                }
+            }
+                return (ret);
+         }
+
 
         /// <summary>
         /// AvisoDrenaje
@@ -609,7 +617,7 @@
             if (lbAnt == null)
                 lbAnt = new LineaBalance();
             double temperatura = dh.Temperatura(fecha);
-            double incT = IncrementoTemperatura(temperatura, dh.CultivoTBase);
+            double incT = IncrementoTemperatura(temperatura, dh.CultivoTBase, dh.CultivoModAltCoefA == -9999);// !!! SIAR
             if (lbAnt?.Fecha == null) incT = 0; // el primero es 0
 
             UnidadCultivoDatosExtra datoExtra = dh.DatoExtra(fecha);

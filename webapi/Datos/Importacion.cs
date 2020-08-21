@@ -222,8 +222,7 @@
                     IdCultivo = idCultivo,
                     IdRegante = idRegante,
                     IdTemporada = idTemporada,
-                    IdTipoRiego = idTipoRiego,                    
-                    FechaSiembra = fs,
+                    IdTipoRiego = idTipoRiego,                                        
                     Pluviometria = DB.PluviometriaTipica(idTipoRiego)
                 };
                 db.Insert(uniCulCul);
@@ -245,7 +244,7 @@
                         FechaInicioEtapa = fechaEtapa
                     };
                     fechaEtapa = fechaEtapa.AddDays(cf.DuracionDiasEtapa);
-                    pcf.FechaFinEtapaConfirmada = null;
+                    pcf.FechaInicioEtapaConfirmada = null;
                     pcf.DefinicionPorDias = cf.DefinicionPorDias;
                     pcf.KcInicial = cf.KcInicial;
                     pcf.KcFinal = cf.KcFinal;

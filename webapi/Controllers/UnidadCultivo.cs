@@ -122,6 +122,7 @@
             try {
                 var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
                 DB.UnidadCultivoSueloSave(param.IdUnidadCultivo, idTemporada, param.IdHorizonte, param.Limo, param.Arcilla, param.Arena, param.MatOrg, param.EleGru, param.Prof);
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok();
             } catch (Exception) {
                 return BadRequest();
@@ -140,6 +141,7 @@
             try {
                 var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
                 DB.UnidadCultivoCultivoTemporadaSave(param.IdUnidadCultivo, idTemporada, param.IdCultivo, param.IdRegante, param.IdTipoRiego, param.FechaSiembra);
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -159,6 +161,7 @@
             try {
                 var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
                 DB.CultivoSueloSave(param.IdUnidadCultivo, idTemporada, param.IdSueloTipo);
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -208,6 +211,7 @@
             try {
                 var idTemporada = DB.TemporadaDeFecha(param.IdUnidadCultivo,DateTime.Parse(param.Fecha));
                 DB.PluviometriaSave(idTemporada, param.IdUnidadCultivo, param.Valor);
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok();
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -266,6 +270,7 @@
         [Route("api/UnidadCultivoTemporadaCosteM3Agua/")]
         public IHttpActionResult PostUnidadCultivoTemporadaCosteM3Agua([FromBody] ParamPostCosteM3Agua param) {
             try {
+                CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Json(DB.UnidadCultivoTemporadaCosteM3AguaSave(param));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

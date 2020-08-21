@@ -135,8 +135,6 @@
         [Route("api/ResumenDiario/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult ResumenDiario(string idUnidadCultivo, string fecha) {
             try {
-
-
                 var dFecha = DateTime.Parse(fecha);
                 var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
                 return Json(bh.ResumenDiario(dFecha));

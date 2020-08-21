@@ -382,15 +382,22 @@
         /// <returns>Fecha din del estudio</returns>
         public DateTime FechaFinalDeEstudio() {
             DateTime ret = temporada.FechaFinal;
+
+            int duracionDias = 0;
+            if ( CultivoEtapasList!=null && CultivoEtapasList.Count>0)
+                duracionDias= CultivoEtapasList[CultivoEtapasList.Count - 1].DuracionDiasEtapa;
+
             if (UnidadCultivoCultivoEtapasList == null)
                 return ret;
             if (UnidadCultivoCultivoEtapasList.Count == 0)
                 return ret;
-            if (UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada != null)
-                ret = (DateTime)UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaFinEtapaConfirmada;
-            else
-                ret = UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa.AddDays(10);
-            if (ret >= DateTime.Today) {
+            DateTime fechaInicioUltimaEtapa = UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa;
+
+            if (UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapaConfirmada != null)
+                fechaInicioUltimaEtapa = (DateTime)UnidadCultivoCultivoEtapasList[UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapaConfirmada;
+            fechaInicioUltimaEtapa = fechaInicioUltimaEtapa.AddDays(duracionDias); 
+
+                if (ret > DateTime.Today) {
                 ret = DateTime.Today;
             }
             return ret;

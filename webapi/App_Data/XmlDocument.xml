@@ -634,7 +634,7 @@
             Gets or sets the IdUnidadCultivo
             </summary>
         </member>
-        <member name="P:WebApi.EtapasController.EtapasPost.IdTtemporada">
+        <member name="P:WebApi.EtapasController.EtapasPost.IdTemporada">
             <summary>
             Gets or sets the IdTtemporada
             </summary>
@@ -957,7 +957,7 @@
             <param name="v3"></param>
             <returns></returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.IncrementoTemperatura(System.Double,System.Double)">
+        <member name="M:DatosOptiaqua.CalculosHidricos.IncrementoTemperatura(System.Double,System.Double,System.Boolean)">
             <summary>
             Incremento de temperatura efectivo
             </summary>

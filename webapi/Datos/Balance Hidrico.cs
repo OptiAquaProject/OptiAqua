@@ -379,7 +379,7 @@
                 var etapas = unidadCultivoDatosHidricos?.UnidadCultivoCultivoEtapasList;
                 if (etapas != null) {
                     etapas.ForEach(e => {
-                        if ( (e.IdEtapaCultivo > lin.NumeroEtapaDesarrollo) && (e.FechaFinEtapaConfirmada==null ) )
+                        if ( (e.IdEtapaCultivo > lin.NumeroEtapaDesarrollo) && (e.FechaInicioEtapaConfirmada==null ) )
                             ret++;
                     });
                 }
@@ -412,6 +412,7 @@
             ResumenDiario ret = new ResumenDiario();
             LineaBalance lb = LineaBalance(fechaDeCalculo);
 
+            ret.IdUnidadCultivo = unidadCultivoDatosHidricos.IdUnidadCultivo;
             ret.FechaDeCalculo = fechaDeCalculo;
             ret.RiegoTotal = SumaRiegosMm(fechaDeCalculo);
             ret.RiegoEfectivoTotal = SumaRiegoEfectivo(fechaDeCalculo);

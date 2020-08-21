@@ -35,6 +35,8 @@
         /// </summary>
         public static TypeModo Modo { set; get; } = TypeModo.Real;
 
+        public static Database NewDatabase() => new Database(DB.CadenaConexionOptiAqua);
+
         /// <summary>
         /// Gets the CadenaConexionOptiAqua
         /// </summary>
@@ -164,6 +166,14 @@
                 return DB.LaParcelaPerteneceAlRegante(idUsuario, idParcela);
             return false;
         }
+
+        internal static DateTime? FechaSiembra(string idUnidadCultivo, string idTemporada) {
+            Database db = DB.NewDatabase();
+            UnidadCultivoCultivoEtapas reg = new UnidadCultivoCultivoEtapas { IdUnidadCultivo = idUnidadCultivo, IdTemporada = idTemporada, IdEtapaCultivo = 1 };
+            var ret= db.SingleOrDefaultById< UnidadCultivoCultivoEtapas>(reg);
+            return ret?.FechaInicioEtapa;
+        }
+        
 
         /// <summary>
         /// Crea y almacena contraseña por defecto para regante.
@@ -983,7 +993,7 @@
                 };
                 dat = db.SingleOrDefaultById<UnidadCultivoCultivoEtapas>(dat);
                 if (dat != null) {
-                    dat.FechaFinEtapaConfirmada = fechaConfirmada;
+                    dat.FechaInicioEtapaConfirmada = fechaConfirmada;
                     db.Save(dat);
                 } else {
                     throw new Exception("Error accediendo a UnidadCultivoCultivoEtapas\n.");
@@ -1552,8 +1562,7 @@
                     IdCultivo = idCultivo,
                     IdRegante = idRegante,
                     IdTemporada = idTemporada,
-                    IdTipoRiego = idTipoRiego,
-                    FechaSiembra = fs,
+                    IdTipoRiego = idTipoRiego,                    
                     Pluviometria = PluviometriaTipica(idTipoRiego)
                 };
                 db.Insert(uniCulCul);
@@ -1574,7 +1583,7 @@
                         FechaInicioEtapa = fechaEtapa
                     };
                     fechaEtapa = fechaEtapa.AddDays(cf.DuracionDiasEtapa);
-                    pcf.FechaFinEtapaConfirmada = null;
+                    pcf.FechaInicioEtapaConfirmada = null;
                     pcf.DefinicionPorDias = cf.DefinicionPorDias;
                     pcf.KcInicial = cf.KcInicial;
                     pcf.KcFinal = cf.KcFinal;

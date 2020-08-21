@@ -241,9 +241,6 @@
     <Compile Include="Utiles\Encrypt.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\XmlDocument.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="bin\webapi.dll" />
     <Content Include="bin\webapi.pdb" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -333,6 +330,7 @@
     <Content Include="Views\Home\EspecificacionesImportacion.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="Areas\HelpPage\App_Start\" />
   </ItemGroup>
   <ItemGroup>
