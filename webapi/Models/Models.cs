@@ -53,7 +53,7 @@ namespace Models {
         public int DuracionDiasEtapa { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
-        public bool DefinicionPorDias { get; set; }
+        public bool DefinicionPorDias { get; set; }        
         public double? CobInicial { get; set; }
         public double? CobFinal { get; set; }
         public double FactorAgotamiento { get; set; }
@@ -213,6 +213,7 @@ namespace Models {
         public DateTime FechaInicioEtapa { get; set; }
         public DateTime? FechaInicioEtapaConfirmada { get; set; }
         public bool DefinicionPorDias { get; set; }
+        public int DuracionDiasEtapa { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
         public double? CobInicial { get; set; }

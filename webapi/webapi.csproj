@@ -224,12 +224,12 @@
     <Compile Include="Controllers\Etapas.cs" />
     <Compile Include="Controllers\Temporada.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Datos\Calculos Hídricos.cs" />
-    <Compile Include="Datos\Balance Hidrico.cs" />
-    <Compile Include="Datos\DatosHidricos.cs" />
-    <Compile Include="Datos\DB.cs" />
-    <Compile Include="Datos\Importacion.cs" />
-    <Compile Include="Datos\CacheDatosHidricos.cs" />
+    <Compile Include="Logica\Calculos Hídricos.cs" />
+    <Compile Include="Logica\Balance Hidrico.cs" />
+    <Compile Include="Models\DatosHidricos.cs" />
+    <Compile Include="Models\DB.cs" />
+    <Compile Include="Logica\Importacion.cs" />
+    <Compile Include="Logica\CacheDatosHidricos.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

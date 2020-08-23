@@ -14,78 +14,85 @@
     /// </summary>
     public static class Importacion {
         /// <summary>
-        /// Defines the <see cref="ImportItem" />
+        /// Defines the <see cref="ImportItem" />.
         /// </summary>
         public class ImportItem {
             /// <summary>
-            /// Gets or sets the IdUnidadCultivo
+            /// Gets or sets the IdUnidadCultivo.
             /// </summary>
             public string IdUnidadCultivo { set; get; }
 
             /// <summary>
-            /// Gets or sets the IdRegante
+            /// Gets or sets the IdRegante.
             /// </summary>
             public int IdRegante { set; get; }
 
             /// <summary>
-            /// Gets or sets the IdEstacion
+            /// Gets or sets the IdEstacion.
             /// </summary>
             public int IdEstacion { set; get; }
 
             /// <summary>
-            /// Gets or sets the Alias
+            /// Gets or sets the Alias.
             /// </summary>
             public string Alias { set; get; }
 
             /// <summary>
-            /// Gets or sets the IdSueloTipo
+            /// Gets or sets the IdSueloTipo.
             /// </summary>
             public string IdSueloTipo { set; get; }
 
-            public string IdTemporada { set; get; }
             /// <summary>
-            /// Gets or sets the IdParcelaInt
+            /// Gets or sets the IdTemporada.
+            /// </summary>
+            public string IdTemporada { set; get; }
+
+            /// <summary>
+            /// Gets or sets the IdParcelaIntList.
             /// </summary>
             public List<int> IdParcelaIntList { set; get; }
 
             /// <summary>
-            /// Gets or sets the IdCultivo
+            /// Gets or sets the IdCultivo.
             /// </summary>
             public int IdCultivo { set; get; }
 
             /// <summary>
-            /// Gets or sets the FechaSiembra
+            /// Gets or sets the FechaSiembra.
             /// </summary>
             public DateTime FechaSiembra { set; get; }
 
+            /// <summary>
+            /// Gets or sets the IdTipoRiego.
+            /// </summary>
             public int IdTipoRiego { set; get; }
 
             /// <summary>
-            /// Gets or sets the SuperficieM2
+            /// Gets or sets the SuperficieM2.
             /// </summary>
             public double? SuperficieM2 { set; get; }
         }
 
         /// <summary>
-        /// Defines the <see cref="ErrorItem" />
+        /// Defines the <see cref="ErrorItem" />.
         /// </summary>
         public class ErrorItem {
             /// <summary>
-            /// Gets or sets the NLinea
+            /// Gets or sets the NLinea.
             /// </summary>
             public int NLinea { set; get; }
 
             /// <summary>
-            /// Gets or sets the Descripcion
+            /// Gets or sets the Descripcion.
             /// </summary>
             public string Descripcion { set; get; }
         }
 
         /// <summary>
-        /// The Importar
+        /// The Importar.
         /// </summary>
-        /// <param name="param">The param<see cref="ImportaPost"/></param>
-        /// <returns>The <see cref="List{ErrorItem}"/></returns>
+        /// <param name="param">The param<see cref="ImportaPost"/>.</param>
+        /// <returns>The <see cref="List{ErrorItem}"/>.</returns>
         internal static List<ErrorItem> Importar(ImportaPost param) {
             string csv = param.CSV;
             int nLinea = 1;
@@ -104,7 +111,7 @@
                         IdEstacion = int.Parse(lItemsLinea[2]),
                         Alias = lItemsLinea[3],
                         IdSueloTipo = lItemsLinea[4],
-                        IdTemporada=lItemsLinea[5],
+                        IdTemporada = lItemsLinea[5],
                         IdParcelaIntList = lItemsLinea[6].Split(',').Select(int.Parse).ToList(),
                         IdCultivo = int.Parse(lItemsLinea[7]),
                         FechaSiembra = DateTime.Parse(lItemsLinea[8]),
@@ -116,18 +123,18 @@
                     lErrores.Add(new ErrorItem { NLinea = nLinea, Descripcion = "<small><i>" + linea + "</i></small><br>" + ex.Message });
                 }
                 nLinea++;
-            }            
+            }
             return lErrores;
         }
 
         /// <summary>
-        /// The Importar
+        /// The Importar.
         /// </summary>
-        /// <param name="item">The item<see cref="ImportItem"/></param>
-        /// <param name="idTemporada"></param>
-        /// <param name="idTemporadaAnterior">The idTemporadaAnterior<see cref="string"/></param>
-        private static void Importar(ImportItem item, string idTemporada, string idTemporadaAnterior) {            
-            var db = new Database(DB.CadenaConexionOptiAqua);
+        /// <param name="item">The item<see cref="ImportItem"/>.</param>
+        /// <param name="idTemporada">.</param>
+        /// <param name="idTemporadaAnterior">The idTemporadaAnterior<see cref="string"/>.</param>
+        private static void Importar(ImportItem item, string idTemporada, string idTemporadaAnterior) {
+            Database db = DB.NewDatabase();
             db.BeginTransaction();
             try {
                 UnidadCultivo uc = new Models.UnidadCultivo {
@@ -141,14 +148,14 @@
                 UnidadCultivoParcelaSave(db, item.IdUnidadCultivo, idTemporada, item.IdRegante, item.IdParcelaIntList);
 
                 // Sólo si se indicar un valor la superficie se almacena valor. En caso contrario se calculará porla parcelas indicadas
-                if ( item.SuperficieM2==null || item.SuperficieM2 != 0)
+                if (item.SuperficieM2 == null || item.SuperficieM2 != 0)
                     UnidadCultivoSuperficieSave(db, item.IdUnidadCultivo, idTemporada, (double)item.SuperficieM2);
                 {
                     // Si se indica un tipo de suelo se replica el suelo tipo para la nueva temporada.
                     // Si no se indica tipo de suelo se duplica el de la temporada anterior para la nueva temporada.
                     if (string.IsNullOrWhiteSpace(item.IdSueloTipo)) {
-                        if (!DB.TemporadaExists(idTemporadaAnterior)) 
-                            throw new Exception("No se indicó IdSueloTipo y la temporada anterior indicada no existe");                        
+                        if (!DB.TemporadaExists(idTemporadaAnterior))
+                            throw new Exception("No se indicó IdSueloTipo y la temporada anterior indicada no existe");
                         if (!DB.DuplicarAnteriorSuelo(item.IdUnidadCultivo, idTemporada, idTemporadaAnterior))
                             throw new Exception("No se indicó IdSueloTipo y no se dispone de información del año anterior");
                     } else
@@ -165,6 +172,14 @@
             }
         }
 
+        /// <summary>
+        /// The UnidadCultivoParcelaSave.
+        /// </summary>
+        /// <param name="db">The db<see cref="Database"/>.</param>
+        /// <param name="idUnidadCultivo">The idUnidadCultivo<see cref="string"/>.</param>
+        /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
+        /// <param name="idRegante">The idRegante<see cref="int"/>.</param>
+        /// <param name="lIdParcelaInt">The lIdParcelaInt<see cref="List{int}"/>.</param>
         private static void UnidadCultivoParcelaSave(Database db, string idUnidadCultivo, string idTemporada, int idRegante, List<int> lIdParcelaInt) {
             UnidadCultivoParcela ucp = new UnidadCultivoParcela {
                 IdUnidadCultivo = idUnidadCultivo,
@@ -178,6 +193,13 @@
             });
         }
 
+        /// <summary>
+        /// The UnidadCultivoSuperficieSave.
+        /// </summary>
+        /// <param name="db">The db<see cref="Database"/>.</param>
+        /// <param name="idUnidadCultivo">The idUnidadCultivo<see cref="string"/>.</param>
+        /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
+        /// <param name="superficieM2">The superficieM2<see cref="double"/>.</param>
         private static void UnidadCultivoSuperficieSave(Database db, string idUnidadCultivo, string idTemporada, double superficieM2) {
             UnidadCultivoSuperficie r = new UnidadCultivoSuperficie {
                 IdTemporada = idTemporada,
@@ -187,6 +209,16 @@
             db.Save(r);
         }
 
+        /// <summary>
+        /// The UnidadCultivoCultivoTemporadaSave.
+        /// </summary>
+        /// <param name="db">The db<see cref="Database"/>.</param>
+        /// <param name="IdUnidadCultivo">The IdUnidadCultivo<see cref="string"/>.</param>
+        /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
+        /// <param name="idCultivo">The idCultivo<see cref="int"/>.</param>
+        /// <param name="idRegante">The idRegante<see cref="int"/>.</param>
+        /// <param name="idTipoRiego">The idTipoRiego<see cref="int"/>.</param>
+        /// <param name="fechaSiembra">The fechaSiembra<see cref="string"/>.</param>
         private static void UnidadCultivoCultivoTemporadaSave(Database db, string IdUnidadCultivo, string idTemporada, int idCultivo, int idRegante, int idTipoRiego, string fechaSiembra) {
             try {
                 if (DateTime.TryParse(fechaSiembra, out DateTime fs) == false) {
@@ -222,7 +254,7 @@
                     IdCultivo = idCultivo,
                     IdRegante = idRegante,
                     IdTemporada = idTemporada,
-                    IdTipoRiego = idTipoRiego,                                        
+                    IdTipoRiego = idTipoRiego,
                     Pluviometria = DB.PluviometriaTipica(idTipoRiego)
                 };
                 db.Insert(uniCulCul);
@@ -239,7 +271,8 @@
                         IdUnidadCultivo = uniCulCul.IdUnidadCultivo,
                         IdTemporada = uniCulCul.IdTemporada,
                         IdEtapaCultivo = cf.OrdenEtapa,
-                        IdTipoEstres=cf.IdTipoEstres,
+                        IdTipoEstres = cf.IdTipoEstres,
+                        DuracionDiasEtapa = cf.DuracionDiasEtapa,
                         Etapa = cf.Etapa,
                         FechaInicioEtapa = fechaEtapa
                     };
@@ -259,6 +292,13 @@
             }
         }
 
+        /// <summary>
+        /// The CultivoSueloSave.
+        /// </summary>
+        /// <param name="db">The db<see cref="Database"/>.</param>
+        /// <param name="idUnidadCultivo">The idUnidadCultivo<see cref="string"/>.</param>
+        /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
+        /// <param name="idSueloTipo">The idSueloTipo<see cref="string"/>.</param>
         private static void CultivoSueloSave(Database db, string idUnidadCultivo, string idTemporada, string idSueloTipo) {
             try {
                 List<SueloTipo> lSt = db.Fetch<SueloTipo>("Select * from suelotipo where idSueloTipo=@0", idSueloTipo);
@@ -278,10 +318,9 @@
                     };
                     db.Save(ucs);
                 }
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 throw new Exception(ex.Message);
             }
         }
-
     }
 }

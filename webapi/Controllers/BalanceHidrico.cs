@@ -19,7 +19,7 @@
         /// <returns></returns>
         [Route("api/balancehidrico/{idUnidadCultivo}/{fecha}/{actualizaFechasEtapas}")]
         public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string fecha, bool actualizaFechasEtapas) {
-            try {                
+            try { 
                 var bh = BalanceHidrico.Balance(idUnidadCultivo, DateTime.Parse(fecha),actualizaFechasEtapas);
                 return Json(bh.LineasBalance);
             } catch (Exception ex) {
@@ -68,7 +68,7 @@
                 int idReganteClamis = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
 
-                object lDatosHidricos = CalculosHidricos.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role,idReganteClamis);
+                object lDatosHidricos = BalanceHidrico.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role,idReganteClamis);
                 return Json(lDatosHidricos);
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
