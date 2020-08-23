@@ -1346,18 +1346,15 @@
         /// ParcelasDatosExtrasList.
         /// </summary>
         /// <param name="IdUnidadCultivo">IdUnidadCultivo<see cref="string"/>.</param>
-        /// <param name="desdeFecha">desdeFecha<see cref="DateTime?"/>.</param>
-        /// <param name="hastaFecha">hastaFecha<see cref="DateTime?"/>.</param>
+        /// <param name="desdeFecha">desdeFecha<see cref="DateTime"/>.</param>
+        /// <param name="hastaFecha">hastaFecha<see cref="DateTime"/>.</param>
         /// <returns><see cref="List{UnidadCultivoDatosExtra}"/>.</returns>
-        public static List<UnidadCultivoDatosExtra> ParcelasDatosExtrasList(string IdUnidadCultivo, DateTime? desdeFecha, DateTime? hastaFecha) {
+        public static List<UnidadCultivoDatosExtra> ParcelasDatosExtrasList(string IdUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
             if (IdUnidadCultivo == null || desdeFecha == null || hastaFecha == null)
                 return null;
             Database db = DB.NewDatabase();
-            string sql = "Select * from UnidadCultivoDatosExtra where ";
-            sql += "IdUnidadCultivo='" + IdUnidadCultivo + "' AND ";
-            sql += "fecha BETWEEN Convert(date, '" + ((DateTime)desdeFecha).ToString("yyyyMMdd") + "') AND ";
-            sql += "Convert(date, '" + ((DateTime)hastaFecha).ToString("yyyyMMdd") + "') ";
-            return db.Fetch<UnidadCultivoDatosExtra>(sql);
+            var sql = "where fecha BETWEEN @0 AND @1 AND IdUnidadCultivo=@2";
+            return db.Fetch<UnidadCultivoDatosExtra>(sql,desdeFecha,hastaFecha,IdUnidadCultivo);
         }
 
         /// <summary>
@@ -1371,8 +1368,7 @@
             List<Riego> riegoHistorico = DB.RiegosHistoricosList(idUnidadCultivo, fechaSiembra, fechaFinal);
             List<Riego> riegoNebula = DB.RiegosNebulaList(idUnidadCultivo, fechaSiembra, fechaFinal);
             List<Riego> ret = riegoHistorico;
-            ret.AddRange(riegoNebula);
-            //ret=ret.OrderBy(x => x.Fecha).ToList();
+            ret.AddRange(riegoNebula);            
             return ret;
         }
 
@@ -1383,16 +1379,12 @@
         /// <param name="desdeFecha">.</param>
         /// <param name="hastaFecha">.</param>
         /// <returns>.</returns>
-        public static List<Riego> RiegosHistoricosList(string idUnidadCultivo, DateTime? desdeFecha, DateTime? hastaFecha) {
+        public static List<Riego> RiegosHistoricosList(string idUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
             if (idUnidadCultivo == null || desdeFecha == null || hastaFecha == null)
                 return null;
-
             Database db = DB.NewDatabase();
-            string sql = "Select * from Riego where ";
-            sql += "idUnidadCultivo=@0 AND ";
-            sql += "fecha BETWEEN Convert(date, '" + ((DateTime)desdeFecha).ToString("yyyyMMdd") + "') AND ";
-            sql += "Convert(date, '" + ((DateTime)hastaFecha).ToString("yyyyMMdd") + "') ";
-            return db.Fetch<Riego>(sql, idUnidadCultivo);
+            var sql = "WHERE idUnidadCultivo=@0 and fecha BETWEEN @1 and @2";
+            return db.Fetch<Riego>(sql, idUnidadCultivo,desdeFecha,hastaFecha);
         }
 
         /// <summary>

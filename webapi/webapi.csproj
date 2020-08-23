@@ -226,11 +226,11 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Logica\Calculos Hídricos.cs" />
     <Compile Include="Logica\Balance Hidrico.cs" />
-    <Compile Include="Models\DatosHidricos.cs" />
-    <Compile Include="Models\DB.cs" />
-    <Compile Include="Logica\Importacion.cs" />
-    <Compile Include="Logica\CacheDatosHidricos.cs" />
-    <Compile Include="Models\Models.cs" />
+    <Compile Include="Datos\DatosHidricos.cs" />
+    <Compile Include="Datos\DB.cs" />
+    <Compile Include="Utiles\Importacion.cs" />
+    <Compile Include="Datos\CacheDatosHidricos.cs" />
+    <Compile Include="Datos\Models.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -241,6 +241,7 @@
     <Compile Include="Utiles\Encrypt.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\XmlDocument.xml" />
     <Content Include="bin\webapi.dll" />
     <Content Include="bin\webapi.pdb" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -330,7 +331,6 @@
     <Content Include="Views\Home\EspecificacionesImportacion.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Areas\HelpPage\App_Start\" />
   </ItemGroup>
   <ItemGroup>

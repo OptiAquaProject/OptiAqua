@@ -11,7 +11,9 @@ namespace ScheduledTasks {
 
     [DisallowConcurrentExecution]
     public class TareaQuartz : IJob {
+#pragma warning disable CS1998 // El método asincrónico carece de operadores "await" y se ejecutará de forma sincrónica
         public async Task Execute(IJobExecutionContext context) {
+#pragma warning restore CS1998 // El método asincrónico carece de operadores "await" y se ejecutará de forma sincrónica
             DB.InsertaEvento("Execute at " + DateTime.Now.ToString());
             CacheDatosHidricos.RecreateAll();
         }
