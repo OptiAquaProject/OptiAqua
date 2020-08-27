@@ -71,10 +71,11 @@
             //     3.- cuando la planta brota, se calcula la cobertura
             //     4.- se cambia la variable itomprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
-
+            if (nEtapa == 2)
+                nEtapa = 2;
             if (definicionEtapaPorDias) { //!!!! SIAR
                 if (coberturaFinal != null && coberturaInicial != null) {
-                    ret = ((double)coberturaFinal - (double)coberturaInicial) / nDiasduracionEtapaDias;
+                    ret = ((double)coberturaFinal - (double)coberturaInicial) / (double) nDiasduracionEtapaDias;
                 } else {
                     ret = 0;
                 }
@@ -422,7 +423,7 @@
                 ret = (double)datoExtra.Cobertura;
             else
                 ret = antCob + tcCob * incT;
-            return ret < -1 ? ret : 1;// !!! SIAR limitar cobertura máxima a 1                               
+            return ret < 1 ? ret : 1;// !!! SIAR limitar cobertura máxima a 1                               
         }
 
         /// <summary>
@@ -670,10 +671,10 @@
 
             lb.IntegralTermica = (lbAnt.IntegralTermica + incT);
 
-            bool definicionEtapaPorDias = dh.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo].DefinicionPorDias;
-            int nDiasduracionEtapaDias = dh.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo].DuracionDiasEtapa;
-            double? coberturaInicial = dh.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo].CobInicial;
-            double? coberturaFinal = dh.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo].CobFinal;
+            bool definicionEtapaPorDias = dh.UnidadCultivoCultivoEtapasList[lbAnt.NumeroEtapaDesarrollo-1].DefinicionPorDias;
+            int nDiasduracionEtapaDias = dh.UnidadCultivoCultivoEtapasList[lbAnt.NumeroEtapaDesarrollo-1].DuracionDiasEtapa;
+            double? coberturaInicial = dh.UnidadCultivoCultivoEtapasList[lbAnt.NumeroEtapaDesarrollo-1].CobInicial;
+            double? coberturaFinal = dh.UnidadCultivoCultivoEtapasList[lbAnt.NumeroEtapaDesarrollo-1].CobFinal;
             int NDiasEtapas1y2 = dh.CultivoEtapasList_Ndias1y2();
 
             lb.TasaCrecimientoCobertura = TasaCrecimientoCobertura(lb.IntegralTermica, lbAnt.NumeroEtapaDesarrollo, dh.CultivoIntegralEmergencia, dh.CultivoModCobCoefA, dh.CultivoModCobCoefB, dh.CultivoModCobCoefC, definicionEtapaPorDias, nDiasduracionEtapaDias, coberturaInicial, coberturaFinal);
@@ -712,6 +713,8 @@
             lb.LimiteAgotamientoFijo = (lb.CapacidadCampo - lb.AguaFacilmenteExtraibleFija); // depletion factor fijo
             lb.CoeficienteEstresHidrico = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
 
+            if (fecha == new DateTime(2020, 08, 26))
+                fecha = fecha;
             lb.EtcFinal = EtcFinal(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
 
             lb.DrenajeProfundidad = DrenajeEnProdundidad(lbAnt, lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, 0);

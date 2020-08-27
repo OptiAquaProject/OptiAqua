@@ -104,6 +104,23 @@ namespace Models {
         public double Eto { get; set; }
     }
 
+    public class RootApiSiar {
+        public List<DatoClimaticoApiSiar> data { get; set; }
+    }
+
+    public class DatoClimaticoApiSiar {
+        public DateTime Fecha { get; set; }
+        public string Estacion { get; set; }
+        public string TAirMd { get; set; }
+        public string HRMn { get; set; }
+        public string PAcum { get; set; }
+        public string ET0 { get; set; }
+        public string VWindMd { get; set; }
+    }
+
+
+
+
     [TableName("Estacion")]
     [PrimaryKey("IdEstacion", AutoIncrement = false)]
     public class Estacion {
@@ -256,6 +273,7 @@ namespace Models {
         public string Email { get; set; }
     }
 
+    [PrimaryKey("Fecha,IdUnidadCultivo", AutoIncrement = false)]
     public class Riego {
         public DateTime Fecha { get; set; }
         public string IdUnidadCultivo { get; set; }
@@ -511,67 +529,6 @@ namespace Models {
         public string IdTemporada { set; get; }
         public string IdUnidadCultivo { set; get; }
         public string UnidadCultivo { set; get; }
-    }
-
-    public class BalanceData {
-        public string IdUnidadCultivo { get; set; }
-        public string Alias { get; set; }
-        public string TipoSueloDescripcion { get; set; }
-        public string IdTemporada { get; set; }
-        public string Descripcion { get; set; }
-        public DateTime? FechaInicial { get; set; }
-        public DateTime? FechaFinal { get; set; }
-        public int IdRegante { get; set; }
-        public string Nombre { get; set; }
-        public DateTime? FechaSiembra { get; set; }
-        public double? Pluviometria { get; set; }
-        public string CultivoNombre { get; set; }
-        public int IdCultivo { get; set; }
-        public double TBase { get; set; }
-        public double ProfRaizInicial { get; set; }
-        public double ProfRaizMax { get; set; }
-        public double ModCobCoefA { get; set; }
-        public double ModCobCoefB { get; set; }
-        public double? ModCobCoefC { get; set; }
-        public double ModAltCoefA { get; set; }
-        public double ModAltCoefB { get; set; }
-        public double? ModAltCoefC { get; set; }
-        public double ModRaizCoefA { get; set; }
-        public double ModRaizCoefB { get; set; }
-        public double? ModRaizCoefC { get; set; }
-        public double? AlturaInicial { get; set; }
-        public double? AlturaFinal { get; set; }
-        public double? IntegralEmergencia { get; set; }
-        public int IdEtapaCultivo { get; set; }
-        public string Etapa { get; set; }
-        public DateTime FechaInicioEtapa { get; set; }
-        public DateTime? FechaFinEtapaConfirmada { get; set; }
-        public bool DefinicionPorDias { get; set; }
-        public double? KcInicial { get; set; }
-        public double? KcFinal { get; set; }
-        public double? CobInicial { get; set; }
-        public double? FactorDeAgotamiento { get; set; }
-        public double? CobFinal { get; set; }
-        public int IdTipoRiego { get; set; }
-        public string TipoRiego { get; set; }
-        public double Eficiencia { get; set; }
-        public double PluviometriaTipica { get; set; }
-        public int IdHorizonte { get; set; }
-        public double ProfundidadHorizonte { get; set; }
-        public double Limo { get; set; }
-        public double Arcilla { get; set; }
-        public double Arena { get; set; }
-        public double ElementosGruesos { get; set; }
-        public double MateriaOrganica { get; set; }
-        public int OrdenEtapa { get; set; }
-        public string EtapaNombre { get; set; }
-        public int DuracionDiasEtapa { get; set; }
-        public double? CultivoEtapasKcInicial { get; set; }
-        public double? CultivoEtapasKcFinal { get; set; }
-        public bool CultivoEtapasDefinicionPorDias { get; set; }
-        public double? CultivoEtapasCobInicial { get; set; }
-        public double? CultivoEtapasFinal { get; set; }
-        public double? FactorAgotamiento { get; set; }
     }
 
     [TableName("UnidadCultivoTemporadaCosteAgua")]

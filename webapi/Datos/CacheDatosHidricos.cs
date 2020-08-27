@@ -2,6 +2,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Web.Http;
+    using System.Web.Http.Results;
 
     /// <summary>
     /// Defines the <see cref="CacheUnidadCultivo" />.
@@ -26,8 +28,8 @@
         /// <summary>
         /// Defines the lCacheBalances.
         /// </summary>
-        internal static Dictionary<string, Dictionary<string, CacheUnidadCultivo>> lCacheBalances = new Dictionary<string, Dictionary<string, CacheUnidadCultivo>>();
-
+        private static Dictionary<string, Dictionary<string, CacheUnidadCultivo>> lCacheBalances = new Dictionary<string, Dictionary<string, CacheUnidadCultivo>>();
+        private static Dictionary<string, IHttpActionResult> lCacheActionResult= new Dictionary<string, IHttpActionResult>();
         /// <summary>
         /// The Balance.
         /// </summary>
@@ -65,9 +67,10 @@
                 return false;
             recalculando = true;
             lCacheBalances.Clear();
+            lCacheActionResult.Clear();
             DB.InsertaEvento("Inicia RecreateAll" + DateTime.Now.ToString());
             DB.DatosClimaticosSiarForceRefresh();
-            NPoco.Database db = DB.ConexionOptiaqua;
+            var db = DB.ConexionOptiaqua;
             List<Models.Temporada> lTemporadas = DB.TemporadasList();
             foreach (Models.Temporada temporada in lTemporadas) {
                 string idTemporada = temporada.IdTemporada;
@@ -77,21 +80,33 @@
                     fechaCalculo = dateUpdate;
                 Dictionary<string, CacheUnidadCultivo> cacheTemporada = new Dictionary<string, CacheUnidadCultivo>();
                 lCacheBalances.Add(idTemporada, cacheTemporada);
-                List<string> lIdUnidadCultivo = db.Fetch<string>($"SELECT DISTINCT IdUnidadCultivo from UnidadCultivoCultivo WHERE IdTemporada=@0", idTemporada);
-
+                List<string> lIdUnidadCultivo = db.Fetch<string>($"SELECT DISTINCT IdUnidadCultivo from UnidadCultivoCultivo WHERE IdTemporada=@0", idTemporada);                
                 BalanceHidrico bh = null;
-                foreach (string idUc in lIdUnidadCultivo) {
-                    try {
-                        bh = BalanceHidrico.Balance(idUc, fechaCalculo, true, false);
+                foreach (string idUC in lIdUnidadCultivo) {
+                    //try {
+                        //DB.InsertaEvento("item " + idTemporada + " " + idUC +" "+  DateTime.Now.ToString());
+                        bh = BalanceHidrico.Balance(idUC, fechaCalculo, true, false);
                         if (bh != null)
-                            cacheTemporada.Add(idUc, new CacheUnidadCultivo { Fecha = dateUpdate, Balance = bh });
-                    } catch (Exception) {
-                    }
+                            cacheTemporada.Add(idUC, new CacheUnidadCultivo { Fecha = dateUpdate, Balance = bh });
+                    //} catch (Exception) {
+                      
+                    //}
                 }
             }
             DB.InsertaEvento("Finaliza RecreateAll" + DateTime.Now.ToString());
             recalculando = false;
             return true;
+        }
+
+        internal static void AddActionResult(string clave, IHttpActionResult result) {
+            lCacheActionResult.Add(clave, result);
+        }
+
+        internal static IHttpActionResult ActionResult(string clave) {
+            if (lCacheActionResult.ContainsKey(clave))
+                return lCacheActionResult[clave];
+            else
+                return null;
         }
 
         /// <summary>
@@ -101,6 +116,7 @@
         internal static void SetDirty(string idUnidadCultivo) {
             foreach (Dictionary<string, CacheUnidadCultivo> cacheTemporada in lCacheBalances.Values) {
                 cacheTemporada.Remove(idUnidadCultivo);
+                lCacheActionResult.Clear();
             }
         }
 
@@ -120,5 +136,6 @@
             cacheTemporada.Remove(idUC);
             cacheTemporada.Add(idUC, new CacheUnidadCultivo { Fecha = fecha, Balance = bh });
         }
+        
     }
 }

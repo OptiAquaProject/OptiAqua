@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using webapi;
@@ -17,26 +18,11 @@
     /// La cadena de conexión Nebula se define como parámetro de la aplicación.
     /// </summary>
     public static class DB {
-        /// <summary>
-        /// Tipo de uso: real o pruebas
-        /// </summary>
-        public enum TypeModo { Real,Pruebas};
-
-        /// <summary>
-        /// Define que base de datos usar, la real o la de pruebas
-        /// </summary>
-        public static TypeModo Modo { set; get; } = TypeModo.Real;
-
-        /// <summary>
-        /// The NewDatabase.
-        /// </summary>
-        /// <returns>The <see cref="Database"/>.</returns>
-        public static Database NewDatabase() => new Database("CadenaConexionOptiAqua");
 
         /// <summary>
         /// Gets the CadenaConexionOptiAqua.
         /// </summary>
-        public static string CadenaConexionOptiAqua => Modo == TypeModo.Real ? "CadenaConexionOptiAqua" : "CadenaConexionOptiAquaPruebas";
+        public static string CadenaConexionOptiAqua = "CadenaConexionOptiAqua";
 
         /// <summary>
         /// Gets the CadenaConexionNebula.
@@ -46,6 +32,7 @@
         /// <summary>
         /// Gets the ConexionOptiaqua.
         /// </summary>
+        //static private Database dbConexion =null;
         public static Database ConexionOptiaqua => new Database(CadenaConexionOptiAqua);
 
         /// <summary>
@@ -63,7 +50,7 @@
         public static bool IsCorrectPassword(LoginRequest login, out Regante regante) {
             regante = null;
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 regante = db.SingleOrDefault<Regante>("select * from regante where nif=@0", login.NifRegante);
                 if (regante == null)
                     return false;
@@ -82,7 +69,7 @@
         /// <returns>The <see cref="bool"/>.</returns>
         public static bool IsCorrectPassword(string nif, string password) {
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 Regante regante = db.SingleOrDefault<Regante>("select * from regante where nif=@0", nif);
                 if (regante == null)
                     return false;
@@ -106,7 +93,7 @@
         /// <param name="search">search<see cref="string"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object AvisosList(string idAviso, int? idAvisoTipo, DateTime? fInicio, DateTime? fFin, string de, string para, string search) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             idAviso = idAviso.Quoted();
             string strFInicio = fInicio?.ToString().Quoted() ?? "''";
             string strFFin = fFin?.ToString().Quoted() ?? "''";
@@ -129,7 +116,7 @@
         /// <param name="search">The search<see cref="string"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaList(int? idMultimedia, int? idMultimediaTipo, DateTime? fInicio, DateTime? fFin, int? activa, string search) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string strFInicio = fInicio?.ToString().Quoted() ?? "''";
             string strFFin = fFin?.ToString().Quoted() ?? "''";
             string strIdMultimedia = idMultimedia?.ToString() ?? "''";
@@ -147,7 +134,7 @@
         /// <param name="search">The search<see cref="string"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaTipoList(int? idMultimediaTipo, string search) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string strIdMultimediaTipo = idMultimediaTipo?.ToString() ?? "''";
             search = search.Quoted();
             string sql = $"SELECT * FROM MultimediaTipoList({strIdMultimediaTipo},{search})";
@@ -219,7 +206,7 @@
         /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
         /// <returns>The <see cref="DateTime?"/>.</returns>
         internal static DateTime? FechaSiembra(string idUnidadCultivo, string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             UnidadCultivoCultivoEtapas reg = new UnidadCultivoCultivoEtapas { IdUnidadCultivo = idUnidadCultivo, IdTemporada = idTemporada, IdEtapaCultivo = 1 };
             UnidadCultivoCultivoEtapas ret = db.SingleOrDefaultById<UnidadCultivoCultivoEtapas>(reg);
             return ret?.FechaInicioEtapa;
@@ -229,7 +216,7 @@
         /// Crea y almacena contraseña por defecto para regante.
         /// </summary>
         public static void CrearPassw() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<Regante> lr = db.Fetch<Regante>("select * from regante");
             foreach (Regante r in lr) {
                 if (r.Role != "admin") {
@@ -263,7 +250,7 @@
         /// <param name="temporada">param<see cref="Temporada"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object TemporadaSave(Temporada temporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             db.Save(temporada);
             return "OK";
         }
@@ -274,7 +261,7 @@
         /// <param name="multimedia">The multimedia<see cref="MultimediaPost"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaSave(MultimediaPost multimedia) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             DateTime? fechaExpira = null;
             if (DateTime.TryParse(multimedia.Expira, out DateTime tempFecha))
                 fechaExpira = tempFecha;
@@ -298,7 +285,7 @@
         /// <param name="idMultimedia">The idMultimedia<see cref="int"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaDelete(int idMultimedia) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             db.DeleteWhere<Multimedia>("IdMultimedia=@0", idMultimedia);
             return "OK";
         }
@@ -309,7 +296,7 @@
         /// <param name="multimediaTipo">The multimediaTipo<see cref="Multimedia_Tipo"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaTipoSave(Multimedia_Tipo multimediaTipo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             db.Save(multimediaTipo);
             return multimediaTipo.IdMultimediaTipo.ToString();
         }
@@ -320,7 +307,7 @@
         /// <param name="idMultimediaTipo">The idMultimediaTipo<see cref="int"/>.</param>
         /// <returns>The <see cref="object"/>.</returns>
         public static object MultimediaTipoDelete(int idMultimediaTipo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             db.DeleteWhere<Multimedia_Tipo>("IdMultimediaTipo=@0", idMultimediaTipo);
             return "OK";
         }
@@ -333,7 +320,7 @@
         /// <returns><see cref="List{GeoLocParcela}"/>.</returns>
         public static List<GeoLocParcela> GeoLocParcelasList(string idUnidadCultivo, string idTemporada) {
             List<GeoLocParcela> ret = new List<GeoLocParcela>();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "SELECT dbo.Parcela.IdParcelaInt, dbo.Parcela.IdMunicipio, dbo.Parcela.IdPoligono, dbo.Parcela.IdParcela, Parcela.GEO.ToString() AS Geo, dbo.Municipio.Municipio, dbo.Parcela.GID ";
             sql += " FROM dbo.Parcela INNER JOIN dbo.UnidadCultivoParcela ON dbo.Parcela.IdParcelaInt = dbo.UnidadCultivoParcela.IdParcelaInt INNER JOIN ";
             sql += " dbo.Municipio ON dbo.Parcela.IdMunicipio = dbo.Municipio.IdMunicipio ";
@@ -347,7 +334,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object ParcelasList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select IdParcelaInt, IdRegante, Descripcion, SuperficieM2 from parcela";
             return db.Fetch<object>(sql);
@@ -360,7 +347,7 @@
         /// <returns><see cref="object"/>.</returns>
         public static object UnidadesDeCultivoList(List<string> lTemporadas) {
             List<UnidadCultivoConSuperficieYGeoLoc> ret = new List<UnidadCultivoConSuperficieYGeoLoc>();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             foreach (string idTemporada in lTemporadas) {
                 string sql = "Select DISTINCT IdUnidadCultivo, IdParcelaInt, IdRegante from UnidadCultivoParcela where IdTemporada=@0 ";
                 List<UnidadCultivoConSuperficieYGeoLoc> deUnaTemporada = db.Fetch<UnidadCultivoConSuperficieYGeoLoc>(sql, idTemporada);
@@ -382,7 +369,7 @@
         /// <param name="idTipoEstres">The idTipoEstres<see cref="string"/>.</param>
         /// <returns>The <see cref="TipoEstres"/>.</returns>
         internal static TipoEstres TipoEstres(string idTipoEstres) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             TipoEstres ret = db.SingleById<TipoEstres>(idTipoEstres);
             return ret;
         }
@@ -396,7 +383,7 @@
         public static double UnidadCultivoTemporadaCosteM3Agua(string idUnidadCultivo, string idTemporada) {
             if (string.IsNullOrEmpty(idTemporada))
                 return 0;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select CosteM3Agua from UnidadCultivoTemporadaCosteAgua where idUnidadCultivo=@0  and IdTemporada=@1;";
             double? ret = db.SingleOrDefault<double?>(sql, idUnidadCultivo, idTemporada);
@@ -412,7 +399,7 @@
         /// </summary>
         /// <returns>The <see cref="Dictionary{string, TipoEstres}"/>.</returns>
         internal static Dictionary<string, TipoEstres> ListaTipoEstres() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<TipoEstres> ret = db.Fetch<TipoEstres>();
             return ret.ToDictionary(x => x.IdTipoEstres);
         }
@@ -422,7 +409,7 @@
         /// </summary>
         /// <returns>The <see cref="Dictionary{string, List{TipoEstresUmbral}}"/>.</returns>
         internal static Dictionary<string, List<TipoEstresUmbral>> ListaEstresUmbral() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<TipoEstresUmbral> lUmbrales = db.Fetch<TipoEstresUmbral>();
             Dictionary<string, List<TipoEstresUmbral>> ret = new Dictionary<string, List<TipoEstresUmbral>>();
             foreach (TipoEstresUmbral umbral in lUmbrales) {
@@ -439,7 +426,7 @@
         /// <param name="param">param<see cref="ParamPostCosteM3Agua"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object UnidadCultivoTemporadaCosteM3AguaSave(ParamPostCosteM3Agua param) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             ParamPostCosteM3Agua reg = db.SingleOrDefaultById<ParamPostCosteM3Agua>(param);
             if (param.CosteM3Agua == null)
                 db.Delete(param);
@@ -455,7 +442,7 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object ParcelasList(string idUnidadCultivo, string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "SELECT DISTINCT dbo.Parcela.IdParcelaInt, dbo.Parcela.Descripcion, dbo.UnidadCultivoParcela.IdRegante, dbo.Parcela.SuperficieM2, dbo.UnidadCultivoParcela.IdUnidadCultivo ";
             sql += " FROM dbo.UnidadCultivoParcela INNER JOIN ";
             sql += " dbo.Parcela ON dbo.UnidadCultivoParcela.IdParcelaInt = dbo.Parcela.IdParcelaInt";
@@ -471,7 +458,7 @@
         /// <param name="idTemporadaAnterior">.</param>
         /// <returns>The <see cref="bool"/>.</returns>
         public static bool DuplicarAnteriorSuelo(string idUnidadCultivo, string idTemporada, string idTemporadaAnterior) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<UnidadCultivoSuelo> lSt = db.Fetch<UnidadCultivoSuelo>("Select * from UnidadCultivoSuelo where idUnidadCultivo=@0 and idTemporada=@1 ", idUnidadCultivo, idTemporadaAnterior);
             if (lSt.Count == 0)
                 return false;
@@ -489,7 +476,7 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/>.</param>
         /// <param name="idSueloTipo">idSueloTipo<see cref="string"/>.</param>
         public static void CultivoSueloSave(string idUnidadCultivo, string idTemporada, string idSueloTipo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             try {
                 db.BeginTransaction();
                 List<SueloTipo> lSt = db.Fetch<SueloTipo>("Select * from suelotipo where idSueloTipo=@0", idSueloTipo);
@@ -589,24 +576,21 @@
         /// <param name="idTipoEstres">idTipoEstres<see cref="string"/>.</param>
         /// <returns><see cref="List{TipoEstresUmbral}"/>.</returns>
         internal static List<TipoEstresUmbral> TipoEstresUmbralOrderList(string idTipoEstres) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = $"SELECT * FROM TipoEstresUmbral Where IdTipoEstres='{idTipoEstres}' order by umbralMaximo";
             List<TipoEstresUmbral> ret = db.Fetch<TipoEstresUmbral>(sql);
             return ret;
         }
 
-        /// <summary>
-        /// RiegosNebulaList.
-        /// </summary>
-        /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/>.</param>
-        /// <param name="desdeFecha">desdeFecha<see cref="DateTime"/>.</param>
-        /// <param name="hastaFecha">hastaFecha<see cref="DateTime"/>.</param>
-        /// <returns><see cref="List{Riego}"/>.</returns>
-        public static List<Riego> RiegosNebulaList(string idUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
-            Database db = new Database(DB.CadenaConexionNebula);
-            string sql = $"SELECT IdUnidadCultivo, RiegoM3, Fecha from riegos where idUnidadCultivo='{idUnidadCultivo}' AND  fecha >=@0 and fecha<=@1";
-            List<Riego> ret = db.Fetch<Riego>(sql, desdeFecha, hastaFecha);
-            return ret;
+
+        public static void RiegosNebulaListRefresh(DateTime? ultimaActualizacion) {
+            Database dbNebula = new Database(DB.CadenaConexionNebula);
+            if (ultimaActualizacion == null)
+                ultimaActualizacion = new DateTime(1995, 1, 1);
+            //string sql = $"SELECT IdUnidadCultivo, RiegoM3, Fecha from riegos where idUnidadCultivo='{idUnidadCultivo}' AND  fecha >=@0 and fecha<=@1";
+            List<Riego> lRiegos = dbNebula.Fetch<Riego>("SELECT * FROM RIEGOS WHERE FECHA>=@0 ORDER BY FECHA", ((DateTime)ultimaActualizacion).AddDays(-5));
+            Database db = DB.ConexionOptiaqua;
+            lRiegos.ForEach(x => db.Save(x));
         }
 
         /// <summary>
@@ -688,7 +672,7 @@
         /// <param name="Search">Search<see cref="string"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object ParcelaList(string IdTemporada, string IdParcela, string IdRegante, string IdMunicipio, string Search) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             IdTemporada = IdTemporada.Quoted();
             Search = Search.Quoted();
             string sql = $"SELECT * FROM ParcelaList({IdTemporada},{IdParcela},{IdRegante},{IdMunicipio},{Search})";
@@ -705,7 +689,7 @@
         /// <param name="Search">Search<see cref="string"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object ReganteList(string strFecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(strFecha));
             if (idTemporada == null)
                 idTemporada = TemporadaActiva();
@@ -722,7 +706,7 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/>.</param>
         /// <param name="pluviometria">pluviometria<see cref="double"/>.</param>
         public static void PluviometriaSave(string idTemporada, string idUnidadCultivo, double pluviometria) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             UnidadCultivoCultivo unidadCultivoCultivo = db.Single<UnidadCultivoCultivo>("SELECT * FROM UnidadCultivoCultivo WHERE IdTemporada=@0 and idUnidadCultivo=@1");
             unidadCultivoCultivo.Pluviometria = pluviometria;
             db.Save(unidadCultivoCultivo);
@@ -736,7 +720,7 @@
         public static Temporada Temporada(string idTemporada) {
             if (string.IsNullOrWhiteSpace(idTemporada))
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleOrDefaultById<Temporada>(idTemporada);
         }
 
@@ -756,7 +740,7 @@
         /// <returns><see cref="object"/>.</returns>
         public static object UnidadCultivoList(string IdTemporada, string IdUnidadCultivo, string IdRegante, string IdCultivo, string idMunicipio, string IdTipoRiego, string IdEstacion, string Search, int idUsuario, string role) {
             IdTemporada = IdTemporada.Unquoted();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             if (string.IsNullOrWhiteSpace(IdTemporada)) {
                 IdTemporada = DB.TemporadaActiva() ?? "";
             }
@@ -795,7 +779,7 @@
         /// </summary>
         /// <returns><see cref="string"/>.</returns>
         public static string TemporadaActiva() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string ret = db.Fetch<string>("SELECT IdTemporada from temporada WHERE ACTIVA=1")[0];
             if (ret == null) {
                 string sql = " SELECT IdTemporada FROM dbo.Temporada WHERE(FechaFinal = (SELECT TOP(1) MAX(FechaFinal) AS Expr1 FROM dbo.Temporada AS Temporada_1))";
@@ -811,7 +795,7 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static List<UnidadCultivoDatosAmpliados> UnidadCultivoDatosAmpliados(string idTemporada, string idUnidadCultivo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string filtro = "";
             if (idTemporada != "''") {
                 filtro += $" WHERE IDTEMPORADA='{idTemporada}'";
@@ -843,7 +827,7 @@
         public static Estacion Estacion(int? idEstacion) {
             if (idEstacion == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleById<Estacion>(idEstacion);
         }
 
@@ -855,7 +839,7 @@
         public static object Regante(int? idRegante) {
             if (idRegante == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleById<Regante>(idRegante);
         }
 
@@ -864,7 +848,7 @@
         /// </summary>
         /// <param name="rp">rp<see cref="RegantePost"/>.</param>
         public static void ReganteUpdate(RegantePost rp) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             Regante r = db.SingleOrDefaultById<Regante>(rp.IdRegante);
             if (r == null)
                 throw new Exception($"El Regante {rp.IdRegante} no existe");
@@ -889,7 +873,7 @@
         public static RiegoTipo RiegoTipo(int? idTipoRiego) {
             if (idTipoRiego == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleById<RiegoTipo>(idTipoRiego);
         }
 
@@ -901,7 +885,7 @@
         /// <param name="IdTemporada">IdTemporada<see cref="string"/>.</param>
         /// <returns><see cref="bool"/>.</returns>
         public static bool LaUnidadDeCultivoPerteneceAlRegante(string IdUnidadCultivo, int idRegante, string IdTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select IdRegante from UnidadCultivoParcela Where IdUnidadCultivo=@0 and IdTemporada=@1 and idRegante=@2";
             List<object> lu = db.Fetch<object>(sql, IdUnidadCultivo, IdTemporada, idRegante);
             return lu.Count != 0;
@@ -912,7 +896,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object RegantesList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select IdRegante, Nombre, Telefono, TelefonoSMS, Email from Regante";
             return db.Fetch<object>(sql);
         }
@@ -923,7 +907,7 @@
         /// <param name="idUsuario">The idUsuario<see cref="int"/>.</param>
         /// <returns>The <see cref="List{string}"/>.</returns>
         internal static List<string> AsesorUnidadCultivoList(int idUsuario) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.Fetch<string>("select IdUnidadCultivo from AsesorUnidadCultivo where idRegante=@0", idUsuario);
         }
 
@@ -934,7 +918,7 @@
         /// <param name="idRegante">idRegante<see cref="int"/>.</param>
         /// <returns><see cref="bool"/>.</returns>
         public static bool LaUnidadDeCultivoPerteneceAlRegante(string idUnidadCultivo, int idRegante) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             UnidadCultivo unidadCultivo = db.SingleOrDefaultById<UnidadCultivo>(idUnidadCultivo);
             if (unidadCultivo == null)
                 return false;
@@ -947,7 +931,7 @@
         /// <param name="login">login<see cref="LoginRequest"/>.</param>
         /// <returns><see cref="bool"/>.</returns>
         public static bool PasswordSave(LoginRequest login) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             Regante regante = db.SingleOrDefault<Regante>("Where NIF=@0", login.NifRegante);
             regante.Contraseña = BuildPassword(login.NifRegante, login.Password);
             db.Save(regante);
@@ -962,7 +946,7 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/>.</param>
         /// <returns><see cref="bool"/>.</returns>
         public static bool LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(string idUnidadCultivo, int idRegante, string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select IdUnidadCultivo from UnidadCultivoCultivo where IdUnidadCultivo=@0 and IdRegante=@1 and idTemporada=@2";
             string unidadCultivo = db.SingleOrDefault<string>(sql, idUnidadCultivo, idRegante, idTemporada);
             return unidadCultivo != null;
@@ -975,7 +959,7 @@
         /// <param name="idUsuario">The idUsuario<see cref="int"/>.</param>
         /// <returns>The <see cref="bool"/>.</returns>
         public static bool LaParcelaPerteneceAlRegante(int idParcela, int idUsuario) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "select idParcelaInt from Parcela where IdParcela=@0 and IdRegante=@1";
             bool pertenece = db.SingleOrDefault<int?>(sql, idParcela, idUsuario) != null;
             if (pertenece)
@@ -993,7 +977,7 @@
         /// <param name="idRegante">The idRegante<see cref="int?"/>.</param>
         /// <returns>The <see cref="List{string}"/>.</returns>
         internal static List<string> ListaUnidadesCultivoQueCumplenFiltro(int? idMunicipio, string idCultivo, int? idRegante) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "SELECT Distinct IdUnidadCultivo from FiltroParcelasDatosHidricos ";
             string filtro = " Where ";
             if (idMunicipio != null) {
@@ -1017,7 +1001,7 @@
         /// </summary>
         /// <returns><see cref="List{Temporada}"/>.</returns>
         public static List<Temporada> TemporadasList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from Temporada;";
             return db.Fetch<Temporada>(sql);
         }
@@ -1027,7 +1011,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object ParajesList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from ParajeAmpliado;";
             return db.Fetch<object>(sql);
         }
@@ -1037,7 +1021,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object ProvinciaList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from Provincia;";
             return db.Fetch<object>(sql);
         }
@@ -1047,7 +1031,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object CultivosList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from Cultivo;";
             return db.Fetch<object>(sql);
         }
@@ -1057,7 +1041,7 @@
         /// </summary>
         /// <returns><see cref="object"/>.</returns>
         public static object MunicipiosList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "SELECT dbo.Municipio.IdMunicipio, dbo.Municipio.Municipio, dbo.Provincia.IdProvincia, dbo.Provincia.Provincia FROM dbo.Municipio INNER JOIN  dbo.Provincia ON dbo.Municipio.IdProvincia = dbo.Provincia.IdProvincia";
             return db.Fetch<object>(sql);
         }
@@ -1068,7 +1052,7 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/>.</param>
         /// <returns><see cref="List{UnidadCultivoDatosExtra}"/>.</returns>
         public static List<UnidadCultivoDatosExtra> DatosExtraList(string idUnidadCultivo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from  UnidadCultivoDatosExtra where IdUnidadCultivo=@0";
             List<UnidadCultivoDatosExtra> ret = db.Fetch<UnidadCultivoDatosExtra>(sql, idUnidadCultivo);
@@ -1082,7 +1066,7 @@
         /// <param name="fecha">fecha<see cref="DateTime"/>.</param>
         /// <returns><see cref="List{UnidadCultivoDatosExtra}"/>.</returns>
         public static List<UnidadCultivoDatosExtra> DatosExtraList(string idUnidadCultivo, DateTime fecha) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from  UnidadCultivoDatosExtra where IdUnidadCultivo=@0 and fecha=@1";
             List<UnidadCultivoDatosExtra> ret = db.Fetch<UnidadCultivoDatosExtra>(sql, idUnidadCultivo, fecha);
@@ -1098,7 +1082,7 @@
         /// <param name="fechaConfirmada">fechaConfirmada<see cref="DateTime"/>.</param>
         public static void FechaConfirmadaSave(string IdUnidadCultivo, string temporada, int nEtapa, DateTime fechaConfirmada) {
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 UnidadCultivoCultivoEtapas dat = new UnidadCultivoCultivoEtapas {
                     IdUnidadCultivo = IdUnidadCultivo,
                     IdTemporada = temporada,
@@ -1126,7 +1110,7 @@
         public static List<CultivoEtapas> CultivoEtapasList(int? idCultivo) {
             if (idCultivo == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<CultivoEtapas> listaCF = db.Fetch<CultivoEtapas>("Select * from CultivoEtapas Where IdCultivo=@0", idCultivo);
             return listaCF;
         }
@@ -1137,7 +1121,7 @@
         /// <param name="idSueloTipo">idSueloTipo<see cref="string"/>.</param>
         /// <returns><see cref="List{SueloTipo}"/>.</returns>
         public static List<SueloTipo> SueloTipo(string idSueloTipo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.Fetch<SueloTipo>();
         }
 
@@ -1146,7 +1130,7 @@
         /// </summary>
         /// <returns><see cref="List{SueloTipo}"/>.</returns>
         public static List<SueloTipo> SuelosTipoList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<SueloTipo> ret = db.Fetch<SueloTipo>("select * from SueloTipo");
             return ret;
         }
@@ -1157,7 +1141,7 @@
         /// <param name="idMateriaOrganicaTipo">The idMateriaOrganicaTipo<see cref="string"/>.</param>
         /// <returns>The <see cref="MateriaOrganicaTipo"/>.</returns>
         public static MateriaOrganicaTipo MateriaOrganicaTipo(string idMateriaOrganicaTipo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             MateriaOrganicaTipo ret = db.SingleById<MateriaOrganicaTipo>(idMateriaOrganicaTipo);
             return ret;
         }
@@ -1167,7 +1151,7 @@
         /// </summary>
         /// <returns><see cref="List{MateriaOrganicaTipo}"/>.</returns>
         public static List<MateriaOrganicaTipo> MateriaOrganicaTipoList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<MateriaOrganicaTipo> ret = db.Fetch<MateriaOrganicaTipo>("select * from MateriaOrganicaTipo");
             return ret;
         }
@@ -1181,7 +1165,7 @@
                 if (DateTime.TryParse(param.Fecha, out DateTime fs) == false) {
                     throw new Exception("Error. El formato de la fecha no es correcto.\n");
                 }
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 UnidadCultivoDatosExtra dat = new UnidadCultivoDatosExtra() { IdUnidadCultivo = param.IdUnidadCultivo, Fecha = fs };
                 dat = db.SingleOrDefaultById<UnidadCultivoDatosExtra>(dat);
                 if (dat == null)
@@ -1292,7 +1276,7 @@
         /// <param name="IdElementosGruesos">The IdElementosGruesos<see cref="string"/>.</param>
         /// <returns>The <see cref="ElementosGruesosTipo"/>.</returns>
         public static ElementosGruesosTipo ElementosGruesosTipo(string IdElementosGruesos) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             ElementosGruesosTipo ret = db.SingleOrDefaultById<ElementosGruesosTipo>(IdElementosGruesos);
             if (ret == null)
                 throw new Exception();
@@ -1304,7 +1288,7 @@
         /// </summary>
         /// <returns><see cref="List{ElementosGruesosTipo}"/>.</returns>
         public static List<ElementosGruesosTipo> ElementosGruesosTipoList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             List<ElementosGruesosTipo> ret = db.Fetch<ElementosGruesosTipo>("select * from ElementosGruesosTipo");
             return ret;
         }
@@ -1315,7 +1299,7 @@
         /// <param name="idUnidadCultivo">idUnidadCultivo<see cref="string"/>.</param>
         /// <returns><see cref="List{string}"/>.</returns>
         public static List<string> TemporadasUnidadCultivoList(string idUnidadCultivo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = $"Select Distinct IdTemporada from UnidadCultivoCultivo where IdUnidadCultivo ='{idUnidadCultivo}'";
             List<string> ret = db.Fetch<string>(sql);
@@ -1334,7 +1318,7 @@
             if (string.IsNullOrWhiteSpace(idTemporada))
                 idTemporada = DB.TemporadaActiva();
             List<UnidadCultivoSuelo> ret = null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             if (idHorizonte == "ALL")
                 ret = db.Fetch<UnidadCultivoSuelo>("Select * from UnidadCultivoSuelo where IdUnidadCultivo=@0 and IdTemporada=@1 ", IdUnidadCultivo, idTemporada);
             else
@@ -1352,9 +1336,9 @@
         public static List<UnidadCultivoDatosExtra> ParcelasDatosExtrasList(string IdUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
             if (IdUnidadCultivo == null || desdeFecha == null || hastaFecha == null)
                 return null;
-            Database db = DB.NewDatabase();
-            var sql = "where fecha BETWEEN @0 AND @1 AND IdUnidadCultivo=@2";
-            return db.Fetch<UnidadCultivoDatosExtra>(sql,desdeFecha,hastaFecha,IdUnidadCultivo);
+            Database db = DB.ConexionOptiaqua;
+            string sql = "where fecha BETWEEN @0 AND @1 AND IdUnidadCultivo=@2";
+            return db.Fetch<UnidadCultivoDatosExtra>(sql, desdeFecha, hastaFecha, IdUnidadCultivo);
         }
 
         /// <summary>
@@ -1365,10 +1349,8 @@
         /// <param name="fechaFinal">.</param>
         /// <returns>.</returns>
         public static List<Riego> RiegosList(string idUnidadCultivo, DateTime fechaSiembra, DateTime fechaFinal) {
-            List<Riego> riegoHistorico = DB.RiegosHistoricosList(idUnidadCultivo, fechaSiembra, fechaFinal);
-            List<Riego> riegoNebula = DB.RiegosNebulaList(idUnidadCultivo, fechaSiembra, fechaFinal);
-            List<Riego> ret = riegoHistorico;
-            ret.AddRange(riegoNebula);            
+            List<Riego> ret = DB.RiegosHistoricosList(idUnidadCultivo, fechaSiembra, fechaFinal);
+            //List<Riego> riegoNebula = DB.RiegosNebulaList(idUnidadCultivo, fechaSiembra, fechaFinal);
             return ret;
         }
 
@@ -1380,11 +1362,16 @@
         /// <param name="hastaFecha">.</param>
         /// <returns>.</returns>
         public static List<Riego> RiegosHistoricosList(string idUnidadCultivo, DateTime desdeFecha, DateTime hastaFecha) {
+            DateTime? ultAct = Config.GetDateTime("FechaUltimaActualizacionNebula");
+            if (ultAct == null || ultAct < DateTime.Today) {
+                RiegosNebulaListRefresh(ultAct);
+                Config.SetDateTime("FechaUltimaActualizacionNebula", DateTime.Today);
+            }
             if (idUnidadCultivo == null || desdeFecha == null || hastaFecha == null)
                 return null;
-            Database db = DB.NewDatabase();
-            var sql = "WHERE idUnidadCultivo=@0 and fecha BETWEEN @1 and @2";
-            return db.Fetch<Riego>(sql, idUnidadCultivo,desdeFecha,hastaFecha);
+            Database db = DB.ConexionOptiaqua;
+            string sql = "WHERE idUnidadCultivo=@0 and fecha BETWEEN @1 and @2";
+            return db.Fetch<Riego>(sql, idUnidadCultivo, desdeFecha, hastaFecha);
         }
 
         /// <summary>
@@ -1396,7 +1383,7 @@
         public static UnidadCultivoCultivo UnidadCultivoCultivo(string idUnidadCultivo, string idTemporada) {
             if (idUnidadCultivo == null || idTemporada == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from UnidadCultivoCultivo where idUnidadCultivo=@0 AND IdTemporada=@1";
             return db.SingleOrDefault<UnidadCultivoCultivo>(sql, idUnidadCultivo, idTemporada);
@@ -1410,7 +1397,7 @@
         public static UnidadCultivo UnidadCultivo(string idUnidadCultivo) {
             if (idUnidadCultivo == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleOrDefaultById<UnidadCultivo>(idUnidadCultivo);
         }
 
@@ -1419,7 +1406,7 @@
         /// </summary>
         /// <returns><see cref="List{UnidadCultivo}"/>.</returns>
         public static List<UnidadCultivo> UnidadCultivoList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.Fetch<UnidadCultivo>();
         }
 
@@ -1432,7 +1419,7 @@
             Database db = null;
             Parcela ret = null;
             try {
-                db = DB.NewDatabase();
+                db = DB.ConexionOptiaqua;
                 string sql = "SELECT IdParcelaInt, IdGadmin, IdRegante, IdProvincia, IdMunicipio, IdPoligono, IdParcela, IdParaje, Descripcion, Longitud, Latitud, XUTM, YUTM, Huso, Altitud, RefCatastral, GID, SuperficieM2 FROM dbo.Parcela";
                 sql += " where idParcelaInt=" + idParcela.ToString();
                 ret = db.Single<Parcela>(sql);
@@ -1450,7 +1437,7 @@
         public static Cultivo Cultivo(int? IdCultivo) {
             if (IdCultivo == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleById<Cultivo>(IdCultivo);
         }
 
@@ -1463,7 +1450,7 @@
         public static List<UnidadCultivoCultivoEtapas> UnidadCultivoCultivoEtapasList(string idUnidadCultivo, string idTemporada) {
             if (idUnidadCultivo == null || idTemporada == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from UnidadCultivoCultivoEtapas where IdUnidadCultivo =@0 AND IDTemporada=@1";
             return db.Fetch<UnidadCultivoCultivoEtapas>(sql, idUnidadCultivo, idTemporada);
@@ -1476,7 +1463,7 @@
         /// <param name="temporada">temporada<see cref="string"/>.</param>
         /// <returns><see cref="UnidadCultivoCultivo"/>.</returns>
         public static UnidadCultivoCultivo ParcelasCultivo(int IdParcela, string temporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from ParcelasCultivoEtapas where IdParcela =" + IdParcela + " AND IDTemporada='" + temporada + "' ";
             return db.SingleOrDefault<UnidadCultivoCultivo>(sql);
@@ -1491,7 +1478,7 @@
         public static List<UnidadCultivoSuelo> UnidadCultivoSueloList(string idTemporada, string idUnidadCultivo) {
             if (idUnidadCultivo == null)
                 return null;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "Select * from UnidadCultivoSuelo where idUnidadCultivo =@0 and IdTemporada=@1";
             return db.Fetch<UnidadCultivoSuelo>(sql, idUnidadCultivo, idTemporada);
@@ -1536,7 +1523,7 @@
         /// </summary>
         /// <param name="lDatClima">lDatClima<see cref="List{DatoClimatico}"/>.</param>
         private static void DatosClimaticosSave(List<DatoClimatico> lDatClima) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             foreach (DatoClimatico datCli in lDatClima) {
                 db.Save(datCli);
             }
@@ -1547,7 +1534,7 @@
         /// </summary>
         /// <returns><see cref="DateTime?"/>.</returns>
         private static DateTime? UltimaFechaDeEstacion() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql;
             sql = "SELECT MIN(MaxFecha) AS MinFecha FROM dbo.DatoClimaticoMaxFecha";
             return db.Single<DateTime?>(sql);
@@ -1558,7 +1545,7 @@
         /// </summary>
         /// <returns><see cref="List{Estacion}"/>.</returns>
         private static List<Estacion> EstacionesList() {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.Fetch<Estacion>();
         }
 
@@ -1574,7 +1561,7 @@
                 return null;
             // Refrescar la base de datos con los datos de Siar si es necesario
             DB.DatosClimaticosSiarRefresh();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from DatoClimatico where fecha BETWEEN  @0 AND @1 AND IDESTACION=@2";
             return db.Fetch<DatoClimatico>(sql, desdeFecha, hastaFecha, idEstacion);
         }
@@ -1594,28 +1581,22 @@
                 sURL += "estacion=" + idEstacion.ToString();
                 sURL += "&fechaInicio=" + desdeFecha.ToString("yyyy-MM-dd");
                 sURL += "&fechaFin=" + hastaFecha.ToString("yyyy-MM-dd");
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
                 WebClient wc = new System.Net.WebClient();
                 string json = wc.DownloadString(sURL);
-                stopWatch.Stop();
-                stopWatch.Start();
-                dynamic JsonDynamic = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-                dynamic data = JsonDynamic.data;
+                var dataSiar = Newtonsoft.Json.JsonConvert.DeserializeObject<RootApiSiar>(json);
                 List<DatoClimatico> lista = new List<DatoClimatico>();
-                foreach (dynamic dat in data) {
+                foreach (var dat in dataSiar.data) {
                     DatoClimatico dc = new DatoClimatico {
-                        IdEstacion = dat.Estacion,
+                        IdEstacion = int.Parse(dat.Estacion),
                         Fecha = Convert.ToDateTime(dat.Fecha),
-                        Eto = dat.ET0 == "NA" ? 0 : Convert.ToSingle(dat.ET0),
-                        TempMedia = dat.TAirMd == "NA" ? 0 : Convert.ToSingle(dat.TAirMd),
-                        HumedadMedia = dat.HRMn == "NA" ? 0 : Convert.ToSingle(dat.HRMn),
-                        VelViento = dat.VWindMd == "NA" ? 0 : Convert.ToSingle(dat.VWindMd),
-                        Precipitacion = dat.PAcum == "NA" ? 0 : Convert.ToSingle(dat.PAcum)
+                        Eto = dat.ET0 == "NA" ? 0 : double.Parse(dat.ET0, CultureInfo.InvariantCulture),
+                        TempMedia = dat.TAirMd == "NA" ? 0 : double.Parse(dat.TAirMd, CultureInfo.InvariantCulture),
+                        HumedadMedia = dat.HRMn == "NA" ? 0 : double.Parse(dat.HRMn, CultureInfo.InvariantCulture),
+                        VelViento = dat.VWindMd == "NA" ? 0 : double.Parse(dat.VWindMd, CultureInfo.InvariantCulture),
+                        Precipitacion = dat.PAcum == "NA" ? 0 : double.Parse(dat.PAcum, CultureInfo.InvariantCulture)
                     };
                     lista.Add(dc);
                 }
-                stopWatch.Stop();
                 return lista;
             } catch {
                 string msgErr = "Error cargando datos climáticos para parametros.\n";
@@ -1640,7 +1621,7 @@
         /// <param name="prof">prof<see cref="double"/>.</param>
         public static void UnidadCultivoSueloSave(string idUnidadCultivo, string idTemporada, int idHorizonte, double limo, double arcilla, double arena, double matOrg, double eleGru, double prof) {
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 UnidadCultivoSuelo ps = new UnidadCultivoSuelo {
                     IdUnidadCultivo = idUnidadCultivo,
                     IdHorizonte = idHorizonte,
@@ -1670,7 +1651,7 @@
         public static void UnidadCultivoCultivoTemporadaSave(string IdUnidadCultivo, string idTemporada, int idCultivo, int idRegante, int idTipoRiego, string fechaSiembra) {
             Database db = null;
             try {
-                db = DB.NewDatabase();
+                db = DB.ConexionOptiaqua;
                 db.BeginTransaction();
                 if (DateTime.TryParse(fechaSiembra, out DateTime fs) == false) {
                     throw new Exception("Error. La fecha de siembra no es correcta. ");
@@ -1751,7 +1732,7 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/>.</param>
         /// <returns><see cref="int?"/>.</returns>
         public static int? NParcelas(string idUnidadCultivo, string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "SELECT COUNT(IdParcelaInt) AS NParcelas FROM dbo.UnidadCultivoParcela GROUP BY IdUnidadCultivo, IdTemporada ";
             sql += " HAVING IdUnidadCultivo=@0 AND IdTemporada=@1";
             return db.SingleOrDefault<int?>(sql, idUnidadCultivo, idTemporada);
@@ -1766,7 +1747,7 @@
         /// <param name="municipios">municipios<see cref="string"/>.</param>
         /// <param name="parajes">parajes<see cref="string"/>.</param>
         public static void ObtenerMunicicioParaje(string idTemporada, string idUnidadCultivo, out string provincias, out string municipios, out string parajes) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select Provincia,Municipio, Paraje from UnidadCultivoParaje where idTemporada=@0 and IdUnidadCultivo=@1";
             List<ProvinciaMunicipioParaje> lMunicipioProvinciaParaje = db.Fetch<ProvinciaMunicipioParaje>(sql, idTemporada, idUnidadCultivo);
             IEnumerable<string> lmunicicipos = lMunicipioProvinciaParaje.Select(x => x.Municipio).Distinct();
@@ -1789,7 +1770,7 @@
                 if (fecha == null)
                     return new List<string>();
                 List<string> lTemporadas = DB.TemporadasDeFecha(fecha);
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 string sql = "Select Distinct IdUnidadCultivo from UnidadCultivoCultivo where IdRegante=@0 AND IdTemporada =@1";
                 foreach (string idTemporada in lTemporadas) {
                     List<string> deTemporada = db.Fetch<string>(sql, idRegante, idTemporada);
@@ -1812,7 +1793,7 @@
         /// <returns><see cref="List{string}"/>.</returns>
         public static List<string> UnidadCultivoList(int idRegante) {
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 string sql;
                 sql = "Select Distinct IdUnidadCultivo from UnidadcultivoCultivo where IdRegante=@0";
                 return db.Fetch<string>(sql, idRegante);
@@ -1832,7 +1813,7 @@
         public static List<UnidadCultivoCultivoEtapas> Etapas(string IdUnidadCultivo, string idTemporada) {
             if (string.IsNullOrWhiteSpace(idTemporada))
                 return new List<UnidadCultivoCultivoEtapas>();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select * from UnidadCultivoCultivoEtapas where IdUnidadCultivo=@0  AND IdTemporada=@1";
             List<UnidadCultivoCultivoEtapas> ret = db.Fetch<UnidadCultivoCultivoEtapas>(sql, IdUnidadCultivo, idTemporada);
             return ret;
@@ -1846,7 +1827,7 @@
             Database db = null;
             if (lEtapas == null || lEtapas.Count == 0) return;
             try {
-                db = DB.NewDatabase();
+                db = DB.ConexionOptiaqua;
                 db.BeginTransaction();
                 //Eliminar las actuales
                 db.Execute(" delete from UnidadCultivoCultivoEtapas where IdUnidadCultivo=@0 and IdTemporada=@1 ", lEtapas[0].IdUnidadCultivo, lEtapas[0].IdTemporada);
@@ -1872,7 +1853,7 @@
                 return null;
 
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 string sql;
                 sql = "Select Distinct IdRegante from UnidadCultivoParcela where IdUnidadCultivo=@0 and idTemporada=@1 ";
                 List<int?> lRet = db.Fetch<int?>(sql, idUnidadCultivo, idTemporada);
@@ -1895,7 +1876,7 @@
             if (string.IsNullOrEmpty(idUnidadCultivo))
                 return null;
             try {
-                Database db = DB.NewDatabase();
+                Database db = DB.ConexionOptiaqua;
                 string sql;
                 sql = "Select Distinct IdRegante from UnidadCultivo where IdUnidadCultivo=@0 ";
                 List<int?> lRet = db.Fetch<int?>(sql, idUnidadCultivo);
@@ -1916,7 +1897,7 @@
         /// <returns>.</returns>
         public static List<int> ParcelasDeUnidadCultivo(string IdUnidadCultivo, string idTemporada) {
 
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select IdParcelaInt From UnidadCultivoParcela Where IdUnidadCultivo=@0 and IdTemporada=@1";
             List<int> ret = db.Fetch<int>(sql, IdUnidadCultivo, idTemporada);
             return ret;
@@ -1932,7 +1913,7 @@
             if (idUnidadCultivo == null || idTemporada == null)
                 return 0;
             double? ret = 0;
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select SuperficieM2 From UnidadCultivoSuperficie Where IdUnidadCultivo=@0 and IdTemporada=@1";
             ret = db.SingleOrDefault<float?>(sql, idUnidadCultivo, idTemporada);
             if (ret != null)
@@ -1966,7 +1947,7 @@
                 return DB.TemporadaActiva();
             if (string.IsNullOrWhiteSpace(idUC))
                 return DB.TemporadaActiva();
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = $"SELECT * FROM TemporadaDeFecha(@0,@1)";
             string ret = db.SingleOrDefault<string>(sql, idUC, fecha);
             if (ret != null) {
@@ -1983,7 +1964,7 @@
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="List{string}"/>.</returns>
         public static List<string> TemporadasDeFecha(DateTime fecha) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string strFecha = fecha.ToString();
             string sql = $"SELECT idTemporada FROM Temporada where @0>=FechaInicial AND @0<=FechaFinal";
             List<string> ret = db.Fetch<string>(sql, fecha);
@@ -1996,7 +1977,7 @@
         /// <param name="idCultivo">idCultivo<see cref="int"/>.</param>
         /// <returns><see cref="double"/>.</returns>
         public static double PluviometriaTipica(int idCultivo) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = "Select PluviometriaTipica from RiegoTipo where IdTipoRiego=@0";
             return db.Single<double>(sql, idCultivo);
         }
@@ -2007,7 +1988,7 @@
         /// <param name="parametro">parametro<see cref="string"/>.</param>
         /// <returns><see cref="string"/>.</returns>
         public static string ConfigLoad(string parametro) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             return db.SingleOrDefaultById<Configuracion>(parametro)?.Valor;
         }
 
@@ -2017,7 +1998,7 @@
         /// <param name="parametro">parametro<see cref="string"/>.</param>
         /// <param name="valor">valor<see cref="string"/>.</param>
         public static void ConfigSave(string parametro, string valor) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             Configuracion cfg = new Configuracion { Parametro = parametro, Valor = valor };
             db.Save(cfg);
         }
@@ -2028,7 +2009,7 @@
         /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
         /// <returns>The <see cref="bool"/>.</returns>
         internal static bool TemporadaExists(string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             bool ret = db.Exists<Temporada>(idTemporada);
             return ret;
         }
@@ -2040,7 +2021,7 @@
         /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
         /// <returns>The <see cref="List{UnidadDeCultivoParcelasValvulas}"/>.</returns>
         internal static List<UnidadDeCultivoParcelasValvulas> UnidadCultivoParcelasValculas(string idUnidadCultivo, string idTemporada) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             string sql = $"Select * from UnidadDeCultivoParcelasValvulas where IdUnidadCultivo='{idUnidadCultivo}' And idTemporada='{idTemporada}'";
             List<UnidadDeCultivoParcelasValvulas> ret = db.FetchOneToMany<UnidadDeCultivoParcelasValvulas>(x => x.LIdValvula, sql);
             return ret;

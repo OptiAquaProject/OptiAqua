@@ -1652,23 +1652,7 @@
             La cadena de conexión Nebula se define como parámetro de la aplicación.
             </summary>
         </member>
-        <member name="T:DatosOptiaqua.DB.TypeModo">
-            <summary>
-            Tipo de uso: real o pruebas
-            </summary>
-        </member>
-        <member name="P:DatosOptiaqua.DB.Modo">
-            <summary>
-            Define que base de datos usar, la real o la de pruebas
-            </summary>
-        </member>
-        <member name="M:DatosOptiaqua.DB.NewDatabase">
-            <summary>
-            The NewDatabase.
-            </summary>
-            <returns>The <see cref="T:NPoco.Database"/>.</returns>
-        </member>
-        <member name="P:DatosOptiaqua.DB.CadenaConexionOptiAqua">
+        <member name="F:DatosOptiaqua.DB.CadenaConexionOptiAqua">
             <summary>
             Gets the CadenaConexionOptiAqua.
             </summary>
@@ -1916,15 +1900,6 @@
             TipoEstresUmbralList.
             </summary>
             <param name="idTipoEstres">idTipoEstres<see cref="T:System.String"/>.</param>
-            <returns><see cref="T:System.Collections.Generic.List`1"/>.</returns>
-        </member>
-        <member name="M:DatosOptiaqua.DB.RiegosNebulaList(System.String,System.DateTime,System.DateTime)">
-            <summary>
-            RiegosNebulaList.
-            </summary>
-            <param name="idUnidadCultivo">idUnidadCultivo<see cref="T:System.String"/>.</param>
-            <param name="desdeFecha">desdeFecha<see cref="T:System.DateTime"/>.</param>
-            <param name="hastaFecha">hastaFecha<see cref="T:System.DateTime"/>.</param>
             <returns><see cref="T:System.Collections.Generic.List`1"/>.</returns>
         </member>
         <member name="M:DatosOptiaqua.DB.DatosLluviaList(System.String,System.String)">

@@ -7,8 +7,6 @@
     public class ImportacionController : ApiController {    
         [HttpPost]
         public IHttpActionResult PostImporta([FromBody]ImportaPost param) {
-            var ModoSave = DB.Modo;
-            DB.Modo = param.ModoPruebas?DB.TypeModo.Pruebas:DB.TypeModo.Real;
             try {
                 if (!DB.IsCorrectPassword(param.NifRegante, param.PassRegante)) {
                     return Json("<h4>Datos de acceso no válidos. Nif o contraseña incorrectos.</h4>");
@@ -18,10 +16,8 @@
                 }
                 var lErrores = Importacion.Importar(param);
                 var ret = Json(lErrores);
-                DB.Modo = ModoSave;
                 return ret;
             } catch (Exception ex) {
-                DB.Modo = ModoSave;
                 return BadRequest(ex.Message);
             }            
         }
@@ -31,8 +27,7 @@
             public string PassRegante { set; get; }
             public string CSV { set; get; }
             public string IdTemporada { set; get; }
-            public string IdTemporadaAnterior { set; get; }
-            public bool ModoPruebas { set; get; }
+            public string IdTemporadaAnterior { set; get; }            
         }
     }
 }

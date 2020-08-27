@@ -19,9 +19,22 @@
         /// <returns></returns>
         [Route("api/balancehidrico/{idUnidadCultivo}/{fecha}/{actualizaFechasEtapas}")]
         public IHttpActionResult GetBalanceHidrico(string idUnidadCultivo, string fecha, bool actualizaFechasEtapas) {
-            try { 
-                var bh = BalanceHidrico.Balance(idUnidadCultivo, DateTime.Parse(fecha),actualizaFechasEtapas);
-                return Json(bh.LineasBalance);
+            try {
+#if DEBUG
+#else
+                string clave = "balancehidrico" + idUnidadCultivo + fecha + actualizaFechasEtapas.ToString();
+                IHttpActionResult cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
+
+                BalanceHidrico bh = BalanceHidrico.Balance(idUnidadCultivo, DateTime.Parse(fecha), actualizaFechasEtapas);
+                System.Web.Http.Results.JsonResult<System.Collections.Generic.List<Models.LineaBalance>> ret = Json(bh.LineasBalance);
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -40,11 +53,11 @@
                 DateTime dFecha = DateTime.Parse(fecha);
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                string role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
                 if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                     return Unauthorized();
-                var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
+                BalanceHidrico bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
                 return Json(bh.DatosEstadoHidrico(dFecha));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -63,13 +76,24 @@
         [HttpGet]
         [Route("api/DatosHidricos/{idRegante}/{idUnidadCultivo}/{idMunicipio}/{idCultivo}/{fecha}")]
         public IHttpActionResult GetDatosHidricosList(int? idRegante, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fecha) {
-            try {                
+            try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idReganteClamis = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
-
-                object lDatosHidricos = BalanceHidrico.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role,idReganteClamis);
-                return Json(lDatosHidricos);
+                string role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+#if DEBUG
+#else
+                string clave = "DatosHidricos" + (idRegante.ToString() ?? "") + idUnidadCultivo + (idMunicipio.ToString() ?? "") + idCultivo + fecha.ToString();
+                IHttpActionResult cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
+                object lDatosHidricos = BalanceHidrico.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role, idReganteClamis);
+                System.Web.Http.Results.JsonResult<object> ret = Json(lDatosHidricos);
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -86,17 +110,29 @@
         public IHttpActionResult GetRiegos(string idUnidadCultivo, string fecha) {
             try {
                 DateTime dFecha = DateTime.Parse(fecha);
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,dFecha);
-                if (idTemporada==null)
+                string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                if (idTemporada == null)
                     return BadRequest("La unidad de cultivo no está definida para la temporada");
 
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                string role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                     return Unauthorized();
+#if DEBUG
+#else
+                string clave = "Riegos" + idUnidadCultivo + fecha;
+                IHttpActionResult cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
 
-                return Json(DB.DatosRiegosList(idUnidadCultivo, idTemporada));
+                System.Web.Http.Results.JsonResult<object> ret = Json(DB.DatosRiegosList(idUnidadCultivo, idTemporada));
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -112,14 +148,29 @@
         [Route("api/Lluvias/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult GetLluvias(string idUnidadCultivo, string fecha) {
             try {
-                
+
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var role= identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value ;
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo,DateTime.Parse(fecha));
-                if (!DB.EstaAutorizado(idUsuario,role,idUnidadCultivo,idTemporada))                
-                    return Unauthorized();                
-                return Json(DB.DatosLluviaList(idUnidadCultivo, idTemporada));
+                string role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                string idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, DateTime.Parse(fecha));
+                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                    return Unauthorized();
+
+#if DEBUG
+#else
+                string clave = "Lluvias" + idUnidadCultivo + fecha;
+                var cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
+
+                var ret= Json(DB.DatosLluviaList(idUnidadCultivo, idTemporada));
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
+                
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -135,15 +186,31 @@
         [Route("api/ResumenDiario/{idUnidadCultivo}/{fecha}")]
         public IHttpActionResult ResumenDiario(string idUnidadCultivo, string fecha) {
             try {
-                var dFecha = DateTime.Parse(fecha);
-                var bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
-                return Json(bh.ResumenDiario(dFecha));
+                DateTime dFecha = DateTime.Parse(fecha);
+
+#if DEBUG
+#else
+                string clave = "ResumenDiario" + idUnidadCultivo + fecha;
+                var cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
+
+                BalanceHidrico bh = BalanceHidrico.Balance(idUnidadCultivo, dFecha);
+                var ret= Json(bh.ResumenDiario(dFecha));
+
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
+
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
         }
 
-      
+
         [HttpGet]
         [Route("api/Recalcula/")]
         public IHttpActionResult Recalcula() {

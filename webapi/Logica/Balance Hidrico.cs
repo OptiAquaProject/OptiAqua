@@ -273,9 +273,18 @@
                 LineasBalance.Add(lineaBalance);
                 lbAnt = lineaBalance;
                 fecha = fecha.AddDays(1);
+                if (lineaBalance.NumeroEtapaDesarrollo < unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count )
+                    fechaFinalEstudio = fecha.AddDays(1);
+                else {
+                    int duracionEtapa = unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList[unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count - 1].DuracionDiasEtapa;
+                    fechaFinalEstudio = unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList[unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count - 1].FechaInicioEtapa.AddDays(duracionEtapa);
+                }
             }
             if (actualizaEtapas)
                 DB.FechasEtapasSave(unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList);
+
+            LineasBalance.RemoveAll(x => x.Fecha > DateTime.Today.AddDays(-1));            
+            
         }
 
         /// <summary>
@@ -332,6 +341,10 @@
             if (fecha > unidadCultivoDatosHidricos.FechaFinalDeEstudio())
                 fecha = unidadCultivoDatosHidricos.FechaFinalDeEstudio();
             LineaBalance linBalAFecha = LineasBalance.Find(x => x.Fecha == fecha);
+            if (linBalAFecha == null) {
+                linBalAFecha = LineasBalance.Last();
+                fecha =(DateTime) linBalAFecha.Fecha;
+            }
             unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);
             DatosEstadoHidrico ret = new DatosEstadoHidrico {
                 Fecha = fecha,

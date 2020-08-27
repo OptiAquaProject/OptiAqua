@@ -134,7 +134,7 @@
         /// <param name="idTemporada">.</param>
         /// <param name="idTemporadaAnterior">The idTemporadaAnterior<see cref="string"/>.</param>
         private static void Importar(ImportItem item, string idTemporada, string idTemporadaAnterior) {
-            Database db = DB.NewDatabase();
+            Database db = DB.ConexionOptiaqua;
             db.BeginTransaction();
             try {
                 UnidadCultivo uc = new Models.UnidadCultivo {
