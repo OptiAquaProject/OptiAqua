@@ -516,7 +516,7 @@
             UnidadCultivo uc = UnidadCultivo(idUnidadCultivo);
             UnidadCultivoCultivo ucc = UnidadCultivoCultivo(idUnidadCultivo, idTemporada);
 
-            DateTime desdeFecha = ucc?.FechaSiembra ?? t.FechaInicial;
+            DateTime desdeFecha = ucc?.FechaSiembra() ?? t.FechaInicial;
             DateTime hastaFecha = t.FechaFinal < DateTime.Today ? DateTime.Today : t.FechaFinal;
 
 
@@ -610,7 +610,7 @@
             UnidadCultivoCultivo ucc = UnidadCultivoCultivo(idUnidadCultivo, idTemporada);
             string estacion = Estacion(uc.IdEstacion).Nombre;
 
-            DateTime desdeFecha = ucc.FechaSiembra ?? t.FechaInicial;
+            DateTime desdeFecha = ucc.FechaSiembra() ?? t.FechaInicial;
             DateTime hastaFecha = t.FechaFinal < DateTime.Today ? DateTime.Today : t.FechaFinal;
 
             List<DatoClimatico> lLluvia = DatosClimaticosList(desdeFecha, hastaFecha, uc.IdEstacion);

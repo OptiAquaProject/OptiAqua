@@ -163,7 +163,7 @@
                 }
                 {
                     //Crear la Etapas de crecimiento según el cultivo indicado y al fecha de siembra
-                    UnidadCultivoCultivoTemporadaSave(db, item.IdUnidadCultivo, idTemporada, item.IdCultivo, item.IdRegante, item.IdTipoRiego, item.FechaSiembra.ToString());
+                    UnidadCultivoCultivoTemporadaSave(db, item.IdUnidadCultivo, idTemporada, item.IdCultivo, item.IdRegante, item.IdTipoRiego, item.FechaSiembra);
                 }
                 db.CompleteTransaction();
             } catch (Exception ex) {
@@ -219,11 +219,8 @@
         /// <param name="idRegante">The idRegante<see cref="int"/>.</param>
         /// <param name="idTipoRiego">The idTipoRiego<see cref="int"/>.</param>
         /// <param name="fechaSiembra">The fechaSiembra<see cref="string"/>.</param>
-        private static void UnidadCultivoCultivoTemporadaSave(Database db, string IdUnidadCultivo, string idTemporada, int idCultivo, int idRegante, int idTipoRiego, string fechaSiembra) {
+        private static void UnidadCultivoCultivoTemporadaSave(Database db, string IdUnidadCultivo, string idTemporada, int idCultivo, int idRegante, int idTipoRiego, DateTime fechaSiembra) {
             try {
-                if (DateTime.TryParse(fechaSiembra, out DateTime fs) == false) {
-                    throw new Exception("Error. La fecha de siembra no es correcta. ");
-                }
 
                 // validar Unidad de cultivo                
                 if (db.Exists<UnidadCultivo>(IdUnidadCultivo) == false) {
@@ -265,7 +262,7 @@
                     throw new Exception("Error. No existe una definición de las Etapas para el cultivo indicado.");
                 }
 
-                DateTime fechaEtapa = fs;
+                DateTime fechaEtapa = fechaSiembra;
                 foreach (CultivoEtapas cf in listaCF) {
                     UnidadCultivoCultivoEtapas pcf = new UnidadCultivoCultivoEtapas {
                         IdUnidadCultivo = uniCulCul.IdUnidadCultivo,

@@ -73,7 +73,7 @@
             double ret;
             if (nEtapa == 2)
                 nEtapa = 2;
-            if (definicionEtapaPorDias) { //!!!! SIAR
+            if (definicionEtapaPorDias) {  // !!! propuestaSIAR && ModCobCoefB < 0) o && ModCobCoefB != -9999) { 
                 if (coberturaFinal != null && coberturaInicial != null) {
                     ret = ((double)coberturaFinal - (double)coberturaInicial) / (double) nDiasduracionEtapaDias;
                 } else {
@@ -118,8 +118,8 @@
             //     5.- se añade la rutina que comprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
 
-            if (definicionEtapaPorDias) {
-                if (nEtapa < 3) {
+            if (definicionEtapaPorDias) { // propuestaSIAR if(ModAltCoefB < 0)
+                if (nEtapa < 3) { 
                     // Obtener de la tabla cultivoEtapas para la UC y la Etapa correspondiente:
                     // duracion de las etapas 1 y 2                    
                     // alturaInicial y alturaFinal
@@ -267,7 +267,7 @@
 
             if (lbAnt.LongitudRaiz == 0) {
                 ret = profRaizInicial;
-            } else if (definicionEtapaPorDias) { //!!!! SIAR
+            } else if (definicionEtapaPorDias) { // propuestaSIAR if(modRaizCoefB < 0)
                 if (nEtapa < 3) {
                     ret = lbAnt.LongitudRaiz + (profRaizMax - profRaizInicial) / (nDiasEtapas1y2 - 2);
                     if (ret > profRaizMax) {
@@ -566,7 +566,7 @@
         public static double IncrementoTemperatura(double temperatura, double CultivoTBase, bool definicionPorDias) {
             // ANTES=> temperatura > CultivoTBase ? temperatura - CultivoTBase : 0;
             double ret;
-            if (definicionPorDias) {
+            if (definicionPorDias) {// propuestaSIAR if(CultivoTBase < 0) {PARECE COMPLICADO.... ESTO FUE UN APAÑO Y CON ESTA SOLUCION ESTÁ FALSEADO Y NO ES CORRECTO
                 ret = 1;
             } else {
                 if (temperatura > CultivoTBase) {

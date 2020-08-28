@@ -53,7 +53,7 @@ namespace Models {
         public int DuracionDiasEtapa { get; set; }
         public double KcInicial { get; set; }
         public double KcFinal { get; set; }
-        public bool DefinicionPorDias { get; set; }        
+        public bool DefinicionPorDias { get; set; }
         public double? CobInicial { get; set; }
         public double? CobFinal { get; set; }
         public double FactorAgotamiento { get; set; }
@@ -213,11 +213,9 @@ namespace Models {
         public int IdCultivo { get; set; }
         public int IdRegante { get; set; }
         public int IdTipoRiego { get; set; }
-        public DateTime? FechaSiembra { get {
-                return DatosOptiaqua.DB.FechaSiembra(IdUnidadCultivo, IdTemporada);
-            }
-        }
-        public double Pluviometria { set; get; }        
+        public double Pluviometria { set; get; }
+
+        public DateTime? FechaSiembra() => DatosOptiaqua.DB.FechaSiembra(IdUnidadCultivo, IdTemporada);
     }
 
     [TableName("UnidadCultivoCultivoEtapas")]
@@ -475,15 +473,15 @@ namespace Models {
         public double LimiteAgotamientoRefPM { get; set; }
         public double LimiteAgotamientoFijoRefPM { get; set; }
 
-        public double Altura { get;  set; }
-        public double Cobertura { get;  set; }
-        public string NombreEtapaDesarrollo { get;  set; }
-        public int NumeroEtapaDesarrollo { get;  set; }
-        public double LongitudRaiz { get;  set; }
-        public double AlturaFinal { get;  set; }
-        public double AlturaInicial { get;  set; }
-        public double ProfRaizInicial { get;  set; }
-        public double ProfRaizMaxima { get;  set; }
+        public double Altura { get; set; }
+        public double Cobertura { get; set; }
+        public string NombreEtapaDesarrollo { get; set; }
+        public int NumeroEtapaDesarrollo { get; set; }
+        public double LongitudRaiz { get; set; }
+        public double AlturaFinal { get; set; }
+        public double AlturaInicial { get; set; }
+        public double ProfRaizInicial { get; set; }
+        public double ProfRaizMaxima { get; set; }
     }
 
     public class GeoLocParcela {
@@ -625,7 +623,7 @@ namespace Models {
     public class UnidadDeCultivoParcelasValvulas {
         public string IdUnidadCultivo { get; set; }
         public string IdTemporada { get; set; }
-        public int IdParcelaInt { get; set; }        
+        public int IdParcelaInt { get; set; }
         public double SuperficieM2 { get; set; }
         public string RefCatastral { get; set; }
         public int IdProvincia { get; set; }

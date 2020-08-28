@@ -2631,7 +2631,7 @@
             <param name="idTemporada">The idTemporada<see cref="T:System.String"/>.</param>
             <param name="superficieM2">The superficieM2<see cref="T:System.Double"/>.</param>
         </member>
-        <member name="M:DatosOptiaqua.Importacion.UnidadCultivoCultivoTemporadaSave(NPoco.Database,System.String,System.String,System.Int32,System.Int32,System.Int32,System.String)">
+        <member name="M:DatosOptiaqua.Importacion.UnidadCultivoCultivoTemporadaSave(NPoco.Database,System.String,System.String,System.Int32,System.Int32,System.Int32,System.DateTime)">
             <summary>
             The UnidadCultivoCultivoTemporadaSave.
             </summary>

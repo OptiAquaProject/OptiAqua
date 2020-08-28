@@ -149,7 +149,7 @@
         /// En caso de que no existandatos retorna fecha actual.
         /// </summary>
         /// <returns>.</returns>
-        public DateTime FechaSiembra() => (DateTime)unidadCultivoCultivo.FechaSiembra;
+        public DateTime FechaSiembra() => (DateTime)unidadCultivoCultivo.FechaSiembra();
 
         /// <summary>
         /// Gets the CultivoNombre.
@@ -442,21 +442,63 @@
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        public double VelocidadViento(DateTime fecha) => (lDatosClimaticos.Find(d => d.Fecha == fecha)?.VelViento) ?? 0;// velocidad del viento
+        public double VelocidadViento(DateTime fecha) {
+            var velocidad=(lDatosClimaticos.Find(d => d.Fecha == fecha)?.VelViento) ;// velocidad del viento
+            if (velocidad == null) {
+                var aux1 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-1))?.TempMedia;
+                var aux2 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-2))?.TempMedia;
+                var aux3 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-3))?.TempMedia;
+                var suma = (aux1 ?? 0) + (aux2 ?? 0) + (aux3 ?? 0);
+                var nItemSumados = (aux1 == null ? 0 : 1) + (aux2 == null ? 0 : 1) + (aux3 == null ? 0 : 1);
+                if (nItemSumados == 0)
+                    velocidad = 0;
+                else
+                    velocidad = suma / (double)nItemSumados;
+            }
+            return (double)velocidad;
+        }
 
         /// <summary>
         /// Retorna Humedad media a una fecha. 0 Si no se dispone de datos en esa fecha.
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        public double HumedadMedia(DateTime fecha) => (lDatosClimaticos.Find(d => d.Fecha == fecha)?.HumedadMedia) ?? 0;// temperatura media
+        public double HumedadMedia(DateTime fecha) {
+            double? humedad = lDatosClimaticos.Find(d => d.Fecha == fecha)?.HumedadMedia;
+            if (humedad == null) {
+                var aux1 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-1))?.TempMedia;
+                var aux2 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-2))?.TempMedia;
+                var aux3 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-3))?.TempMedia;
+                var suma = (aux1 ?? 0) + (aux2 ?? 0) + (aux3 ?? 0);
+                var nItemSumados = (aux1 == null ? 0 : 1) + (aux2 == null ? 0 : 1) + (aux3 == null ? 0 : 1);
+                if (nItemSumados == 0)
+                    humedad = 0;
+                else
+                    humedad = suma / (double)nItemSumados;
+            }
+            return (double)humedad;
+        }
 
         /// <summary>
         /// Retorna la temperatura a una fecha.  0 Si no se dispone de datos en esa fecha.
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        public double Temperatura(DateTime fecha) => (lDatosClimaticos.Find(d => d.Fecha == fecha)?.TempMedia) ?? 0;// temperatura media
+        public double Temperatura(DateTime fecha) {
+            double? temp = lDatosClimaticos.Find(d => d.Fecha == fecha)?.TempMedia;
+            if (temp == null) {
+                var temp1= lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-1))?.TempMedia;
+                var temp2 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-2))?.TempMedia;
+                var temp3 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-3))?.TempMedia;
+                var suma = (temp1 ?? 0) + (temp2 ?? 0) + (temp3 ?? 0);
+                var nItemSumados = (temp1 == null ? 0 : 1)+ (temp2 == null ? 0 : 1)+ (temp3 == null ? 0 : 1);
+                if (nItemSumados == 0)
+                    temp = 0;
+                else
+                    temp = suma / (double)nItemSumados;
+            }
+            return (double)temp;
+        }
 
         /// <summary>
         /// Retorna los mm de lluvía a una fecha.  0 Si no se dispone de datos en esa fecha.
@@ -476,7 +518,22 @@
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        public double Eto(DateTime fecha) => (lDatosClimaticos.Find(d => d.Fecha == fecha)?.Eto) ?? 0;// temperatura media
+        public double Eto(DateTime fecha) {
+            var eto= lDatosClimaticos.Find(d => d.Fecha == fecha)?.Eto ;
+            if (eto == null) {
+                var aux1 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-1))?.TempMedia;
+                var aux2 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-2))?.TempMedia;
+                var aux3 = lDatosClimaticos.Find(d => d.Fecha == fecha.AddDays(-3))?.TempMedia;
+                var suma = (aux1 ?? 0) + (aux2 ?? 0) + (aux3 ?? 0);
+                var nItemSumados = (aux1 == null ? 0 : 1) + (aux2 == null ? 0 : 1) + (aux3 == null ? 0 : 1);
+                if (nItemSumados == 0)
+                    eto = 0;
+                else
+                    eto = suma / (double)nItemSumados;
+            }
+            return (double)eto;
+
+        }
 
         /// <summary>
         /// Retorna la definición de la clase de estrés.
