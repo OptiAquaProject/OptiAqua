@@ -738,22 +738,6 @@
             <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/>.</param>
             <returns>The <see cref="T:System.Double"/>.</returns>
         </member>
-        <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoCobertura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Boolean,System.Int32,System.Nullable{System.Double},System.Nullable{System.Double})">
-            <summary>
-            The TasaCrecimientoCobertura.
-            </summary>
-            <param name="it">The it<see cref="T:System.Double"/>.</param>
-            <param name="nEtapa">The nEtapa<see cref="T:System.Int32"/>.</param>
-            <param name="itEmergencia">The itEmergencia<see cref="T:System.Double"/>.</param>
-            <param name="ModCobCoefA">The ModCobCoefA<see cref="T:System.Double"/>.</param>
-            <param name="ModCobCoefB">The ModCobCoefB<see cref="T:System.Double"/>.</param>
-            <param name="ModCobCoefC">The ModCobCoefC<see cref="!:double?"/>.</param>
-            <param name="definicionEtapaPorDias">The definicionEtapaPorDias<see cref="T:System.Boolean"/>.</param>
-            <param name="nDiasduracionEtapaDias">The nDiasduracionEtapaDias<see cref="T:System.Int32"/>.</param>
-            <param name="coberturaInicial">The coberturaInicial<see cref="!:double?"/>.</param>
-            <param name="coberturaFinal">The coberturaFinal<see cref="!:double?"/>.</param>
-            <returns>The <see cref="T:System.Double"/>.</returns>
-        </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoAltura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Boolean,System.Int32,System.Nullable{System.Double},System.Nullable{System.Double})">
             <summary>
             The TasaCrecimientoAltura.
@@ -1095,6 +1079,13 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/>.</param>
             <returns>The <see cref="T:System.Double"/>.</returns>
         </member>
+        <member name="M:DatosOptiaqua.BalanceHidrico.AguaPerdidaEficienciaRiego(System.DateTime)">
+            <summary>
+            AguaPerdidaEficienciaRiego.
+            </summary>
+            <param name="fecha">The fecha<see cref="T:System.DateTime"/>.</param>
+            <returns>The <see cref="T:System.Double"/>.</returns>
+        </member>
         <member name="M:DatosOptiaqua.BalanceHidrico.AguaTotalPerdidaDrenaje(System.DateTime)">
             <summary>
             Suma agua perdida por drenaje hasta fecha.
@@ -1158,7 +1149,7 @@
             <param name="fecha">The fecha<see cref="T:System.DateTime"/>.</param>
             <returns>The <see cref="T:System.Double"/>.</returns>
         </member>
-        <member name="M:DatosOptiaqua.BalanceHidrico.Consumo(System.DateTime)">
+        <member name="M:DatosOptiaqua.BalanceHidrico.SumaEtc(System.DateTime)">
             <summary>
             AguaUtilTotal.
             </summary>

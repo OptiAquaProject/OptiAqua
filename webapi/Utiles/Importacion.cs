@@ -201,12 +201,19 @@
         /// <param name="idTemporada">The idTemporada<see cref="string"/>.</param>
         /// <param name="superficieM2">The superficieM2<see cref="double"/>.</param>
         private static void UnidadCultivoSuperficieSave(Database db, string idUnidadCultivo, string idTemporada, double superficieM2) {
+            /*
             UnidadCultivoSuperficie r = new UnidadCultivoSuperficie {
                 IdTemporada = idTemporada,
                 IdUnidadCultivo = idUnidadCultivo,
                 SuperficieM2 = superficieM2
             };
             db.Save(r);
+            */
+            var ucc = db.SingleOrDefault<UnidadCultivoCultivo>("IdUnidadCultivo=@0 AND IdTemporada=@1");
+            if (ucc != null) {
+                ucc.SuperficieM2 = superficieM2;
+                db.Save(ucc);
+            }
         }
 
         /// <summary>

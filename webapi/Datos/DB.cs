@@ -766,6 +766,8 @@
                     if (DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(idUC, idUsuario, IdTemporada) == false)
                         continue;
                 }
+                dic.Add("SuperficieM2", UnidadCultivoExtensionM2(idUC, IdTemporada));
+                dic.Add("FechaSiembra", DB.FechaSiembra(idUC, IdTemporada));
                 lValidos.Add(dic);
                 List<GeoLocParcela> lGeoLocParcelas = DB.GeoLocParcelasList(idUC, IdTemporada);
                 string geo = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
@@ -849,20 +851,21 @@
         /// <param name="rp">rp<see cref="RegantePost"/>.</param>
         public static void ReganteUpdate(RegantePost rp) {
             Database db = DB.ConexionOptiaqua;
-            Regante r = db.SingleOrDefaultById<Regante>(rp.IdRegante);
-            if (r == null)
+            Regante regante = db.SingleOrDefaultById<Regante>(rp.IdRegante);
+            if (regante == null)
                 throw new Exception($"El Regante {rp.IdRegante} no existe");
-            r.NIF = rp.NIF;
-            r.Nombre = rp.Nombre;
-            r.Direccion = rp.Direccion;
-            r.CodigoPostal = rp.CodigoPostal;
-            r.Poblacion = rp.Poblacion;
-            r.Provincia = rp.Provincia;
-            r.Pais = rp.Pais;
-            r.Telefono = rp.Telefono;
-            r.TelefonoSMS = rp.TelefonoSMS;
-            r.Email = rp.Email;
-            db.Save(r);
+            regante.NIF = rp.NIF;
+            regante.Nombre = rp.Nombre;
+            regante.Direccion = rp.Direccion;
+            regante.CodigoPostal = rp.CodigoPostal;
+            regante.Poblacion = rp.Poblacion;
+            regante.Provincia = rp.Provincia;
+            regante.Pais = rp.Pais;
+            regante.Telefono = rp.Telefono;
+            regante.TelefonoSMS = rp.TelefonoSMS;
+            regante.Email = rp.Email;
+            regante.Contraseña = BuildPassword(regante.NIF, "Pass" + regante.IdRegante.ToString());
+            db.Save(regante);
         }
 
         /// <summary>
@@ -1914,14 +1917,11 @@
                 return 0;
             double? ret = 0;
             Database db = DB.ConexionOptiaqua;
-            string sql = "Select SuperficieM2 From UnidadCultivoSuperficie Where IdUnidadCultivo=@0 and IdTemporada=@1";
+            string sql = "Select SuperficieM2 From UnidadCultivoCultivo Where IdUnidadCultivo=@0 and IdTemporada=@1";
             ret = db.SingleOrDefault<float?>(sql, idUnidadCultivo, idTemporada);
             if (ret != null)
                 return (double)ret;
-            sql = "SELECT TOP (1) dbo.UnidadCultivoSuperficie.SuperficieM2 FROM dbo.Temporada INNER JOIN dbo.UnidadCultivoSuperficie ";
-            sql += " ON dbo.Temporada.IdTemporada = dbo.UnidadCultivoSuperficie.IdUnidadCultivo ";
-            sql += " WHERE dbo.UnidadCultivoSuperficie.IdUnidadCultivo = @0 ";
-            sql += " ORDER BY dbo.Temporada.FechaInicial DESC";
+            sql = " SELECT TOP(1) SuperficieM2 FROM UnidadCultivoCultivo WHERE(IdTemporada = @0) ORDER BY IdTemporada DESC";
             ret = db.SingleOrDefault<float?>(sql, idUnidadCultivo);
             if (ret != null)
                 return (double)ret;

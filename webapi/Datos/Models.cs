@@ -34,7 +34,7 @@ namespace Models {
         public string Alias { get; set; }
         public string TipoSueloDescripcion { get; set; }
     }
-
+    /*
     [TableName("UnidadCultivoSuperficie")]
     [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
     public class UnidadCultivoSuperficie {
@@ -42,7 +42,7 @@ namespace Models {
         public string IdTemporada { get; set; }
         public double SuperficieM2 { get; set; }
     }
-
+    */
     [TableName("CultivoEtapas")]
     [PrimaryKey("IdCultivo,OrdenEtapa", AutoIncrement = false)]
     public class CultivoEtapas {
@@ -214,7 +214,7 @@ namespace Models {
         public int IdRegante { get; set; }
         public int IdTipoRiego { get; set; }
         public double Pluviometria { set; get; }
-
+        public double SuperficieM2 { set; get; }
         public DateTime? FechaSiembra() => DatosOptiaqua.DB.FechaSiembra(IdUnidadCultivo, IdTemporada);
     }
 

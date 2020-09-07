@@ -184,6 +184,16 @@
         [Route("api/UnidadCultivoList/{Fecha}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{Search}")]
         public IHttpActionResult GetUnidadCultivoList(string Fecha, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
             try {
+
+
+#if DEBUG
+#else
+                string clave = "GetUnidadCultivoList" + Fecha + IdUnidadCultivo + IdRegante+IdCultivo+IdMunicipio+IdTipoRiego+IdEstacion+Search;
+                IHttpActionResult cache = CacheDatosHidricos.ActionResult(clave);
+                if (cache != null)
+                    return cache;
+#endif
+
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
@@ -193,7 +203,12 @@
                     idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo.Unquoted(), dFecha);
                 else
                     idTemporada = DB.TemporadaActiva();
-                return Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
+                var ret= Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
+#if DEBUG
+#else
+                CacheDatosHidricos.AddActionResult(clave, ret);
+#endif
+                return ret;
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

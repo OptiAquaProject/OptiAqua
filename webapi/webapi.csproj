@@ -224,8 +224,8 @@
     <Compile Include="Controllers\Etapas.cs" />
     <Compile Include="Controllers\Temporada.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Logica\Calculos Hídricos.cs" />
-    <Compile Include="Logica\Balance Hidrico.cs" />
+    <Compile Include="Logica Agrónoma\Calculos Hídricos.cs" />
+    <Compile Include="Logica Agrónoma\Balance Hidrico.cs" />
     <Compile Include="Datos\DatosHidricos.cs" />
     <Compile Include="Datos\DB.cs" />
     <Compile Include="Utiles\Importacion.cs" />

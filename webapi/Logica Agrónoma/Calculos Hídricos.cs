@@ -48,6 +48,39 @@
             return paw33;
         }
 
+        public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC, bool definicionEtapaPorDias, int nDiasduracionEtapaDias, double? coberturaInicial, double? coberturaFinal) {
+            // !!! SIAR se añade un calculo alternativo del coeficiente cuando DefinicionPorDias = TRUE
+
+            // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
+            //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
+            //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
+            //     3.- cuando la planta brota, se calcula la cobertura
+            //     4.- se cambia la variable itomprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
+            double ret;
+            if (nEtapa == 2)
+                nEtapa = 2;
+            if (definicionEtapaPorDias) {  // !!! propuestaSIAR && ModCobCoefB < 0) o && ModCobCoefB != -9999) { 
+                if (coberturaFinal != null && coberturaInicial != null) {
+                    ret = ((double)coberturaFinal - (double)coberturaInicial) / (double)nDiasduracionEtapaDias;
+                } else {
+                    ret = 0;
+                }
+            } else {
+                if (nEtapa == 1 && it < itEmergencia) {
+                    ret = 0;
+                } else {
+                    it = it - itEmergencia;
+                    if (ModCobCoefC != null && ModCobCoefC != 0) {
+                        ret = ModCobCoefA * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC)) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
+                    } else {
+                        ret = ModCobCoefB;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        /*
         /// <summary>
         /// The TasaCrecimientoCobertura.
         /// </summary>
@@ -71,9 +104,9 @@
             //     3.- cuando la planta brota, se calcula la cobertura
             //     4.- se cambia la variable itomprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
-            if (nEtapa == 2)
-                nEtapa = 2;
-            if (definicionEtapaPorDias) {  // !!! propuestaSIAR && ModCobCoefB < 0) o && ModCobCoefB != -9999) { 
+            //if (nEtapa == 1)
+            //    nEtapa = 1;
+            if (definicionEtapaPorDias && (ModCobCoefB < 0)) {  // !!! propuestaSIAR hemos añadido  && ModCobCoefB < 0) { 
                 if (coberturaFinal != null && coberturaInicial != null) {
                     ret = ((double)coberturaFinal - (double)coberturaInicial) / (double) nDiasduracionEtapaDias;
                 } else {
@@ -94,6 +127,7 @@
             return ret;
         }
 
+    */
         /// <summary>
         /// The TasaCrecimientoAltura.
         /// </summary>
@@ -118,7 +152,9 @@
             //     5.- se añade la rutina que comprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
             double ret;
 
-            if (definicionEtapaPorDias) { // propuestaSIAR if(ModAltCoefB < 0)
+            //if (nEtapa == 1)
+              //  nEtapa = 1;
+            if (ModAltCoefB < 0){  //old: if (definicionEtapaPorDias) { // propuestaSIAR 
                 if (nEtapa < 3) { 
                     // Obtener de la tabla cultivoEtapas para la UC y la Etapa correspondiente:
                     // duracion de las etapas 1 y 2                    
@@ -126,7 +162,7 @@
                     if (alturaInicial == null || alturaFinal == null)
                         ret = 0;
                     else
-                        ret = ((double)alturaFinal - (double)alturaFinal) / NDiasEtapas1y2;
+                        ret = ((double)alturaFinal - (double)alturaInicial) / NDiasEtapas1y2; // modificado SIAR (29/08), estaba mal la fórmula
                 } else {
                     ret = 0;
                 }
@@ -267,7 +303,7 @@
 
             if (lbAnt.LongitudRaiz == 0) {
                 ret = profRaizInicial;
-            } else if (definicionEtapaPorDias) { // propuestaSIAR if(modRaizCoefB < 0)
+            } else if (modRaizCoefB < 0) { //old: if (definicionEtapaPorDias) { // propuestaSIAR esta función es más natural y fácil de entender que tener la tasa de crecimiento por un lado y el calculo crecimiento  en dos funciones distintas. Este modelo de función además permite un cálculo real de la integral térmica ya que sólo la usa si hay fórmula.
                 if (nEtapa < 3) {
                     ret = lbAnt.LongitudRaiz + (profRaizMax - profRaizInicial) / (nDiasEtapas1y2 - 2);
                     if (ret > profRaizMax) {
@@ -566,7 +602,7 @@
         public static double IncrementoTemperatura(double temperatura, double CultivoTBase, bool definicionPorDias) {
             // ANTES=> temperatura > CultivoTBase ? temperatura - CultivoTBase : 0;
             double ret;
-            if (definicionPorDias) {// propuestaSIAR if(CultivoTBase < 0) {PARECE COMPLICADO.... ESTO FUE UN APAÑO Y CON ESTA SOLUCION ESTÁ FALSEADO Y NO ES CORRECTO
+            if (CultivoTBase < 0) { // old: if(definicionPorDias) {// propuestaSIAR PARECE COMPLICADO.... ESTO FUE UN APAÑO Y CON ESTA SOLUCION ESTÁ FALSEADO Y NO ES CORRECTO. Sería más conveniente cambiar las funciones de cálculo de cobertura y altura para que no use la integral térmica (IT) si no hay fórmula, en lugar de cálcular una IT falsa
                 ret = 1;
             } else {
                 if (temperatura > CultivoTBase) {
@@ -713,8 +749,6 @@
             lb.LimiteAgotamientoFijo = (lb.CapacidadCampo - lb.AguaFacilmenteExtraibleFija); // depletion factor fijo
             lb.CoeficienteEstresHidrico = CoeficienteEstresHidrico(lb.AguaDisponibleTotal, lb.AguaFacilmenteExtraible, lb.AgotamientoInicioDia); // K de estrés hídrico
 
-            if (fecha == new DateTime(2020, 08, 26))
-                fecha = fecha;
             lb.EtcFinal = EtcFinal(dh.Eto(fecha), lb.KcAjustadoClima, lb.CoeficienteEstresHidrico); //ETc ajustada por clima y estrés
 
             lb.DrenajeProfundidad = DrenajeEnProdundidad(lbAnt, lb.AguaDisponibleTotal, lb.EtcFinal, lb.RiegoEfectivo, lb.LluviaEfectiva, lb.AguaCrecRaiz, lb.AgotamientoInicioDia, 0);

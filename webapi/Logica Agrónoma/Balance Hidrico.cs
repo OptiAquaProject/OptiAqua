@@ -61,7 +61,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double AguaUtil(DateTime fecha) {
+        public double AguaUtil(DateTime fecha) { // !!!SIAR esta formula es errónea y se puede eliminar
             double ret = 0;
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
@@ -75,7 +75,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double AguaPerdida(DateTime fecha) {
+        public double AguaPerdida(DateTime fecha) { // !!! SIAR, eliminar esta función sustituyendola por AguaPerdidaEficienciaRiego
             double sumaRiego = 0;
             double sumaRiegoEfec = 0;
             double sumaDrenaje = 0;
@@ -90,11 +90,27 @@
         }
 
         /// <summary>
+        /// AguaPerdidaEficienciaRiego.
+        /// </summary>
+        /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
+        /// <returns>The <see cref="double"/>.</returns>
+        public double AguaPerdidaEficienciaRiego(DateTime fecha) { // !!! SIAR, añadir al glosario
+            double sumaRiego = 0;
+            double sumaRiegoEfec = 0;
+            foreach (LineaBalance lin in LineasBalance) {
+                if (lin.Fecha <= fecha) {
+                    sumaRiego += lin.Riego;
+                    sumaRiegoEfec += lin.RiegoEfectivo;
+                         }
+            }
+            return (sumaRiego - sumaRiegoEfec);
+        }
+        /// <summary>
         /// Suma agua perdida por drenaje hasta fecha.
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        public double AguaTotalPerdidaDrenaje(DateTime fecha) {
+        public double AguaTotalPerdidaDrenaje(DateTime fecha) { //!!! SIAR en el glosario se llama a este parámetro AguaPerdida, cambiar glosario, ver comentario funcion SumaDrenajeMm
             double ret = LineasBalance.Sum(x => x.Fecha > fecha ? 0 : x.DrenajeProfundidad);
             return ret;
         }
@@ -115,7 +131,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double SumaDrenajeMm(DateTime fecha) {
+        public double SumaDrenajeMm(DateTime fecha) { //!!! SIAR esta función y la función AguaTotalPerdidaDrenaje son iguales, eliminar una de ellas
             // Los datos de riego del balance hídrico ya han tenido en cuenta los datos Extra
             double ret = LineasBalance.Sum(x => (x.Fecha > fecha) ? 0d : x.DrenajeProfundidad);
             return ret;
@@ -147,11 +163,12 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double AguaUtilOptima(DateTime fecha) {
+        public double AguaUtilOptima(DateTime fecha) { // !!! SIAR renombrar a AguaFacilmenteExtraible, también en la salida API si se usase
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron datos del balance para esa fecha.");
-            return (lin.CapacidadCampo - lin.ContenidoAguaSuelo);
+            return (lin.CapacidadCampo - lin.LimiteAgotamiento);
+            //return (lin.AguaFacilmenteExtraible); // !!! SIAR es más sencillo así
         }
 
         /// <summary>
@@ -198,11 +215,12 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double AguaUtilTotal(DateTime fecha) {
+        public double AguaUtilTotal(DateTime fecha) { //!!! SIAR renombrar función a AguaDisponibleTotal; también en la salida de la API si se usase
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin == null)
                 throw new Exception("No se encontraron valores en el balance para la fecha indicada.");
             double ret = lin.CapacidadCampo - lin.PuntoMarchitez;
+            // double ret = lin.AguaDisponibleTotal; // !!! SIAR, más sencillo así
             return ret;
         }
 
@@ -211,7 +229,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double Consumo(DateTime fecha) {
+        public double SumaEtc(DateTime fecha) {
             double ret = LineasBalance.Sum(x => x.Fecha > fecha ? 0 : x.EtcFinal);
             return ret;
         }
@@ -292,11 +310,11 @@
         /// </summary>
         /// <param name="fechaCalculo">The fechaCalculo<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double CosteAgua(DateTime fechaCalculo) {
+        public double CosteAgua(DateTime fechaCalculo) { // !!! SIAR Cambiar nombre función a CosteAguaRiego, hemos introducido pequeños cambios estéticos a la función para entenderla mejor
             double precioM3 = DB.UnidadCultivoTemporadaCosteM3Agua(unidadCultivoDatosHidricos.IdUnidadCultivo, unidadCultivoDatosHidricos.IdTemporada);
             double totalMm = SumaRiegosMm(fechaCalculo);
-            double superficie = unidadCultivoDatosHidricos.UnidadCultivoExtensionM2 ?? 0;
-            double ret = totalMm / 1000 * precioM3 * superficie;
+            double superficieM2 = unidadCultivoDatosHidricos.UnidadCultivoExtensionM2 ?? 0;
+            double ret = (totalMm / 1000) * precioM3 * superficieM2;
             return ret;
         }
 
@@ -305,14 +323,14 @@
         /// </summary>
         /// <param name="fechaCalculo">The fechaCalculo<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public double CosteDrenaje(DateTime fechaCalculo) {
+        public double CosteDrenaje(DateTime fechaCalculo) {// !!! SIAR, renombrar a CosteAguaDrenaje; hemos introducido pequeños cambios estéticos a la función para entenderla mejor
             double? precioM3 = DB.UnidadCultivoTemporadaCosteM3Agua(unidadCultivoDatosHidricos.IdUnidadCultivo, unidadCultivoDatosHidricos.IdTemporada);
-            double totalMm = SumaDrenajeMm(fechaCalculo);
-            double superficie = unidadCultivoDatosHidricos.UnidadCultivoExtensionM2 ?? 0;
-            double? ret = totalMm / 1000 * precioM3 * superficie;
+            double totalMm = SumaDrenajeMm(fechaCalculo); //!!! Ver comentario en esta función
+            double superficieM2 = unidadCultivoDatosHidricos.UnidadCultivoExtensionM2 ?? 0;
+            double? ret = (totalMm / 1000) * precioM3 * superficieM2;
             return ret ?? 0;
         }
-
+        
         /// <summary>
         /// LineaBalance.
         /// </summary>
@@ -374,7 +392,7 @@
                 AguaUtil = AguaUtil(fecha),
                 RegarEnNDias = RegarEnNDias(fecha),
                 AguaUtilTotal = AguaUtilTotal(fecha),
-                Consumo = Consumo(fecha),
+                Consumo = SumaEtc(fecha),
                 CapacidadDeCampo = linBalAFecha.CapacidadCampo,
                 PuntoDeMarchited = linBalAFecha.PuntoMarchitez,
                 AguaUtilOptima = AguaUtilOptima(fecha),
@@ -400,7 +418,7 @@
         /// </summary>
         /// <param name="fecha">The fecha<see cref="DateTime"/>.</param>
         /// <returns>The <see cref="int"/>.</returns>
-        private int NumCambiosDeEtapaPendientesDeConfirmar(DateTime fecha) {
+        private int NumCambiosDeEtapaPendientesDeConfirmar(DateTime fecha) { // !!! SIAR, no entendemos muy bien la función pero creemos que lo calcula mal
             int ret = 0;
             LineaBalance lin = LineasBalance.Find(x => x.Fecha == fecha);
             if (lin != null) {
@@ -420,7 +438,7 @@
         /// </summary>
         /// <param name="fecha">.</param>
         /// <returns>.</returns>
-        private int NumDiasEstresPorDrenaje(DateTime fecha) {
+        private int NumDiasEstresPorDrenaje(DateTime fecha) { // !!! SIAR renombrar a NDiasDrenaje 
             int ret = LineasBalance.Count(x => x.DrenajeProfundidad > 0);
             return ret;
         }
@@ -442,17 +460,17 @@
 
             ret.IdUnidadCultivo = unidadCultivoDatosHidricos.IdUnidadCultivo;
             ret.FechaDeCalculo = fechaDeCalculo;
-            ret.RiegoTotal = SumaRiegosMm(fechaDeCalculo);
-            ret.RiegoEfectivoTotal = SumaRiegoEfectivo(fechaDeCalculo);
-            ret.LluviaTotal = SumaLluvias(fechaDeCalculo);
-            ret.LluviaEfectivaTotal = SumaLluviasEfectivas(fechaDeCalculo);
-            ret.AguaPerdida = AguaPerdida(fechaDeCalculo);
-            ret.ConsumoAguaCultivo = SumaConsumoAguaCultivo(fechaDeCalculo);
-            ret.DiasEstres = NDIasEstres(fechaDeCalculo);
-            ret.DeficitRiego = double.NaN; // Aún no definido
-            ret.CosteDeficitRiego = double.NaN; // Aúno no definido.
-            ret.CosteAguaRiego = CosteAgua(fechaDeCalculo);
-            ret.CosteAguaDrenaje = CosteDrenaje(fechaDeCalculo);
+            ret.RiegoTotal = SumaRiegosMm(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.RiegoEfectivoTotal = SumaRiegoEfectivo(fechaDeCalculo); // !!! SIAR ELIMINAR  y AÑADIR A LA SALIDA DatosHidricos
+            ret.LluviaTotal = SumaLluvias(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.LluviaEfectivaTotal = SumaLluviasEfectivas(fechaDeCalculo); // !!! SIAR ELIMINAR  y AÑADIR A LA SALIDA DatosHidricos
+            ret.AguaPerdida = AguaPerdida(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.ConsumoAguaCultivo = SumaConsumoAguaCultivo(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.DiasEstres = NDIasEstres(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.DeficitRiego = double.NaN; // Aún no definido // !!! SIAR ELIMINAR y AÑADIR A LA SALIDA DatosHidricos
+            ret.CosteDeficitRiego = double.NaN; // Aúno no definido. // !!! SIAR ELIMINAR y AÑADIR A LA SALIDA DatosHidricos
+            ret.CosteAguaRiego = CosteAgua(fechaDeCalculo); // !!! SIAR ELIMINAR
+            ret.CosteAguaDrenaje = CosteDrenaje(fechaDeCalculo); // !!! SIAR ELIMINAR y AÑADIR A LA SALIDA DatosHidricos
 
             ret.CapacidadCampo = lb.CapacidadCampo;
 
