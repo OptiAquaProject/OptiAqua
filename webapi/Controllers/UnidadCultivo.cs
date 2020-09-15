@@ -21,7 +21,9 @@
         [Route("api/UnidadCultivo/{idUnidadCultivo}")]
         public IHttpActionResult Get(string idUnidadCultivo) {
             try {
-                return Json(DB.UnidadCultivo(idUnidadCultivo));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.UnidadCultivo(idUnidadCultivo));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -36,8 +38,13 @@
         [Route("api/UnidadesDeCultivo/{fecha}")]
         public IHttpActionResult GetUnidadesDeCultivo(string fecha) {
             try {
-                var lTemporadas = DB.TemporadasDeFecha(DateTime.Parse(fecha));
-                return Json(DB.UnidadesDeCultivoList(lTemporadas));
+                ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath + "Usuario" + idUsuario.ToString(), () => {
+                    var lTemporadas = DB.TemporadasDeFecha(DateTime.Parse(fecha));
+                    return Json(DB.UnidadesDeCultivoList(lTemporadas, idUsuario, role));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -54,8 +61,13 @@
         [Route("api/UnidadCultivo/{fecha}/{idUnidadCultivo}/{idHorizonte}")]
         public IHttpActionResult GetHorizontes(string fecha, string idUnidadCultivo, string idHorizonte) {
             try {
+
                 var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, DateTime.Parse(fecha));
-                return Json(DB.UnidadCultivoHorizonte(idTemporada, idUnidadCultivo, idHorizonte));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    var ret = Json(DB.UnidadCultivoHorizonte(idTemporada, idUnidadCultivo, idHorizonte));
+                    return ret;
+                });
+
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -185,15 +197,6 @@
         public IHttpActionResult GetUnidadCultivoList(string Fecha, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
             try {
 
-
-#if DEBUG
-#else
-                string clave = "GetUnidadCultivoList" + Fecha + IdUnidadCultivo + IdRegante+IdCultivo+IdMunicipio+IdTipoRiego+IdEstacion+Search;
-                IHttpActionResult cache = CacheDatosHidricos.ActionResult(clave);
-                if (cache != null)
-                    return cache;
-#endif
-
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
@@ -203,12 +206,12 @@
                     idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo.Unquoted(), dFecha);
                 else
                     idTemporada = DB.TemporadaActiva();
-                var ret= Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
-#if DEBUG
-#else
-                CacheDatosHidricos.AddActionResult(clave, ret);
-#endif
-                return ret;
+
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath + "Usuario" + idUsuario.ToString(), () => {
+                    var ret = Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
+                    return ret;
+                });
+                
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -246,12 +249,20 @@
         [Route("api/UnidadCultivoDatosAmpliados/{Fecha}/{IdUnidadCultivo}")]
         public IHttpActionResult GetUnidadCultivoDatosAmpliados(string Fecha, string IdUnidadCultivo) {
             try {
+
+
                 string idTemporada;
                 if (string.IsNullOrWhiteSpace(Fecha))
                     idTemporada = "";
                 else
                     idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
-                return Json(DB.UnidadCultivoDatosAmpliados(idTemporada, IdUnidadCultivo));
+
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    var ret =Json(DB.UnidadCultivoDatosAmpliados(idTemporada, IdUnidadCultivo));
+                    return ret;
+                });
+
+
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -268,8 +279,10 @@
         [Route("api/UnidadCultivoTemporadaCosteM3Agua/{IdUnidadCultivo}/{Fecha}")]
         public IHttpActionResult UnidadCultivoTemporadaCosteM3Agua(string Fecha, string IdUnidadCultivo) {
             try {
-                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(Fecha));
-                return Json(DB.UnidadCultivoTemporadaCosteM3Agua(IdUnidadCultivo, idTemporada));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
+                    return Json(DB.UnidadCultivoTemporadaCosteM3Agua(IdUnidadCultivo, idTemporada));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -291,5 +304,35 @@
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/AsesorUnidadCultivo/{IdRegante}")]
+        public IHttpActionResult GetAsesorUnidadCultivo(int idRegante) {
+            try {
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.AsesorUnidadCultivoList(idRegante));
+                });
+            } catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("api/AsesorUnidadCultivo/")]
+        public IHttpActionResult PostAsesorUnidadCultivo([FromBody] ParamAsesorUnidadCultivo param) {
+            try {
+                param.LUnidadesCultivo = param.LUnidadesCultivo.Replace(";", ",");
+                var lUnidadesCultivo = param.LUnidadesCultivo.Split(',').ToList();
+                foreach( var iuc in lUnidadesCultivo) 
+                    CacheDatosHidricos.SetDirty(iuc);
+                return Json(DB.AsesorUnidadCultivoSave(param.IdRegante,lUnidadesCultivo));
+            } catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

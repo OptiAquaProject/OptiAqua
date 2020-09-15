@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Web.Http;
-    using System.Web.Http.Results;
 
     /// <summary>
     /// Defines the <see cref="CacheUnidadCultivo" />.
@@ -29,7 +28,7 @@
         /// Defines the lCacheBalances.
         /// </summary>
         private static Dictionary<string, Dictionary<string, CacheUnidadCultivo>> lCacheBalances = new Dictionary<string, Dictionary<string, CacheUnidadCultivo>>();
-        private static Dictionary<string, IHttpActionResult> lCacheActionResult= new Dictionary<string, IHttpActionResult>();
+        private static Dictionary<string, IHttpActionResult> lCacheActionResult = new Dictionary<string, IHttpActionResult>();
         /// <summary>
         /// The Balance.
         /// </summary>
@@ -56,6 +55,12 @@
         /// </summary>
         public static bool recalculando = false;
 
+        internal static void SetDirtyContainsKey(string key) {
+            foreach (var s in lCacheActionResult.Where(kv => kv.Key.ToUpper().Contains(key.ToUpper())).ToList()) {
+                lCacheActionResult.Remove(s.Key);
+            }
+        }
+
         /// <summary>
         /// The RecreateAll.
         /// </summary>
@@ -70,7 +75,7 @@
             lCacheActionResult.Clear();
             DB.InsertaEvento("Inicia RecreateAll" + DateTime.Now.ToString());
             DB.DatosClimaticosSiarForceRefresh();
-            var db = DB.ConexionOptiaqua;
+            NPoco.Database db = DB.ConexionOptiaqua;
             List<Models.Temporada> lTemporadas = DB.TemporadasList();
             foreach (Models.Temporada temporada in lTemporadas) {
                 string idTemporada = temporada.IdTemporada;
@@ -80,16 +85,16 @@
                     fechaCalculo = dateUpdate;
                 Dictionary<string, CacheUnidadCultivo> cacheTemporada = new Dictionary<string, CacheUnidadCultivo>();
                 lCacheBalances.Add(idTemporada, cacheTemporada);
-                List<string> lIdUnidadCultivo = db.Fetch<string>($"SELECT DISTINCT IdUnidadCultivo from UnidadCultivoCultivo WHERE IdTemporada=@0", idTemporada);                
+                List<string> lIdUnidadCultivo = db.Fetch<string>($"SELECT DISTINCT IdUnidadCultivo from UnidadCultivoCultivo WHERE IdTemporada=@0", idTemporada);
                 BalanceHidrico bh = null;
                 foreach (string idUC in lIdUnidadCultivo) {
                     //try {
-                        //DB.InsertaEvento("item " + idTemporada + " " + idUC +" "+  DateTime.Now.ToString());
-                        bh = BalanceHidrico.Balance(idUC, fechaCalculo, true, false);
-                        if (bh != null)
-                            cacheTemporada.Add(idUC, new CacheUnidadCultivo { Fecha = dateUpdate, Balance = bh });
+                    //DB.InsertaEvento("item " + idTemporada + " " + idUC +" "+  DateTime.Now.ToString());
+                    bh = BalanceHidrico.Balance(idUC, fechaCalculo, true, false);
+                    if (bh != null)
+                        cacheTemporada.Add(idUC, new CacheUnidadCultivo { Fecha = dateUpdate, Balance = bh });
                     //} catch (Exception) {
-                      
+
                     //}
                 }
             }
@@ -98,9 +103,12 @@
             return true;
         }
 
-        internal static void AddActionResult(string clave, IHttpActionResult result) {
-            lCacheActionResult.Add(clave, result);
+        internal static void ClearAll() {
+            lCacheBalances.Clear();
+            lCacheActionResult.Clear();
         }
+
+        internal static void AddActionResult(string clave, IHttpActionResult result) => lCacheActionResult.Add(clave, result);
 
         internal static IHttpActionResult ActionResult(string clave) {
             if (lCacheActionResult.ContainsKey(clave))
@@ -108,6 +116,24 @@
             else
                 return null;
         }
+
+        public static IHttpActionResult Cache(string uri, Func<IHttpActionResult> codigo) {
+#if DEBUG
+#else                
+            IHttpActionResult cache = CacheDatosHidricos.ActionResult(uri);
+            if (cache != null)
+                return cache;
+#endif
+            IHttpActionResult ret = codigo();
+#if DEBUG
+#else
+
+            CacheDatosHidricos.AddActionResult(uri, ret);
+#endif
+            return ret;
+
+        }
+
 
         /// <summary>
         /// The SetDirty.
@@ -136,6 +162,6 @@
             cacheTemporada.Remove(idUC);
             cacheTemporada.Add(idUC, new CacheUnidadCultivo { Fecha = fecha, Balance = bh });
         }
-        
+
     }
 }

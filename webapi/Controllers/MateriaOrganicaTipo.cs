@@ -16,7 +16,9 @@
         [Route("api/MateriaOrganicaTipo/{idMateriaOrganicatipo}")]
         public IHttpActionResult Get(string idMateriaOrganicatipo) {
             try {
-                return Json(DB.MateriaOrganicaTipo(idMateriaOrganicatipo));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.MateriaOrganicaTipo(idMateriaOrganicatipo));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -30,7 +32,9 @@
         [Route("api/MateriaOrganicaTipo/")]
         public IHttpActionResult GetListSuelos() {
             try {
-                return Json(DB.MateriaOrganicaTipoList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.MateriaOrganicaTipoList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

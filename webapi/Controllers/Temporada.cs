@@ -78,6 +78,7 @@
                 if (isAdmin == false)
                     return Unauthorized();
                 */
+                CacheDatosHidricos.ClearAll();
                 return Json(DB.TemporadaSave(temporada));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

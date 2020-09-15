@@ -21,10 +21,12 @@
             try {                
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
-                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;                
-                if (!DB.EstaAutorizado(idUsuario, role, idParcela))
-                    return Unauthorized();
-                return Json(DB.Parcela(idParcela));
+                var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+idUsuario.ToString(), () => {
+                    if (!DB.EstaAutorizado(idUsuario, role, idParcela))
+                        return Unauthorized();
+                    return Json(DB.Parcela(idParcela));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -44,11 +46,14 @@
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
-                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
-                    return Unauthorized();
 
-                return Json(DB.ParcelasList(idUnidadCultivo, idTemporada));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+idUsuario.ToString(), () => {
+                    var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                    if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                        return Unauthorized();
+                    return Json(DB.ParcelasList(idUnidadCultivo, idTemporada));
+                });
+
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -62,7 +67,9 @@
         [Route("api/parcelas/")]
         public IHttpActionResult GetParcelas() {
             try {
-                return Json(DB.ParcelasList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ParcelasList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -80,8 +87,10 @@
         [Authorize]
         [Route("api/ParcelaList/{IdTemporada}/{IdParcela}/{IdRegante}/{IdMunicipio}/{Search}")]
         public IHttpActionResult GetParcelaList(string Fecha, string IdParcela, string IdRegante, string IdMunicipio, string Search) {
-            try {                
-                return Json(DB.ParcelaList(Fecha, IdParcela, IdRegante, IdMunicipio, Search));
+            try {
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ParcelaList(Fecha, IdParcela, IdRegante, IdMunicipio, Search));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

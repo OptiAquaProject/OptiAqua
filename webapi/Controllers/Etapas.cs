@@ -17,8 +17,10 @@
         [Route("api/etapas/{IdUnidadCultivo}/{fecha}")]
         public IHttpActionResult Get(string IdUnidadCultivo, string fecha) {
             try {
-                var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo,DateTime.Parse(fecha));
-                return Json(DB.Etapas(IdUnidadCultivo, idTemporada));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    var idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(fecha));
+                    return Json(DB.Etapas(IdUnidadCultivo, idTemporada));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -64,6 +66,7 @@
         public IHttpActionResult Post([FromBody] EtapasPost param) {
             try {
                 DB.FechaConfirmadaSave(param.IdUnidadCultivo, param.IdTemporada, param.nEtapa, DateTime.Parse(param.FechaStrConfirmada));
+                CacheDatosHidricos.SetDirtyContainsKey("/Etapas");
                 return Ok();
             } catch {
                 return BadRequest();

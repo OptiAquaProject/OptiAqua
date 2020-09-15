@@ -16,7 +16,9 @@
         [Route("api/ElementosGruesosTipo/{IdElementosGruesosTipo}")]
         public IHttpActionResult Get(string IdElementosGruesosTipo) {
             try {
-                return Json(DB.ElementosGruesosTipo(IdElementosGruesosTipo));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ElementosGruesosTipo(IdElementosGruesosTipo));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -30,7 +32,9 @@
         [Route("api/ElementosGruesosTipo/")]
         public IHttpActionResult GetList() {
             try {
-                return Json(DB.ElementosGruesosTipoList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ElementosGruesosTipoList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

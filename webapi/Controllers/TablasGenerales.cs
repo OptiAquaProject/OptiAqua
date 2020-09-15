@@ -16,7 +16,9 @@
         [Route("api/Parajes/")]
         public IHttpActionResult Parajes() {
             try {
-                return Json(DB.ParajesList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ParajesList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -31,7 +33,9 @@
         [Route("api/Municipios/")]
         public IHttpActionResult Municipios() {
             try {
-                return Json(DB.MunicipiosList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.MunicipiosList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -46,7 +50,9 @@
         [Route("api/Provincias/")]
         public IHttpActionResult Provincias() {
             try {
-                return Json(DB.ProvinciaList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.ProvinciaList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -61,7 +67,9 @@
         [Route("api/Cultivos/")]
         public IHttpActionResult Cultivos() {
             try {
-                return Json(DB.CultivosList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.CultivosList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

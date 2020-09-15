@@ -21,12 +21,14 @@
         public IHttpActionResult Get(int idRegante) {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idUser = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                int IdUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false && idUser != idRegante) {
-                    return BadRequest("La parcela no pertenece al regante");
-                }
-                return Json(DB.Regante(idRegante));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+IdUsuario.ToString(), () => {
+                    if (isAdmin == false && IdUsuario != idRegante) {
+                        return BadRequest("La parcela no pertenece al regante");
+                    }
+                    return Json(DB.Regante(idRegante));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -41,12 +43,14 @@
         public IHttpActionResult Get() {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idUser = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                int IdUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
-                if (isAdmin == false) {
-                    return BadRequest("La parcela no pertenece al regante");
-                }
-                return Json(DB.RegantesList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath + "Usuario" + IdUsuario.ToString(), () => {
+                    if (isAdmin == false) {
+                        return BadRequest("La parcela no pertenece al regante");
+                    }
+                    return Json(DB.RegantesList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -64,8 +68,10 @@
         [Authorize]
         [Route("api/ReganteList/{Fecha}/{IdRegante}/{IdUnidadCultivo}/{IdParcela}/{Search}")]
         public IHttpActionResult GetReganteList(string Fecha, string IdRegante, string IdUnidadCultivo, string IdParcela, string Search) {
-            try {                
-                return Json(DB.ReganteList(Fecha, IdRegante, IdUnidadCultivo, IdParcela, Search));
+            try {
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath , () => {
+                    return Json(DB.ReganteList(Fecha, IdRegante, IdUnidadCultivo, IdParcela, Search));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -82,7 +88,8 @@
         public IHttpActionResult ReganteUpdate([FromBody] RegantePost regante) {
             try {
                 DB.ReganteUpdate(regante);
-                return Ok();
+                CacheDatosHidricos.SetDirtyContainsKey("/Regante");
+                return Ok(DB.ReganteUpdate(regante));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

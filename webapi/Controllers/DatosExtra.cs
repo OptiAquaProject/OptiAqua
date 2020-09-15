@@ -23,11 +23,12 @@
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
-                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
-                    return Unauthorized();
-
-                return Json(DB.DatosExtraList(idUnidadCultivo));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+idUsuario.ToString(), () => {
+                    var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                    if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                        return Unauthorized();
+                    return Json(DB.DatosExtraList(idUnidadCultivo));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -47,10 +48,12 @@
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
                 int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
-                var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
-                if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
-                    return Unauthorized();
-                return Json(DB.DatosExtraList(idUnidadCultivo, dFecha));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+idUsuario.ToString(), () => {
+                    var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
+                    if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
+                        return Unauthorized();
+                    return Json(DB.DatosExtraList(idUnidadCultivo, dFecha));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -119,6 +122,7 @@
         public IHttpActionResult Post([FromBody] PostDatosExtraParam param) {
             try {
                 DB.DatosExtraSave(param);
+                CacheDatosHidricos.SetDirtyContainsKey("/DatosExtra");
                 CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok(Newtonsoft.Json.JsonConvert.SerializeObject(param));
             } catch (Exception ex) {

@@ -25,7 +25,9 @@
                 if (FFin != "''") {
                     fin = DateTime.Parse(FFin.Unquoted());
                 }
-                return Json(DB.MultimediaList(IdMultimedia, IdMultimediaTipo, ini, fin, Activa, Search));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.MultimediaList(IdMultimedia, IdMultimediaTipo, ini, fin, Activa, Search));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -33,8 +35,10 @@
 
         [Route("api/MultimediaTipo/{IdMultimediaTipo}/{Search}")]
         public IHttpActionResult GetMultimediaTipo(int? IdMultimediaTipo, string Search) {
-            try {              
-                return Json(DB.MultimediaTipoList(IdMultimediaTipo, Search));
+            try {
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.MultimediaTipoList(IdMultimediaTipo, Search));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -49,6 +53,7 @@
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false)
                     return Unauthorized();
+                CacheDatosHidricos.SetDirtyContainsKey("/Multimedia");
                 return Json(DB.MultimediaSave(multimedia));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -64,6 +69,7 @@
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false)
                     return Unauthorized();
+                CacheDatosHidricos.SetDirtyContainsKey("/Multimedia");
                 return Json(DB.MultimediaDelete(idMultimedia));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -79,6 +85,7 @@
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false)
                     return Unauthorized();
+                CacheDatosHidricos.SetDirtyContainsKey("/Multimedia");
                 return Json(DB.MultimediaTipoSave(multimediaTipo));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
@@ -94,6 +101,7 @@
                 bool isAdmin = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value == "admin";
                 if (isAdmin == false)
                     return Unauthorized();
+                CacheDatosHidricos.SetDirtyContainsKey("/Multimedia");
                 return Json(DB.MultimediaTipoDelete(idMultimediaTipo));
             } catch (Exception ex) {
                 return BadRequest(ex.Message);

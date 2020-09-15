@@ -16,7 +16,9 @@
         [Route("api/SuelosTipo/{idSueloTipo}")]
         public IHttpActionResult Get(string idSueloTipo) {
             try {
-                return Json(DB.SueloTipo(idSueloTipo));
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath , () => {
+                    return Json(DB.SueloTipo(idSueloTipo));
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }
@@ -30,7 +32,9 @@
         [Route("api/SuelosTipo/")]
         public IHttpActionResult GetList() {
             try {
-                return Json(DB.SuelosTipoList());
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
+                    return Json(DB.SuelosTipoList());
+                });
             } catch (Exception ex) {
                 return BadRequest(ex.Message);
             }

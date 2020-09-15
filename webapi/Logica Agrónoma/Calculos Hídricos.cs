@@ -48,39 +48,8 @@
             return paw33;
         }
 
-        public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC, bool definicionEtapaPorDias, int nDiasduracionEtapaDias, double? coberturaInicial, double? coberturaFinal) {
-            // !!! SIAR se añade un calculo alternativo del coeficiente cuando DefinicionPorDias = TRUE
 
-            // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
-            //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
-            //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
-            //     3.- cuando la planta brota, se calcula la cobertura
-            //     4.- se cambia la variable itomprueba si el coeficiente C existe y se aplica fórmula logarítmica o lineal
-            double ret;
-            if (nEtapa == 2)
-                nEtapa = 2;
-            if (definicionEtapaPorDias) {  // !!! propuestaSIAR && ModCobCoefB < 0) o && ModCobCoefB != -9999) { 
-                if (coberturaFinal != null && coberturaInicial != null) {
-                    ret = ((double)coberturaFinal - (double)coberturaInicial) / (double)nDiasduracionEtapaDias;
-                } else {
-                    ret = 0;
-                }
-            } else {
-                if (nEtapa == 1 && it < itEmergencia) {
-                    ret = 0;
-                } else {
-                    it = it - itEmergencia;
-                    if (ModCobCoefC != null && ModCobCoefC != 0) {
-                        ret = ModCobCoefA * ModCobCoefB * Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC)) / Math.Pow((1 + Math.Exp(-ModCobCoefB * (it - (double)ModCobCoefC))), 2);
-                    } else {
-                        ret = ModCobCoefB;
-                    }
-                }
-            }
-            return ret;
-        }
-
-        /*
+        
         /// <summary>
         /// The TasaCrecimientoCobertura.
         /// </summary>
@@ -95,9 +64,7 @@
         /// <param name="coberturaInicial">The coberturaInicial<see cref="double?"/>.</param>
         /// <param name="coberturaFinal">The coberturaFinal<see cref="double?"/>.</param>
         /// <returns>The <see cref="double"/>.</returns>
-        public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC, bool definicionEtapaPorDias, int nDiasduracionEtapaDias, double? coberturaInicial, double? coberturaFinal) {
-            // !!! SIAR se añade un calculo alternativo del coeficiente cuando DefinicionPorDias = TRUE
-
+        public static double TasaCrecimientoCobertura(double it, int nEtapa, double itEmergencia, double ModCobCoefA, double ModCobCoefB, double? ModCobCoefC, bool definicionEtapaPorDias, int nDiasduracionEtapaDias, double? coberturaInicial, double? coberturaFinal) {            
             // ((CobCoefA) * CobCoefB * EXP(-CobCoefB * (C10 - CobCoefC)))/POTENCIA((1+EXP(-CobCoefB*(C10-CobCoefC)));2)
             //     1.- La función necesita conocer el número de Etapa y la it de emergencia de la BBDD
             //     2.- Si la it es menor que la de emergencia la planta no ha brotado y no hay cobertura
@@ -126,8 +93,7 @@
             }
             return ret;
         }
-
-    */
+    
         /// <summary>
         /// The TasaCrecimientoAltura.
         /// </summary>
@@ -178,6 +144,9 @@
                     }
                 }
             }
+
+            if (ret > 1)
+                ret = ret;
             return ret;
         }
 

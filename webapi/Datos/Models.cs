@@ -216,6 +216,7 @@ namespace Models {
         public double Pluviometria { set; get; }
         public double SuperficieM2 { set; get; }
         public DateTime? FechaSiembra() => DatosOptiaqua.DB.FechaSiembra(IdUnidadCultivo, IdTemporada);
+        public double? CosteM3Agua{set; get; }
     }
 
     [TableName("UnidadCultivoCultivoEtapas")]
@@ -257,8 +258,17 @@ namespace Models {
         public bool? WebActive { get; set; }
     }
 
+
+    [TableName("AsesorUnidadCultivo")]
+    [PrimaryKey("IdRegante,IdUnidadCultivo", AutoIncrement = false)]
+    public class AsesorUnidadCultivo{
+        public int IdRegante { get; set; }
+        public string IdUnidadCultivo { get; set; }
+    }
+
     public class RegantePost {
         public int IdRegante { get; set; }
+        public int IdGadmin { get; set; }
         public string NIF { get; set; }
         public string Nombre { get; set; }
         public string Direccion { get; set; }
@@ -269,6 +279,7 @@ namespace Models {
         public string TelefonoSMS { get; set; }
         public string Telefono { get; set; }
         public string Email { get; set; }
+        public string Role { get; set; }
     }
 
     [PrimaryKey("Fecha,IdUnidadCultivo", AutoIncrement = false)]
@@ -529,12 +540,15 @@ namespace Models {
         public string UnidadCultivo { set; get; }
     }
 
-    [TableName("UnidadCultivoTemporadaCosteAgua")]
-    [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
     public class ParamPostCosteM3Agua {
         public string IdUnidadCultivo { set; get; }
         public string IdTemporada { set; get; }
         public float? CosteM3Agua { set; get; }
+    }
+
+    public class ParamAsesorUnidadCultivo {
+        public int IdRegante { set; get; }        
+        public string LUnidadesCultivo { set; get; }
     }
 
     [TableName("TipoEstres")]

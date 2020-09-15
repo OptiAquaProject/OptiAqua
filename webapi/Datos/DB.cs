@@ -191,8 +191,8 @@
             if (role == "admin")
                 return true;
             if (role == "asesor") {
-                List<string> lAsesor = DB.AsesorUnidadCultivoList(idUsuario);
-                return lAsesor.Contains(idParcela.ToString());
+                List<int> lAsesor = DB.AsesorParcelaList(idUsuario);
+                return lAsesor.Contains(idParcela);
             }
             if (role == "dbo")
                 return DB.LaParcelaPerteneceAlRegante(idUsuario, idParcela);
@@ -279,6 +279,19 @@
             return m.IdMultimedia.ToString();
         }
 
+        internal static string AsesorUnidadCultivoSave(int idRegante, List<string> lUnidadesCultivo) {
+            var db = DB.ConexionOptiaqua;
+            var regante = db.SingleById<Regante>(idRegante);
+            if (regante.Role != "asesor")
+                return "El regante indicado no tienen role de asesor";
+            db.Delete<AsesorUnidadCultivo>("wHERE IDREGANTE=@0", idRegante);
+            foreach (var iduc in lUnidadesCultivo) {
+                var reg = new AsesorUnidadCultivo { IdRegante = idRegante, IdUnidadCultivo = iduc };
+                db.Insert(reg);
+            }
+            return "Eliminada anterior lista de unidades de cultivo, se ha creado una nueva con las " + lUnidadesCultivo.Count + " unidades de cultivo indicadas";
+        }
+
         /// <summary>
         /// The MultimediaDelete.
         /// </summary>
@@ -341,17 +354,21 @@
         }
 
         /// <summary>
-        /// UnidadesDeCultivoList.
+        /// UnidadesDeCultivoList
         /// </summary>
-        /// <param name="lTemporadas">idTemporada<see cref="string"/>.</param>
-        /// <returns><see cref="object"/>.</returns>
-        public static object UnidadesDeCultivoList(List<string> lTemporadas) {
+        /// <param name="lTemporadas"></param>
+        /// <param name="idUsuario"></param>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        public static object UnidadesDeCultivoList(List<string> lTemporadas,int idUsuario,string role) {
             List<UnidadCultivoConSuperficieYGeoLoc> ret = new List<UnidadCultivoConSuperficieYGeoLoc>();
             Database db = DB.ConexionOptiaqua;
             foreach (string idTemporada in lTemporadas) {
                 string sql = "Select DISTINCT IdUnidadCultivo, IdParcelaInt, IdRegante from UnidadCultivoParcela where IdTemporada=@0 ";
                 List<UnidadCultivoConSuperficieYGeoLoc> deUnaTemporada = db.Fetch<UnidadCultivoConSuperficieYGeoLoc>(sql, idTemporada);
                 foreach (UnidadCultivoConSuperficieYGeoLoc item in deUnaTemporada) {
+                    if (!DB.EstaAutorizado(idUsuario, role, item.IdUnidadCultivo))
+                        continue;
                     List<UnidadDeCultivoParcelasValvulas> lValvulas = DB.UnidadCultivoParcelasValculas(item.IdUnidadCultivo, idTemporada);
                     item.ParcelasValvulasJson = Newtonsoft.Json.JsonConvert.SerializeObject(lValvulas);
                     item.SuperficieM2 = UnidadCultivoExtensionM2(item.IdUnidadCultivo, idTemporada);
@@ -381,15 +398,14 @@
         /// <param name="idTemporada">idTemporada<see cref="string"/>.</param>
         /// <returns><see cref="double?"/>.</returns>
         public static double UnidadCultivoTemporadaCosteM3Agua(string idUnidadCultivo, string idTemporada) {
-            if (string.IsNullOrEmpty(idTemporada))
+            if (string.IsNullOrEmpty(idTemporada) || string.IsNullOrWhiteSpace(idUnidadCultivo))
                 return 0;
-            Database db = DB.ConexionOptiaqua;
-            string sql;
-            sql = "Select CosteM3Agua from UnidadCultivoTemporadaCosteAgua where idUnidadCultivo=@0  and IdTemporada=@1;";
+            Database db = DB.ConexionOptiaqua;            
+            var sql = "Select CosteM3Agua from UnidadCultivoCultivo where idUnidadCultivo=@0  and IdTemporada=@1;";
             double? ret = db.SingleOrDefault<double?>(sql, idUnidadCultivo, idTemporada);
             if (ret == null) {
                 sql = "Select CosteM3Agua from Temporada where IdTemporada=@0;";
-                ret = db.SingleOrDefault<double?>(sql, idTemporada);
+                ret = db.FirstOrDefault<double?>(sql, idTemporada);
             }
             return ret ?? 0;
         }
@@ -426,12 +442,16 @@
         /// <param name="param">param<see cref="ParamPostCosteM3Agua"/>.</param>
         /// <returns><see cref="object"/>.</returns>
         public static object UnidadCultivoTemporadaCosteM3AguaSave(ParamPostCosteM3Agua param) {
+            if (string.IsNullOrWhiteSpace(param.IdUnidadCultivo) || string.IsNullOrWhiteSpace(param.IdTemporada))
+                return "Error en actualización";
             Database db = DB.ConexionOptiaqua;
-            ParamPostCosteM3Agua reg = db.SingleOrDefaultById<ParamPostCosteM3Agua>(param);
-            if (param.CosteM3Agua == null)
-                db.Delete(param);
-            else
-                db.Save(param);
+            if (param.CosteM3Agua <= 0 )
+                param.CosteM3Agua = null;
+            var ucc = db.SingleOrDefault<UnidadCultivoCultivo>("where IdUnidadCultivo=@0 AND IdTemporada=@1",param.IdUnidadCultivo,param.IdTemporada);
+            if (ucc != null) {
+                ucc.CosteM3Agua = param.CosteM3Agua;
+            }
+            db.Save(ucc);
             return "OK";
         }
 
@@ -590,7 +610,9 @@
             //string sql = $"SELECT IdUnidadCultivo, RiegoM3, Fecha from riegos where idUnidadCultivo='{idUnidadCultivo}' AND  fecha >=@0 and fecha<=@1";
             List<Riego> lRiegos = dbNebula.Fetch<Riego>("SELECT * FROM RIEGOS WHERE FECHA>=@0 ORDER BY FECHA", ((DateTime)ultimaActualizacion).AddDays(-5));
             Database db = DB.ConexionOptiaqua;
-            lRiegos.ForEach(x => db.Save(x));
+            var nDel=db.Delete<Riego>("WHERE FECHA>=@0", ((DateTime)ultimaActualizacion).AddDays(-5));
+            db.InsertBulk(lRiegos);
+            //lRiegos.ForEach(x => db.Save(x));
         }
 
         /// <summary>
@@ -817,6 +839,7 @@
                 dat.Provincia = provincias;
                 dat.Municipio = municipios;
                 dat.Paraje = parajes;
+                dat.FechaSiembra = DB.FechaSiembra(idUnidadCultivo, idTemporada);
             }
             return ret;
         }
@@ -847,14 +870,16 @@
 
         /// <summary>
         /// ReganteUpdate.
+        /// Retorna la clave del cliente
+        /// Si idRegane =-1 se creará nuevo
         /// </summary>
         /// <param name="rp">rp<see cref="RegantePost"/>.</param>
-        public static void ReganteUpdate(RegantePost rp) {
+        public static string ReganteUpdate(RegantePost rp) {
             Database db = DB.ConexionOptiaqua;
-            Regante regante = db.SingleOrDefaultById<Regante>(rp.IdRegante);
-            if (regante == null)
-                throw new Exception($"El Regante {rp.IdRegante} no existe");
+            var regante = new Regante();
             regante.NIF = rp.NIF;
+            regante.IdRegante = rp.IdRegante;
+            regante.IdGadmin = rp.IdGadmin;
             regante.Nombre = rp.Nombre;
             regante.Direccion = rp.Direccion;
             regante.CodigoPostal = rp.CodigoPostal;
@@ -864,8 +889,14 @@
             regante.Telefono = rp.Telefono;
             regante.TelefonoSMS = rp.TelefonoSMS;
             regante.Email = rp.Email;
+            regante.Role= rp.Role;
+            regante.WebActive = true;
             regante.Contraseña = BuildPassword(regante.NIF, "Pass" + regante.IdRegante.ToString());
+            if (regante.Role!="dbo" && regante.Role != "admin" && regante.Role != "asesor") {
+                return "Error. El role puede ser:dbo,admin,asesor";
+            }
             db.Save(regante);
+            return  "Pass" + regante.IdRegante.ToString();
         }
 
         /// <summary>
@@ -912,6 +943,11 @@
         internal static List<string> AsesorUnidadCultivoList(int idUsuario) {
             Database db = DB.ConexionOptiaqua;
             return db.Fetch<string>("select IdUnidadCultivo from AsesorUnidadCultivo where idRegante=@0", idUsuario);
+        }
+
+        internal static List<int> AsesorParcelaList(int idUsuario) {
+            Database db = DB.ConexionOptiaqua;
+            return db.Fetch<int>("select IdParcelaInt from AsesorParcelas where IdAsesor=@0 ", idUsuario);
         }
 
         /// <summary>

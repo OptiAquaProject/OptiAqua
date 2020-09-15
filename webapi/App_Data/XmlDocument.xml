@@ -738,6 +738,22 @@
             <param name="suelo">The suelo<see cref="T:Models.UnidadCultivoSuelo"/>.</param>
             <returns>The <see cref="T:System.Double"/>.</returns>
         </member>
+        <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoCobertura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Boolean,System.Int32,System.Nullable{System.Double},System.Nullable{System.Double})">
+            <summary>
+            The TasaCrecimientoCobertura.
+            </summary>
+            <param name="it">The it<see cref="T:System.Double"/>.</param>
+            <param name="nEtapa">The nEtapa<see cref="T:System.Int32"/>.</param>
+            <param name="itEmergencia">The itEmergencia<see cref="T:System.Double"/>.</param>
+            <param name="ModCobCoefA">The ModCobCoefA<see cref="T:System.Double"/>.</param>
+            <param name="ModCobCoefB">The ModCobCoefB<see cref="T:System.Double"/>.</param>
+            <param name="ModCobCoefC">The ModCobCoefC<see cref="!:double?"/>.</param>
+            <param name="definicionEtapaPorDias">The definicionEtapaPorDias<see cref="T:System.Boolean"/>.</param>
+            <param name="nDiasduracionEtapaDias">The nDiasduracionEtapaDias<see cref="T:System.Int32"/>.</param>
+            <param name="coberturaInicial">The coberturaInicial<see cref="!:double?"/>.</param>
+            <param name="coberturaFinal">The coberturaFinal<see cref="!:double?"/>.</param>
+            <returns>The <see cref="T:System.Double"/>.</returns>
+        </member>
         <member name="M:DatosOptiaqua.CalculosHidricos.TasaCrecimientoAltura(System.Double,System.Int32,System.Double,System.Double,System.Double,System.Nullable{System.Double},System.Boolean,System.Int32,System.Nullable{System.Double},System.Nullable{System.Double})">
             <summary>
             The TasaCrecimientoAltura.
@@ -1812,12 +1828,14 @@
             </summary>
             <returns><see cref="T:System.Object"/>.</returns>
         </member>
-        <member name="M:DatosOptiaqua.DB.UnidadesDeCultivoList(System.Collections.Generic.List{System.String})">
+        <member name="M:DatosOptiaqua.DB.UnidadesDeCultivoList(System.Collections.Generic.List{System.String},System.Int32,System.String)">
             <summary>
-            UnidadesDeCultivoList.
+            UnidadesDeCultivoList
             </summary>
-            <param name="lTemporadas">idTemporada<see cref="T:System.String"/>.</param>
-            <returns><see cref="T:System.Object"/>.</returns>
+            <param name="lTemporadas"></param>
+            <param name="idUsuario"></param>
+            <param name="role"></param>
+            <returns></returns>
         </member>
         <member name="M:DatosOptiaqua.DB.TipoEstres(System.String)">
             <summary>
@@ -1985,6 +2003,8 @@
         <member name="M:DatosOptiaqua.DB.ReganteUpdate(Models.RegantePost)">
             <summary>
             ReganteUpdate.
+            Retorna la clave del cliente
+            Si idRegane =-1 se creará nuevo
             </summary>
             <param name="rp">rp<see cref="T:Models.RegantePost"/>.</param>
         </member>

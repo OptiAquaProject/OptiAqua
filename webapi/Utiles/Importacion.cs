@@ -147,9 +147,6 @@
                 db.Save(uc);
                 UnidadCultivoParcelaSave(db, item.IdUnidadCultivo, idTemporada, item.IdRegante, item.IdParcelaIntList);
 
-                // Sólo si se indicar un valor la superficie se almacena valor. En caso contrario se calculará porla parcelas indicadas
-                if (item.SuperficieM2 == null || item.SuperficieM2 != 0)
-                    UnidadCultivoSuperficieSave(db, item.IdUnidadCultivo, idTemporada, (double)item.SuperficieM2);
                 {
                     // Si se indica un tipo de suelo se replica el suelo tipo para la nueva temporada.
                     // Si no se indica tipo de suelo se duplica el de la temporada anterior para la nueva temporada.
@@ -165,6 +162,10 @@
                     //Crear la Etapas de crecimiento según el cultivo indicado y al fecha de siembra
                     UnidadCultivoCultivoTemporadaSave(db, item.IdUnidadCultivo, idTemporada, item.IdCultivo, item.IdRegante, item.IdTipoRiego, item.FechaSiembra);
                 }
+                // Sólo si se indicar un valor la superficie se almacena valor. En caso contrario se calculará porla parcelas indicadas
+                if (item.SuperficieM2 == null || item.SuperficieM2 != 0)
+                    UnidadCultivoSuperficieSave(db, item.IdUnidadCultivo, idTemporada, (double)item.SuperficieM2);
+
                 db.CompleteTransaction();
             } catch (Exception ex) {
                 db.AbortTransaction();
@@ -209,7 +210,7 @@
             };
             db.Save(r);
             */
-            var ucc = db.SingleOrDefault<UnidadCultivoCultivo>("IdUnidadCultivo=@0 AND IdTemporada=@1");
+            var ucc = db.SingleOrDefault<UnidadCultivoCultivo>("WHERE IdUnidadCultivo=@0 AND IdTemporada=@1",idUnidadCultivo,idTemporada);
             if (ucc != null) {
                 ucc.SuperficieM2 = superficieM2;
                 db.Save(ucc);
