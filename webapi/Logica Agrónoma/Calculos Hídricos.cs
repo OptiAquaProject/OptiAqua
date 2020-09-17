@@ -144,9 +144,6 @@
                     }
                 }
             }
-
-            if (ret > 1)
-                ret = ret;
             return ret;
         }
 

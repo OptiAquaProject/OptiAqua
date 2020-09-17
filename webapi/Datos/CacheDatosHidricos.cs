@@ -139,11 +139,12 @@
         /// The SetDirty.
         /// </summary>
         /// <param name="idUnidadCultivo">The idUnidadCultivo<see cref="string"/>.</param>
-        internal static void SetDirty(string idUnidadCultivo) {
+        internal static void SetDirty(string idUnidadCultivo) {            
             foreach (Dictionary<string, CacheUnidadCultivo> cacheTemporada in lCacheBalances.Values) {
-                cacheTemporada.Remove(idUnidadCultivo);
-                lCacheActionResult.Clear();
+                cacheTemporada.Remove(idUnidadCultivo);                
             }
+            // Se ponen en duda todas las respuestas memorizadas.
+            lCacheActionResult.Clear();
         }
 
         /// <summary>

@@ -121,8 +121,7 @@
         [HttpPost]
         public IHttpActionResult Post([FromBody] PostDatosExtraParam param) {
             try {
-                DB.DatosExtraSave(param);
-                CacheDatosHidricos.SetDirtyContainsKey("/DatosExtra");
+                DB.DatosExtraSave(param);                
                 CacheDatosHidricos.SetDirty(param.IdUnidadCultivo);
                 return Ok(Newtonsoft.Json.JsonConvert.SerializeObject(param));
             } catch (Exception ex) {

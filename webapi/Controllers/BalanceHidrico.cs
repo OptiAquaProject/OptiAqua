@@ -72,11 +72,11 @@
         public IHttpActionResult GetDatosHidricosList(int? idRegante, string idUnidadCultivo, int? idMunicipio, string idCultivo, string fecha) {
             try {
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
-                int idReganteClamis = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
+                int idUsuario = int.Parse(identity.Claims.SingleOrDefault(c => c.Type == "IdRegante").Value);
                 string role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
 
-                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
-                    object lDatosHidricos = BalanceHidrico.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role, idReganteClamis);
+                return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath+"Usuario"+idUsuario, () => {
+                    object lDatosHidricos = BalanceHidrico.DatosHidricosList(idRegante, idUnidadCultivo, idMunicipio, idCultivo, fecha, role, idUsuario);
                     return  Json(lDatosHidricos);                    
                 });
 
