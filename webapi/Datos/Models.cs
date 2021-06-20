@@ -57,29 +57,38 @@ namespace Models {
         public double? CobInicial { get; set; }
         public double? CobFinal { get; set; }
         public double FactorAgotamiento { get; set; }
+        public double? AlturaInicial { get; set; }
+        public double? AlturaFinal { get; set; }
+        public int IdTipoCalculoCobertura { get; set; }
+        public int IdTipoCalculoAltura { get; set; }
+        public int IdTipoCalculoLongitudRaiz { get; set; }
+        public bool? SeAplicaRiego { get; set; }
+        public string ParametrosJson { get; set; }
     }
 
+    //	EtapaInicioRiego	RaízInicial	RaízMáxima	TemperaturaBase	IntegralEmergencia	Forma de calcular crecimiento raíz	Forma de calcular cobertura	Forma de calcular crecimiento altura
     [TableName("Cultivo")]
     [PrimaryKey("IdCultivo", AutoIncrement = false)]
     public class Cultivo {
         public int IdCultivo { get; set; }
         public string Nombre { get; set; }
-        public double TBase { get; set; }
+        public double? TBase { get; set; }
         public double ProfRaizInicial { get; set; }
         public double ProfRaizMax { get; set; }
-        public double ModCobCoefA { get; set; }
-        public double ModCobCoefB { get; set; }
-        public double? ModCobCoefC { get; set; }
-        public double ModAltCoefA { get; set; }
-        public double ModAltCoefB { get; set; }
-        public double? ModAltCoefC { get; set; }
-        public double ModRaizCoefA { get; set; }
-        public double ModRaizCoefB { get; set; }
-        public double? ModRaizCoefC { get; set; }
-        public double? AlturaInicial { get; set; }
-        public double? AlturaFinal { get; set; }
+         //     public double ModCobCoefA { get; set; }
+         //     public double ModCobCoefB { get; set; }
+         //     public double? ModCobCoefC { get; set; }
+         //     public double ModAltCoefA { get; set; }
+         //     public double ModAltCoefB { get; set; }
+         //     public double? ModAltCoefC { get; set; }
+         //     public double ModRaizCoefA { get; set; }
+         //     public double ModRaizCoefB { get; set; }
+         //     public double? ModRaizCoefC { get; set; }
+        //public double? AlturaInicial { get; set; }
+        //public double? AlturaFinal { get; set; }
         public double IntegralEmergencia { get; set; }
-        public int EtapaInicioRiego { get; set; }
+        //public int EtapaInicioRiego { get; set; }
+        public string ParametrosJson { get; set; }
     }
 
     [TableName("UnidadCultivoParcela")]
@@ -196,15 +205,6 @@ namespace Models {
         public string Paraje { get; set; }
     }
 
-
-
-    [TableName("ParcelaValvula")]
-    [PrimaryKey("IdParcelaInt,IdValcula", AutoIncrement = false)]
-    public class ParcelaValvula {
-        public int IdParcelaInt { get; set; }
-        public int IdValvula { get; set; }
-    }
-
     [TableName("UnidadCultivoCultivo")]
     [PrimaryKey("IdUnidadCultivo,IdTemporada", AutoIncrement = false)]
     public class UnidadCultivoCultivo {
@@ -234,8 +234,15 @@ namespace Models {
         public double KcFinal { get; set; }
         public double? CobInicial { get; set; }
         public double? CobFinal { get; set; }
+        public double? AlturaInicial { get; set; }
+        public double? AlturaFinal { get; set; }
         public double FactorDeAgotamiento { get; set; }
         public string IdTipoEstres { get; set; }
+        public int IdTipoCalculoCobertura { get; set; }
+        public int IdTipoCalculoAltura{ get; set; }
+        public int IdTipoCalculoLongitudRaiz { get; set; }
+        public bool? SeAplicaRiego { get; set; }
+        public string ParametrosJson { get; set; }
     }
 
     [TableName("Regante")]
@@ -335,7 +342,7 @@ namespace Models {
         public double TasaCrecimientoAltura { get; set; }
         public double AlturaCultivo { get; set; }
         public double DiasMaduracion { get; set; }
-        public int NumeroEtapaDesarrollo { get; set; } = 1;
+        public int NumeroEtapaDesarrollo { get; set; }  = 1;
         public string NombreEtapaDesarrollo { get; set; }
         public double Kc { get; set; }
         public double KcAjustadoClima { get; set; }
@@ -376,6 +383,11 @@ namespace Models {
         public string MensajeEstres { set; get; }
         public string DescripcionEstres { set; get; }
         public string ColorEstres { set; get; }
+
+        public double UmbralInferiorOptimo { set; get; }
+        public double UmbralInferiorRiego { set; get; }
+        public double UmbralSuperiorRiegoOptimoRefPM { get; internal set; }
+        public double UmbralInferiorRiegoOptimoRefPM { get; internal set; }
     }
 
     [TableName("Temporada")]
@@ -434,6 +446,7 @@ namespace Models {
         public string ColorEstres { set; get; }
 
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
+        public string HidranteTomaJson { set; get; }
         public double Consumo { get; set; }
         public double AguaTotalPerdidaDrenaje { get; set; }
         public int NumDiasEstresPorDrenaje { set; get; }
@@ -556,8 +569,9 @@ namespace Models {
     public class TipoEstres {
         public string IdTipoEstres { get; set; }
         public string Estres { get; set; }
-        public int? IdUmbralInferiorRiego { get; set; }
-        public int? IdUmbralSuperiorRiego { get; set; }
+        public int IdUmbralInferiorRiego { get; set; }
+        public int IdUmbralSuperiorRiego { get; set; }
+        public int IdUmbralOptimoRiego { get; set; }
     }
 
     [TableName("TipoEstresUmbral")]
@@ -599,7 +613,7 @@ namespace Models {
         public string Alias { get; set; }
         public double? SuperficieM2 { get; set; }
         public string GeoLocJson { set; get; }  // List<GeoLocParcela> ->Json 
-        public string ParcelasValvulasJson { set; get; }  // List<UnidadCultivoParcelasValvulas> ->Json 
+        public string Hidrantes { set; get; }  // Hidrantes separados por #
     }
 
     public class ProvinciaMunicipioParaje {
@@ -628,24 +642,10 @@ namespace Models {
         public string Municipio { get; set; }
         public string Paraje { get; set; }
         public string TipoSueloDescripcion { get; set; }
-    }
-
-    public class Valvula {
-        public int IdValvula { set; get; }
-    }
-
-    public class UnidadDeCultivoParcelasValvulas {
-        public string IdUnidadCultivo { get; set; }
-        public string IdTemporada { get; set; }
-        public int IdParcelaInt { get; set; }
-        public double SuperficieM2 { get; set; }
-        public string RefCatastral { get; set; }
-        public int IdProvincia { get; set; }
-        public int IdPoligono { get; set; }
-        public string IdParcela { get; set; }
-        public string Paraje { get; set; }
-        public string Municipio { get; set; }
-        public List<Valvula> LIdValvula { get; set; }
+        public string Hidrantes { get; set; }
+        public string RefCatastrales { get; set; }
+        public string Poligonos { get; set; }
+        public string Parcelas { get; set; }
     }
 
     [TableName("Multimedia")]

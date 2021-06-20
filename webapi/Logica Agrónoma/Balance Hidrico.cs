@@ -101,7 +101,7 @@
                 if (lin.Fecha <= fecha) {
                     sumaRiego += lin.Riego;
                     sumaRiegoEfec += lin.RiegoEfectivo;
-                         }
+                }
             }
             return (sumaRiego - sumaRiegoEfec);
         }
@@ -285,13 +285,14 @@
             int diasDesdeSiembra = 1;
             if (unidadCultivoDatosHidricos.nEtapas <= 0)
                 throw new Exception("No se han definido etapas para la unidad de cultivo: " + unidadCultivoDatosHidricos.IdUnidadCultivo);
-            while (fecha <= fechaFinalEstudio) {
-                LineaBalance lineaBalance = CalculosHidricos.CalculaLineaBalance(unidadCultivoDatosHidricos, lbAnt, fecha);
+            while (fecha <= fechaFinalEstudio && fecha <= DateTime.Today) {
+                LineaBalance lineaBalance = null;
+                lineaBalance = CalculosHidricos.CalculaLineaBalance(unidadCultivoDatosHidricos, lbAnt, fecha);
                 lineaBalance.DiasDesdeSiembra = diasDesdeSiembra++;
                 LineasBalance.Add(lineaBalance);
                 lbAnt = lineaBalance;
                 fecha = fecha.AddDays(1);
-                if (lineaBalance.NumeroEtapaDesarrollo < unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count )
+                if (lineaBalance.NumeroEtapaDesarrollo < unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count)
                     fechaFinalEstudio = fecha.AddDays(1);
                 else {
                     int duracionEtapa = unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList[unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList.Count - 1].DuracionDiasEtapa;
@@ -301,8 +302,8 @@
             if (actualizaEtapas)
                 DB.FechasEtapasSave(unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList);
 
-            LineasBalance.RemoveAll(x => x.Fecha > DateTime.Today.AddDays(-1));            
-            
+            LineasBalance.RemoveAll(x => x.Fecha > DateTime.Today.AddDays(-1));
+
         }
 
         /// <summary>
@@ -330,7 +331,7 @@
             double? ret = (totalMm / 1000) * precioM3 * superficieM2;
             return ret ?? 0;
         }
-        
+
         /// <summary>
         /// LineaBalance.
         /// </summary>
@@ -361,7 +362,7 @@
             LineaBalance linBalAFecha = LineasBalance.Find(x => x.Fecha == fecha);
             if (linBalAFecha == null) {
                 linBalAFecha = LineasBalance.Last();
-                fecha =(DateTime) linBalAFecha.Fecha;
+                fecha = (DateTime)linBalAFecha.Fecha;
             }
             unidadCultivoDatosHidricos.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);
             DatosEstadoHidrico ret = new DatosEstadoHidrico {
@@ -511,10 +512,9 @@
             ret.LimiteAgotamientoRefPM = lb.LimiteAgotamientoRefPM;
             ret.LimiteAgotamientoFijoRefPM = lb.LimiteAgotamientoFijoRefPM;
 
-            ret.AlturaFinal = unidadCultivoDatosHidricos.CultivoAlturaFinal ?? 0;
-            ret.AlturaInicial = unidadCultivoDatosHidricos.CultivoAlturaInicial ?? 0;
+            ret.AlturaInicial = unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo - 1].AlturaInicial ?? 0;
+            ret.AlturaFinal = unidadCultivoDatosHidricos.UnidadCultivoCultivoEtapasList[lb.NumeroEtapaDesarrollo - 1].AlturaFinal ?? 0;
             ret.Altura = lb.AlturaCultivo;
-
             ret.Cobertura = lb.Cobertura;
 
             ret.ProfRaizInicial = unidadCultivoDatosHidricos.CultivoProfRaizInicial;
@@ -559,8 +559,8 @@
                 lValidas = lIdUnidadCultivo.Intersect(lAsesorUCList).ToList();
             } else {// usuario
                 foreach (string uc in lIdUnidadCultivo) {
-                    string idTemporada = DB.TemporadaDeFecha(uc, dFecha);
-                    if (DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(uc, idUsuario, idTemporada))
+                    var idTemp= DB.TemporadaDeFecha(uc, dFecha);
+                    if (DB.LaUnidadDeCultivoPerteneceAlReganteEnLaTemporada(uc, idUsuario, idTemp))
                         lValidas.Add(uc);
                 }
             }
@@ -569,20 +569,22 @@
             UnidadCultivoDatosHidricos dh = null;
             BalanceHidrico bh = null;
             List<GeoLocParcela> lGeoLocParcelas = null;
+            string idTemporada="";
             foreach (string idUc in lValidas) {
                 try {
                     lGeoLocParcelas = null;
-                    string idTemporada = DB.TemporadaDeFecha(idUc, dFecha);
+                    idTemporada = DB.TemporadaDeFecha(idUc, dFecha);
                     if (idTemporada != null) {
                         lGeoLocParcelas = DB.GeoLocParcelasList(idUc, idTemporada);
                         bh = BalanceHidrico.Balance(idUc, dFecha);
                         datosEstadoHidrico = bh.DatosEstadoHidrico(dFecha);
                         datosEstadoHidrico.GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas);
+                        datosEstadoHidrico.HidranteTomaJson = DB.HidrantesListJson(idUc, idTemporada);
                         ret.Add(datosEstadoHidrico);
                     }
                 } catch (Exception ex) {
                     dh = bh.unidadCultivoDatosHidricos;
-                    dh.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);
+                    dh.ObtenerMunicicioParaje(out string provincias, out string municipios, out string parajes);                    
                     datosEstadoHidrico = new DatosEstadoHidrico {
                         Fecha = dFecha,
                         Pluviometria = dh.Pluviometria,
@@ -608,6 +610,7 @@
                         NParcelas = dh.NParcelas,
                         Textura = "",
                         GeoLocJson = Newtonsoft.Json.JsonConvert.SerializeObject(lGeoLocParcelas),
+                        HidranteTomaJson = DB.HidrantesListJson(idUc, idTemporada),
                         Status = "ERROR:" + ex.Message
                     };
                     ret.Add(datosEstadoHidrico);

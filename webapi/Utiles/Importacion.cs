@@ -117,6 +117,7 @@
                         FechaSiembra = DateTime.Parse(lItemsLinea[8]),
                         IdTipoRiego = int.Parse(lItemsLinea[9]),
                         SuperficieM2 = double.Parse(lItemsLinea[10])
+                        
                     };
                     Importar(item, param.IdTemporada, param.IdTemporadaAnterior);
                 } catch (Exception ex) {
@@ -142,7 +143,7 @@
                     Alias = item.Alias,
                     IdEstacion = item.IdEstacion,
                     IdRegante = item.IdRegante,
-                    TipoSueloDescripcion = item.IdSueloTipo
+                    TipoSueloDescripcion = item.IdSueloTipo                    
                 };
                 db.Save(uc);
                 UnidadCultivoParcelaSave(db, item.IdUnidadCultivo, idTemporada, item.IdRegante, item.IdParcelaIntList);
@@ -186,10 +187,10 @@
                 IdUnidadCultivo = idUnidadCultivo,
                 IdTemporada = idTemporada,
                 IdParcelaInt = 0,
-                IdRegante = idRegante,
+                IdRegante = idRegante                
             };
             lIdParcelaInt.ForEach(x => {
-                ucp.IdParcelaInt = x;
+                ucp.IdParcelaInt = x;                
                 db.Save(ucp);
             });
         }
@@ -260,7 +261,7 @@
                     IdRegante = idRegante,
                     IdTemporada = idTemporada,
                     IdTipoRiego = idTipoRiego,
-                    Pluviometria = DB.PluviometriaTipica(idTipoRiego)
+                    Pluviometria = DB.PluviometriaTipica(idTipoRiego)                    
                 };
                 db.Insert(uniCulCul);
 
@@ -279,16 +280,23 @@
                         IdTipoEstres = cf.IdTipoEstres,
                         DuracionDiasEtapa = cf.DuracionDiasEtapa,
                         Etapa = cf.Etapa,
-                        FechaInicioEtapa = fechaEtapa
+                        FechaInicioEtapa = fechaEtapa,
+                        IdTipoCalculoAltura=cf.IdTipoCalculoAltura,
+                        IdTipoCalculoCobertura=cf.IdTipoCalculoCobertura,
+                        IdTipoCalculoLongitudRaiz=cf.IdTipoCalculoLongitudRaiz,
+                        SeAplicaRiego=cf.SeAplicaRiego,
+                        ParametrosJson=cf.ParametrosJson,
+                        CobInicial=cf.CobInicial,
+                        CobFinal=cf.CobFinal,
+                        DefinicionPorDias=cf.DefinicionPorDias,
+                        FactorDeAgotamiento=cf.FactorAgotamiento,
+                        KcFinal=cf.KcFinal,
+                        KcInicial=cf.KcInicial,
+                        FechaInicioEtapaConfirmada=null,
+                        AlturaFinal=cf.AlturaFinal,
+                        AlturaInicial=cf.AlturaInicial
                     };
-                    fechaEtapa = fechaEtapa.AddDays(cf.DuracionDiasEtapa);
-                    pcf.FechaInicioEtapaConfirmada = null;
-                    pcf.DefinicionPorDias = cf.DefinicionPorDias;
-                    pcf.KcInicial = cf.KcInicial;
-                    pcf.KcFinal = cf.KcFinal;
-                    pcf.CobInicial = cf.CobInicial;
-                    pcf.CobFinal = cf.CobFinal;
-                    pcf.FactorDeAgotamiento = cf.FactorAgotamiento;
+                    fechaEtapa = fechaEtapa.AddDays(cf.DuracionDiasEtapa);                    
                     db.Insert(pcf);
                 }
                 return;
@@ -319,7 +327,7 @@
                         Limo = st.Limo,
                         MateriaOrganica = st.MateriaOrganica,
                         ProfundidadHorizonte = st.Profundidad,
-                        IdTemporada = idTemporada
+                        IdTemporada = idTemporada                     
                     };
                     db.Save(ucs);
                 }

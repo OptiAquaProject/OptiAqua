@@ -21,6 +21,14 @@ namespace webapi
 
             //SqlServerTypes.Utilities.LoadNativeAssemblies(Server.MapPath("~/bin"));
 
+            //var tt = DB.HidrantesListJson("2467_R1", "T2021");
+            //DB.ImportarHidrantes();
+            //DB.AlturaInicialYFInal();
+            //DB.QuitarParametrosJson();
+            //DB.PropagarJsonCultivo();
+            //DB.PropagarEtapas2();
+            //DB.CrearJson1();
+            //DB.CrearJson2();
             //Elimino que el sistema devuelva en XML, sólo trabajaremos con JSON
             GlobalConfiguration.Configuration.Formatters.Remove(GlobalConfiguration.Configuration.Formatters.XmlFormatter);
             AreaRegistration.RegisterAllAreas();

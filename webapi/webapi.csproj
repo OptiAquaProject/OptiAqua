@@ -228,6 +228,7 @@
     <Compile Include="Logica Agrónoma\Balance Hidrico.cs" />
     <Compile Include="Datos\DatosHidricos.cs" />
     <Compile Include="Datos\DB.cs" />
+    <Compile Include="Utiles\ParametrosCalculos.cs" />
     <Compile Include="Utiles\Importacion.cs" />
     <Compile Include="Datos\CacheDatosHidricos.cs" />
     <Compile Include="Datos\Models.cs" />

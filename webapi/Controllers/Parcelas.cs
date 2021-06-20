@@ -51,7 +51,7 @@
                     var idTemporada = DB.TemporadaDeFecha(idUnidadCultivo, dFecha);
                     if (!DB.EstaAutorizado(idUsuario, role, idUnidadCultivo, idTemporada))
                         return Unauthorized();
-                    return Json(DB.ParcelasList(idUnidadCultivo, idTemporada));
+                    return Json(DB.IdParcelasList(idUnidadCultivo, idTemporada));
                 });
 
             } catch (Exception ex) {

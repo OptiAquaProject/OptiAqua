@@ -2,6 +2,7 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using Utiles;
 
     /// <summary>
     /// Define <see cref="UnidadCultivoDatosHidricos" />
@@ -144,6 +145,9 @@
         /// </summary>
         public List<UnidadCultivoCultivoEtapas> UnidadCultivoCultivoEtapasList { get; private set; }
 
+        public ParametrosEtapasCalculos ParametrosEtapas { get; private set; }
+        public ParametrosCultivoCalculos ParametrosCultivo { get; private set; }
+
         /// <summary>
         /// Retorna primera fecha de las etapas como fecha de siembra.
         /// En caso de que no existandatos retorna fecha actual.
@@ -189,52 +193,23 @@
         /// <summary>
         /// Gets the CultivoTBase.
         /// </summary>
-        public double CultivoTBase => cultivo.TBase;
+        public double CultivoTBase => cultivo.TBase??0;
 
         /// <summary>
         /// Gets the CultivoIntegralEmergencia.
         /// </summary>
         public double CultivoIntegralEmergencia => cultivo.IntegralEmergencia;
 
-        /// <summary>
-        /// Gets the CultivoModCobCoefA.
-        /// </summary>
-        public double CultivoModCobCoefA => cultivo.ModCobCoefA;
-
-        /// <summary>
-        /// Gets the CultivoModCobCoefB.
-        /// </summary>
-        public double CultivoModCobCoefB => cultivo.ModCobCoefB;
-
-        /// <summary>
-        /// Gets the CultivoModCobCoefC.
-        /// </summary>
-        public double? CultivoModCobCoefC => cultivo.ModCobCoefC;
-
+       
         /// <summary>
         /// Gets the CultivoAlturaFinal.
         /// </summary>
-        public double? CultivoAlturaFinal => cultivo.AlturaFinal;
+        //public double? CultivoAlturaFinal => cultivo.AlturaFinal;
 
         /// <summary>
         /// Gets the CultivoAlturaInicial.
         /// </summary>
-        public double? CultivoAlturaInicial => cultivo.AlturaInicial;
-
-        /// <summary>
-        /// Gets the CultivoModAltCoefA.
-        /// </summary>
-        public double CultivoModAltCoefA => cultivo.ModAltCoefA;
-
-        /// <summary>
-        /// Gets the CultivoModAltCoefB.
-        /// </summary>
-        public double CultivoModAltCoefB => cultivo.ModAltCoefB;
-
-        /// <summary>
-        /// Gets the CultivoModAltCoefC.
-        /// </summary>
-        public double? CultivoModAltCoefC => cultivo.ModAltCoefC;
+        //public double? CultivoAlturaInicial => cultivo.AlturaInicial;
 
         /// <summary>
         /// Gets the CultivoProfRaizInicial.
@@ -247,30 +222,10 @@
         public double CultivoProfRaizMax => cultivo.ProfRaizMax;
 
         /// <summary>
-        /// Gets the CultivoModRaizCoefA.
-        /// </summary>
-        public double CultivoModRaizCoefA => cultivo.ModRaizCoefA;
-
-        /// <summary>
-        /// Gets the CultivoModRaizCoefB.
-        /// </summary>
-        public double CultivoModRaizCoefB => cultivo.ModRaizCoefB;
-
-        /// <summary>
-        /// Gets the CultivoModRaizCoefC.
-        /// </summary>
-        public double? CultivoModRaizCoefC => cultivo.ModRaizCoefC;
-
-        /// <summary>
         /// Gets the ListaUcSuelo.
         /// </summary>
         public List<UnidadCultivoSuelo> ListaUcSuelo { get; private set; }
-
-        /// <summary>
-        /// Gets the EtapaInicioRiego.
-        /// </summary>
-        public int EtapaInicioRiego => cultivo.EtapaInicioRiego;
-
+  
         // Devuelve los límites inferior y superior para la etapa indicada.
         // de la etapa se optiene el tipo de estres (con idUmbralInferior Riego y idUmbralSuperiorRiego)
         // Los valores de los límite inferior y superior se obtienen de la lista de umbrales. Buscando por identificador.
@@ -344,8 +299,11 @@
             if ((UnidadCultivoCultivoEtapasList = DB.UnidadCultivoCultivoEtapasList(idUnidadCultivo, idTemporada)).Count == 0)
                 throw new Exception($"Imposible cargar las etapas para la unidad de cultivo {idUnidadCultivo}.");
 
+            ParametrosEtapas = DeserializaParamtros(UnidadCultivoCultivoEtapasList);
+            
             if ((unidadCultivoCultivo = DB.UnidadCultivoCultivo(idUnidadCultivo, idTemporada)) == null)
                 throw new Exception("Imposible datos del cultivo en la temporada indicada.");
+            
 
             lTiposEstres = DB.ListaTipoEstres();
             lTipoEstresUmbralList = DB.ListaEstresUmbral();
@@ -354,6 +312,7 @@
                 throw new Exception($"Imposible cargar datos climáticos para la estación {unidadCultivo.IdEstacion}  en el intervalo de fechas de {FechaSiembra()} a {FechaFinalDeEstudio()}");
 
             cultivo = DB.Cultivo(unidadCultivoCultivo.IdCultivo);
+            ParametrosCultivo = Newtonsoft.Json.JsonConvert.DeserializeObject<ParametrosCultivoCalculos>(cultivo.ParametrosJson);
             estacion = DB.Estacion(unidadCultivo.IdEstacion);
             regante = (Regante)DB.Regante(unidadCultivoCultivo.IdRegante);
 
@@ -367,6 +326,19 @@
             lDatosRiego = DB.RiegosList(idUnidadCultivo, fechaSiembra, fechaFinal);
 
             lUnidadCultivoDatosExtas = DB.ParcelasDatosExtrasList(idUnidadCultivo, fechaSiembra, fechaFinal);
+        }
+
+        private ParametrosEtapasCalculos DeserializaParamtros(List<UnidadCultivoCultivoEtapas> unidadCultivoCultivoEtapasList) {
+            var ret = new ParametrosEtapasCalculos();
+            foreach( var ucce in unidadCultivoCultivoEtapasList) {
+                if (ucce.ParametrosJson == null) {
+                    ret.Add(new Dictionary<string, double>());
+                } else {
+                    var d = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, double>>(ucce.ParametrosJson);
+                    ret.Add(d);
+                }
+            }
+            return ret;
         }
 
         /// <summary>
@@ -550,11 +522,43 @@
         /// The CultivoEtapasList_Ndias1y2.
         /// </summary>
         /// <returns>The <see cref="int"/>.</returns>
-        public int CultivoEtapasList_Ndias1y2() {
+        public int CultivoEtapasListNdias1y2_sin_uso() {
             if (UnidadCultivoCultivoEtapasList == null)
                 return 0;
             int ret = UnidadCultivoCultivoEtapasList.Count > 1 ? UnidadCultivoCultivoEtapasList[0].DuracionDiasEtapa : 0;
             ret += UnidadCultivoCultivoEtapasList.Count > 2 ? UnidadCultivoCultivoEtapasList[1].DuracionDiasEtapa : 0;
+            return ret;
+        }
+
+        internal double UmbralSuperiorRiego(int numeroEtapaDesarrollo){
+            if (UnidadCultivoCultivoEtapasList.Count <= numeroEtapaDesarrollo)
+                return double.MinValue;
+            var idTipoEstres = UnidadCultivoCultivoEtapasList[numeroEtapaDesarrollo].IdTipoEstres;
+            if (idTipoEstres==null)
+                return double.MinValue;
+            if (!lTiposEstres.ContainsKey(idTipoEstres))
+                return double.MinValue;
+            var indiceEstres = lTiposEstres[idTipoEstres].IdUmbralSuperiorRiego;            
+            var lEstresUmbral = lTipoEstresUmbralList[idTipoEstres];
+            if (lEstresUmbral.Count <= indiceEstres)
+                return double.MinValue;
+            var ret = lEstresUmbral[(int)indiceEstres].UmbralMaximo;
+            return ret;
+        }
+
+        internal double UmbralOptimoRiego(int numeroEtapaDesarrollo) {
+            if (UnidadCultivoCultivoEtapasList.Count <= numeroEtapaDesarrollo)
+                return double.MinValue;
+            var idTipoEstres = UnidadCultivoCultivoEtapasList[numeroEtapaDesarrollo].IdTipoEstres;
+            if (idTipoEstres == null)
+                return double.MinValue;
+            if (!lTiposEstres.ContainsKey(idTipoEstres))
+                return double.MinValue;
+            var indiceEstres = lTiposEstres[idTipoEstres].IdUmbralOptimoRiego;
+            var lEstresUmbral = lTipoEstresUmbralList[idTipoEstres];
+            if (lEstresUmbral.Count <= indiceEstres)
+                return double.MinValue;
+            var ret = lEstresUmbral[(int)indiceEstres].UmbralMaximo;
             return ret;
         }
     }

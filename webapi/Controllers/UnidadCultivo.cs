@@ -183,18 +183,20 @@
         /// <summary>
         /// Lista datos ampliados de unidades de cultivos con filtros
         /// </summary>
-        /// <param name="Fecha"></param>
-        /// <param name="IdUnidadCultivo"></param>
-        /// <param name="IdRegante"></param>
-        /// <param name="IdCultivo"></param>
-        /// <param name="IdMunicipio"></param>
-        /// <param name="IdTipoRiego"></param>
-        /// <param name="IdEstacion"></param>
-        /// <param name="Search"></param>
+        /// <param name="fecha"></param>
+        /// <param name="idUnidadCultivo"></param>
+        /// <param name="idRegante"></param>
+        /// <param name="idCultivo"></param>
+        /// <param name="idMunicipio"></param>
+        /// <param name="idTipoRiego"></param>
+        /// <param name="idEstacion"></param>
+        /// <param name="idPoligono"></param>
+        /// <param name="idParcela"></param>
+        /// <param name="search"></param>     
         /// <returns></returns>
         [Authorize]
-        [Route("api/UnidadCultivoList/{Fecha}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{Search}")]
-        public IHttpActionResult GetUnidadCultivoList(string Fecha, string IdUnidadCultivo, string IdRegante, string IdCultivo, string IdMunicipio, string IdTipoRiego, string IdEstacion, string Search) {
+        [Route("api/UnidadCultivoList/{Fecha}/{IdUnidadCultivo}/{IdRegante}/{IdCultivo}/{IdMunicipio}/{IdTipoRiego}/{IdEstacion}/{IdPoligono}/{IdParcela}/{Search}")]
+        public IHttpActionResult GetUnidadCultivoList(string fecha, string idUnidadCultivo, string idRegante, string idCultivo, string idMunicipio, string idTipoRiego, string idEstacion, string idPoligono, string idParcela, string search) {
             try {
 
                 ClaimsIdentity identity = Thread.CurrentPrincipal.Identity as ClaimsIdentity;
@@ -202,13 +204,13 @@
                 var role = identity.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Role).Value;
 
                 var idTemporada = "";
-                if (DateTime.TryParse(Fecha, out var dFecha))
-                    idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo.Unquoted(), dFecha);
+                if (DateTime.TryParse(fecha, out var dFecha))
+                    idTemporada = DB.TemporadaDeFecha(idUnidadCultivo.Unquoted(), dFecha);
                 else
                     idTemporada = DB.TemporadaActiva();
 
                 return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath + "Usuario" + idUsuario.ToString(), () => {
-                    var ret = Json(DB.UnidadCultivoList(idTemporada, IdUnidadCultivo, IdRegante, IdCultivo, IdMunicipio, IdTipoRiego, IdEstacion, Search,idUsuario,role));
+                    var ret = Json(DB.UnidadCultivoList(idTemporada, idUnidadCultivo, idRegante, idCultivo, idMunicipio, idTipoRiego, idEstacion,idPoligono,idParcela, search,idUsuario,role));
                     return ret;
                 });
                 
@@ -249,16 +251,12 @@
         [Route("api/UnidadCultivoDatosAmpliados/{Fecha}/{IdUnidadCultivo}")]
         public IHttpActionResult GetUnidadCultivoDatosAmpliados(string Fecha, string IdUnidadCultivo) {
             try {
-
-
-                string idTemporada;
-                if (string.IsNullOrWhiteSpace(Fecha))
-                    idTemporada = "";
-                else
-                    idTemporada = DB.TemporadaDeFecha(IdUnidadCultivo, DateTime.Parse(Fecha));
+                DateTime FechaEstudio = DateTime.Today;
+                if (!string.IsNullOrWhiteSpace(Fecha))
+                    FechaEstudio = DateTime.Parse(Fecha);
 
                 return CacheDatosHidricos.Cache(Request.RequestUri.AbsolutePath, () => {
-                    var ret =Json(DB.UnidadCultivoDatosAmpliados(idTemporada, IdUnidadCultivo));
+                    var ret =Json(DB.UnidadCultivoDatosAmpliados(FechaEstudio, IdUnidadCultivo.Unquoted()));
                     return ret;
                 });
 
@@ -305,7 +303,6 @@
             }
         }
 
-
         [Authorize]
         [HttpGet]
         [Route("api/AsesorUnidadCultivo/{IdRegante}")]
@@ -324,8 +321,8 @@
         [Route("api/AsesorUnidadCultivo/")]
         public IHttpActionResult PostAsesorUnidadCultivo([FromBody] ParamAsesorUnidadCultivo param) {
             try {
-                param.LUnidadesCultivo = param.LUnidadesCultivo.Replace(";", ",");
-                var lUnidadesCultivo = param.LUnidadesCultivo.Split(',').ToList();
+                param.LUnidadesCultivo = param.LUnidadesCultivo.Replace(";", "#");
+                var lUnidadesCultivo = param.LUnidadesCultivo.Split('#').ToList();
                 foreach( var iuc in lUnidadesCultivo) 
                     CacheDatosHidricos.SetDirty(iuc);
                 return Json(DB.AsesorUnidadCultivoSave(param.IdRegante,lUnidadesCultivo));
